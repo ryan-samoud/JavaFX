@@ -1,0 +1,15 @@
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\controller\DashboardController.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\controller\HomeController.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\controller\MainController.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\controller\TournamentsController.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\controller\TournamentsPublicController.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\controller\UsersController.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\dao\TournamentDAO.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\dao\UserDAO.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\MainApp.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\model\Player.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\model\Team.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\model\Tournament.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\model\User.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\service\AuthService.java
+C:\Users\Rana\Downloads\esports-app-nexus-redesigned (5)\esports-redesigned-final\src\main\java\com\esports\utils\DatabaseConnection.java
