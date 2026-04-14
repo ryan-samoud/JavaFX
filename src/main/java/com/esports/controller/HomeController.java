@@ -8,7 +8,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -138,12 +141,52 @@ public class HomeController implements Initializable {
         if (lblConnectedUser != null) lblConnectedUser.setText("✔ " + name);
         if (lblAvatar != null && AuthService.getCurrentUser() != null) {
             User u = AuthService.getCurrentUser();
-            lblAvatar.setText(getInitials(u.getNom(), u.getPrenom()));
+            setAvatar(u);
         }
         if (btnDeconnexion != null) { btnDeconnexion.setVisible(true);  btnDeconnexion.setManaged(true); }
         if (btnConnexion   != null) { btnConnexion.setVisible(false);   btnConnexion.setManaged(false); }
         if (btnInscrire    != null) { btnInscrire.setVisible(false);    btnInscrire.setManaged(false); }
         if (btnAdmin       != null) { btnAdmin.setVisible(isAdmin);     btnAdmin.setManaged(isAdmin); }
+    }
+
+    private void setAvatar(User u) {
+        String photo = u.getPhoto();
+        if (photo != null && !photo.isBlank()) {
+            try {
+                Image img = photo.startsWith("http") || photo.startsWith("file:")
+                        ? new Image(photo, 36, 36, false, true, true)
+                        : new Image("file:" + photo, 36, 36, false, true, true);
+
+                if (!img.isError()) {
+                    ImageView iv = new ImageView(img);
+                    iv.setFitWidth(36);
+                    iv.setFitHeight(36);
+                    iv.setPreserveRatio(false);
+
+                    Circle clip = new Circle(18, 18, 18);
+                    iv.setClip(clip);
+
+                    lblAvatar.setGraphic(iv);
+                    lblAvatar.setText("");
+                    lblAvatar.setStyle(
+                            "-fx-background-color: transparent;" +
+                            "-fx-background-radius: 50%;" +
+                            "-fx-min-width: 36px; -fx-min-height: 36px;" +
+                            "-fx-max-width: 36px; -fx-max-height: 36px;" +
+                            "-fx-padding: 0; -fx-cursor: hand;");
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+        // Fallback: initials
+        lblAvatar.setGraphic(null);
+        lblAvatar.setText(getInitials(u.getNom(), u.getPrenom()));
+        lblAvatar.setStyle(
+                "-fx-background-color: linear-gradient(to bottom right,#7c3aed,#ec4899);" +
+                "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 50%;" +
+                "-fx-min-width: 36px; -fx-min-height: 36px;" +
+                "-fx-max-width: 36px; -fx-max-height: 36px; -fx-cursor: hand;");
     }
 
     private void showLoggedOutNavbar() {

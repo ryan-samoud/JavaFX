@@ -430,6 +430,17 @@
     -fx-font-size: 14px;
 }
 
+/* ─── PAGE SUBTITLE ────────────────────────── */
+.page-subtitle {
+    -fx-text-fill: #7c6fa8;
+    -fx-font-size: 12px;
+}
+
+/* ─── TOPBAR ICON ───────────────────────────── */
+.topbar-icon {
+    -fx-font-size: 22px;
+}
+
 /* ─── ROLE BADGES ──────────────────────────── */
 .role-admin {
     -fx-background-color: rgba(168,85,247,0.2);
