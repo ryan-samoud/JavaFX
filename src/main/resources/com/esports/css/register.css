@@ -1,0 +1,20 @@
+/* register.css */
+
+.field-label {
+    -fx-text-fill: #c4b5fd;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.radio-role {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+.radio-role .radio {
+    -fx-border-color: #a855f7;
+    -fx-border-radius: 50%;
+}
+.radio-role:selected .dot {
+    -fx-background-color: #a855f7;
+}

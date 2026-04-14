@@ -46,9 +46,22 @@
             <Label text="🏆" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
             <Label text="🛒" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
 
-            <Label fx:id="lblConnectedUser" text="" 
-                   style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"
-                   visible="false" managed="false"/>
+            <!-- Avatar cercle + nom — visible quand connecté -->
+            <HBox fx:id="hboxUserNav" visible="false" managed="false"
+                  alignment="CENTER_LEFT" spacing="8">
+                <Button fx:id="lblAvatar"
+                        text=""
+                        onAction="#onProfile"
+                        style="-fx-background-color: linear-gradient(to bottom right,#7c3aed,#ec4899);
+                               -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                               -fx-background-radius: 50%; -fx-alignment: center;
+                               -fx-min-width: 36px; -fx-min-height: 36px;
+                               -fx-max-width: 36px; -fx-max-height: 36px;
+                               -fx-cursor: hand; -fx-border-color: transparent;
+                               -fx-effect: dropshadow(gaussian,rgba(168,85,247,0.6),8,0.3,0,0);"/>
+                <Label fx:id="lblConnectedUser" text=""
+                       style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+            </HBox>
 
             <!-- Bouton Déconnexion — visible seulement si connecté -->
             <Button fx:id="btnDeconnexion"
@@ -69,7 +82,7 @@
             <!-- Connexion + S'inscrire — cachés si connecté -->
             <Button fx:id="btnConnexion" text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
 
-            <Button fx:id="btnInscrire" text="S'inscrire"
+            <Button fx:id="btnInscrire" text="S'inscrire" onAction="#onRegister"
                     style="-fx-background-color: transparent;
                            -fx-text-fill: white;
                            -fx-border-color: rgba(255,255,255,0.5);
@@ -109,34 +122,6 @@
                 <Button text="Explorer les Tournois" onAction="#onViewTournaments" styleClass="btn-hero-primary"/>
                 <Button text="Voir les Jeux" styleClass="btn-hero-ghost"/>
             </HBox>
-
-        </VBox>
-
-        <!-- LOGIN -->
-        <VBox styleClass="login-section" alignment="CENTER" spacing="10">
-
-            <Label text="CONNEXION JOUEUR" styleClass="section-title-center"/>
-            <Label text="Accédez à votre espace tournoi" styleClass="section-subtitle-center"/>
-
-            <VBox spacing="10" maxWidth="320">
-
-                <TextField fx:id="fieldUsername"
-                           promptText="Pseudo / Email"
-                           styleClass="input-field"/>
-
-                <PasswordField fx:id="fieldPassword"
-                               promptText="Mot de passe"
-                               styleClass="input-field"/>
-
-                <Label fx:id="lblLoginError" styleClass="error-label"/>
-                <Label fx:id="lblLoginSuccess" styleClass="hero-stat-value"/>
-
-                <Button fx:id="btnSubmitLogin"
-                        text="SE CONNECTER"
-                        onAction="#onLogin"
-                        styleClass="btn-neon"
-                        maxWidth="Infinity"/>
-            </VBox>
 
         </VBox>
 
