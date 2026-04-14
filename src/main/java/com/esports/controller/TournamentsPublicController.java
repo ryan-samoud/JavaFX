@@ -358,10 +358,12 @@ public class TournamentsPublicController implements Initializable {
             Parent root = FXMLLoader.load(
                     getClass().getResource("/com/esports/fxml/HomeView.fxml")
             );
-            // Réutiliser la scène existante (préserve le contexte JVM et la session)
-            javafx.scene.Scene scene = fieldSearch.getScene();
-            scene.setRoot(root);
-            Stage stage = (Stage) scene.getWindow();
+            Stage stage = (Stage) fieldSearch.getScene().getWindow();
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(root, w, h));
+            stage.setWidth(w);
+            stage.setHeight(h);
             stage.setTitle("NexUS Gaming Arena");
         } catch (Exception e) {
             e.printStackTrace();

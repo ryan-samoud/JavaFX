@@ -83,8 +83,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void onShop() {
-        System.out.println("[MainController] ShopView non disponible.");
-        setActiveButton(btnShop);
+        navigate("/com/esports/fxml/ShopView.fxml", btnShop);
     }
 
     @FXML
@@ -111,14 +110,17 @@ public class MainController implements Initializable {
     @FXML
     private void onHome() {
         try {
-            // Indiquer à HomeController de NE PAS rediriger vers le backoffice
-            // même si la session est active (on veut rester sur le front)
             com.esports.controller.HomeController.skipAutoRedirect = true;
 
             Parent root = FXMLLoader.load(
                     getClass().getResource("/com/esports/fxml/HomeView.fxml")
             );
-            contentArea.getScene().setRoot(root);
+            javafx.stage.Stage stage = (javafx.stage.Stage) contentArea.getScene().getWindow();
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(root, w, h));
+            stage.setWidth(w);
+            stage.setHeight(h);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -135,7 +137,12 @@ public class MainController implements Initializable {
             Parent root = FXMLLoader.load(
                     getClass().getResource("/com/esports/fxml/HomeView.fxml")
             );
-            contentArea.getScene().setRoot(root);
+            javafx.stage.Stage stage = (javafx.stage.Stage) contentArea.getScene().getWindow();
+            double w = stage.getWidth();
+            double h = stage.getHeight();
+            stage.setScene(new javafx.scene.Scene(root, w, h));
+            stage.setWidth(w);
+            stage.setHeight(h);
         } catch (IOException e) {
             e.printStackTrace();
         }
