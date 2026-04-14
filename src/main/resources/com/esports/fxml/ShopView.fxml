@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<ScrollPane fitToWidth="true" fitToHeight="true"
+            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            minWidth="1280" minHeight="800"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.HomeController"
+            styleClass="home-scroll">
+
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+    </stylesheets>
+
+    <VBox styleClass="home-root" spacing="0" minWidth="1280" minHeight="800">
+
+        <!-- NAVBAR -->
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white;
+                       -fx-font-size: 15px; -fx-font-weight: bold;
+                       -fx-background-radius: 6px; -fx-padding: 4 9 4 9;"/>
+                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18px;
+                       -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnConnexion" text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
+            <Button fx:id="btnInscrire" text="S'inscrire" onAction="#onRegister"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;
+                           -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1.5px;
+                           -fx-border-radius: 8px; -fx-background-radius: 8px;
+                           -fx-font-size: 13px; -fx-font-weight: bold;
+                           -fx-padding: 7 20 7 20; -fx-cursor: hand;"/>
+            <HBox fx:id="hboxUserNav" visible="false" managed="false"
+                  alignment="CENTER_LEFT" spacing="8">
+                <Button fx:id="lblAvatar" text="" onAction="#onProfile"
+                        style="-fx-background-color: linear-gradient(to bottom right,#7c3aed,#ec4899);
+                               -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                               -fx-background-radius: 50%; -fx-min-width: 36px; -fx-min-height: 36px;
+                               -fx-max-width: 36px; -fx-max-height: 36px; -fx-cursor: hand;"/>
+                <Label fx:id="lblConnectedUser" text=""
+                       style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+            </HBox>
+            <Button fx:id="btnDeconnexion" text="Déconnexion" onAction="#onLogout"
+                    visible="false" managed="false"
+                    style="-fx-background-color: rgba(248,113,113,0.15); -fx-text-fill: #f87171;
+                           -fx-border-color: rgba(248,113,113,0.5); -fx-border-width: 1.5px;
+                           -fx-border-radius: 8px; -fx-background-radius: 8px;
+                           -fx-font-size: 13px; -fx-font-weight: bold;
+                           -fx-padding: 7 20 7 20; -fx-cursor: hand;"/>
+            <Button fx:id="btnAdmin" text="⚙" visible="false" managed="false"
+                    onAction="#onAdminBackoffice" styleClass="btn-neon-sm"/>
+        </HBox>
+
+        <!-- SHOP CONTENT -->
+        <VBox alignment="CENTER" spacing="20" VBox.vgrow="ALWAYS"
+              style="-fx-background-color: linear-gradient(to bottom, #100c2a, #0d0b1e);
+                     -fx-padding: 60 40 60 40;">
+
+            <Label text="🛍️" style="-fx-font-size: 64px;"/>
+
+            <Label text="BOUTIQUE"
+                   style="-fx-text-fill: white; -fx-font-size: 32px;
+                          -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+
+            <Label text="Bientôt disponible — équipez-vous avec le meilleur matériel gaming"
+                   style="-fx-text-fill: #9ca3af; -fx-font-size: 16px;"
+                   wrapText="true"/>
+
+            <Button text="← Retour à l'accueil"
+                    onAction="#onHome"
+                    styleClass="btn-hero-primary"
+                    style="-fx-padding: 12 30 12 30;"/>
+
+        </VBox>
+    </VBox>
+</ScrollPane>
