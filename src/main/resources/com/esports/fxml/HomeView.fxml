@@ -37,14 +37,14 @@
             <Region HBox.hgrow="ALWAYS"/>
 
             <Button text="Accueil" styleClass="nav-link"/>
-            <Button text="Jeux" styleClass="nav-link"/>
+            <Button text="Jeux" onAction="#onViewGames" styleClass="nav-link"/>
             <Button text="Tournois" onAction="#onViewTournaments" styleClass="nav-link"/>
             <Button text="Boutique" onAction="#onShop" styleClass="nav-link"/>
             <Button text="Événements" styleClass="nav-link"/>
 
             <!-- Trophy / Cart icons -->
             <Label text="🏆" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
-            <Label text="🛒" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
+            <Button text="🛒" onAction="#onShop" style="-fx-background-color: transparent; -fx-font-size: 18px; -fx-cursor: hand; -fx-border-color: transparent; -fx-padding: 2 6 2 6;"/>
 
             <!-- Avatar cercle + nom — visible quand connecté -->
             <HBox fx:id="hboxUserNav" visible="false" managed="false"
@@ -120,7 +120,7 @@
 
             <HBox spacing="15" alignment="CENTER">
                 <Button text="Explorer les Tournois" onAction="#onViewTournaments" styleClass="btn-hero-primary"/>
-                <Button text="Voir les Jeux" styleClass="btn-hero-ghost"/>
+                <Button text="Voir les Jeux" onAction="#onViewGames" styleClass="btn-hero-ghost"/>
             </HBox>
 
         </VBox>
@@ -150,7 +150,7 @@
                            style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;
                                   -fx-wrap-text: true; -fx-text-alignment: CENTER;
                                   -fx-alignment: CENTER;" wrapText="true"/>
-                    <Button text="Accéder →" styleClass="btn-hero-primary"/>
+                    <Button text="Accéder →" onAction="#onViewGames" styleClass="btn-hero-primary"/>
                 </VBox>
 
                 <!-- Tournois -->

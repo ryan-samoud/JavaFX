@@ -91,6 +91,12 @@
                            -fx-font-size: 13px; -fx-background-radius: 6px;
                            -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
 
+            <Button fx:id="btnStatistiques" text="  📈   Statistiques"
+                    maxWidth="Infinity" onAction="#onStatistiques"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
             <Region VBox.vgrow="ALWAYS"/>
 
             <!-- Divider -->

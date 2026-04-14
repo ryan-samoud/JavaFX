@@ -102,6 +102,20 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- ── Tests — Mockito ──────────────────────────────────── -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- ══════════════════════════════════════════════════════════ -->
@@ -130,6 +144,9 @@
                 <configuration>
                     <!-- Module/MainClass format required for modular projects -->
                     <mainClass>com.esports/com.esports.MainApp</mainClass>
+                    <options>
+                        <option>-Dprism.order=sw</option>
+                    </options>
                 </configuration>
                 <executions>
                     <execution>
@@ -137,6 +154,7 @@
                         <configuration>
                             <mainClass>com.esports/com.esports.MainApp</mainClass>
                             <options>
+                                <option>-Dprism.order=sw</option>
                                 <option>-Xms128m</option>
                                 <option>-Xmx512m</option>
                                 <option>-XX:ReservedCodeCacheSize=128m</option>
