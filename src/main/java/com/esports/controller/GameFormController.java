@@ -122,8 +122,14 @@ public class GameFormController implements Initializable {
         boolean ok = true;
         
         // Nom
-        if (fieldNom.getText().trim().isEmpty()) {
+        String nomStr = fieldNom.getText().trim();
+        if (nomStr.isEmpty()) {
             ok = showError(errNom, fieldNom, "Le nom est obligatoire");
+        } else {
+            int currentId = (jeuToEdit == null) ? -1 : jeuToEdit.getId();
+            if (jeuService.existsByName(nomStr, currentId)) {
+                ok = showError(errNom, fieldNom, "Ce jeu existe déjà");
+            }
         }
         
         // Age

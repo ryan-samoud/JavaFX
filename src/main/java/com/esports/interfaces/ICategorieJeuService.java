@@ -9,4 +9,5 @@ public interface ICategorieJeuService {
     boolean delete(int id);
     List<CategorieJeu> findAll();
     CategorieJeu findById(int id);
+    boolean existsByName(String nom_categorie, int excludeId);
 }

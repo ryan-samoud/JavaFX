@@ -171,6 +171,27 @@ public class JeuService implements IJeuService {
         return null;
     }
 
+    @Override
+    public boolean existsByName(String nom, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM jeu WHERE LOWER(nom) = LOWER(?) AND id != ?";
+        try {
+            Connection conn = DatabaseConnection.getInstance();
+            ensureJeuSchema(conn);
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, nom);
+                stmt.setInt(2, excludeId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt(1) > 0;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[JeuService] existsByName: " + e.getMessage());
+        }
+        return false;
+    }
+
     private Jeu mapFull(ResultSet rs, Set<String> labels) throws SQLException {
         int nbJoueurs = labels.contains("nb_joueurs") ? rs.getInt("nb_joueurs") : 1;
         double note = labels.contains("note") ? rs.getDouble("note") : 0.0;
