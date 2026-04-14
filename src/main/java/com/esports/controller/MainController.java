@@ -88,10 +88,9 @@ public class MainController implements Initializable {
 
     @FXML
     private void onEvents() {
-        setActiveButton(btnEvents);
-        // EventsView à implémenter
-        System.out.println("[MainController] EventsView non disponible.");
+        navigate("/com/esports/fxml/EvenementsView.fxml", btnEvents);
     }
+
 
     @FXML
     private void onGames() {

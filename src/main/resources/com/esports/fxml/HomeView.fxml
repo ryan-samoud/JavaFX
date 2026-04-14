@@ -40,7 +40,7 @@
             <Button text="Jeux" onAction="#onViewGames" styleClass="nav-link"/>
             <Button text="Tournois" onAction="#onViewTournaments" styleClass="nav-link"/>
             <Button text="Boutique" onAction="#onShop" styleClass="nav-link"/>
-            <Button text="Événements" styleClass="nav-link"/>
+            <Button text="Événements" onAction="#onViewEvents" styleClass="nav-link"/>
 
             <!-- Trophy / Cart icons -->
             <Label text="🏆" style="-fx-font-size: 18px; -fx-cursor: hand;"/>

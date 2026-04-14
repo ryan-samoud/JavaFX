@@ -80,6 +80,10 @@ public class HomeController implements Initializable {
     }
 
     @FXML
+    private void onViewEvents() { navigateTo("/com/esports/fxml/EvenementsPublicView.fxml", "Événements");}
+
+
+    @FXML
     private void onShop() {
         navigateTo("/com/esports/fxml/ShopView.fxml", "Shop");
     }
