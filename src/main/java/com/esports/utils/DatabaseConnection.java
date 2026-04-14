@@ -12,7 +12,7 @@ public class DatabaseConnection {
             + "&allowPublicKeyRetrieval=true"
             + "&characterEncoding=UTF-8";
     private static final String USER     = "root";   // ← à adapter
-    private static final String PASSWORD = "";       // ← à adapter
+    private static final String PASSWORD = "";       // ←  adapter
 
     private static Connection instance = null;
 
