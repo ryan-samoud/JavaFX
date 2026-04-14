@@ -34,6 +34,7 @@ public class MainController implements Initializable {
     @FXML private Button btnShop;
     @FXML private Button btnEvents;
     @FXML private Button btnGames;
+    @FXML private Button btnStatistiques;
 
     private Button activeButton;
 
@@ -95,9 +96,12 @@ public class MainController implements Initializable {
 
     @FXML
     private void onGames() {
-        setActiveButton(btnGames);
-        // GamesView à implémenter
-        System.out.println("[MainController] GamesView non disponible.");
+        navigate("/com/esports/fxml/GamesManagementView.fxml", btnGames);
+    }
+
+    @FXML
+    private void onStatistiques() {
+        navigate("/com/esports/fxml/StatisticsView.fxml", btnStatistiques);
     }
 
     // ═══════════════════════════════════════

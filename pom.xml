@@ -102,6 +102,20 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- ── Tests — Mockito ──────────────────────────────────── -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- ══════════════════════════════════════════════════════════ -->
@@ -130,12 +144,19 @@
                 <configuration>
                     <!-- Classe principale de votre application -->
                     <mainClass>com.esports.MainApp</mainClass>
+                    <!-- Évite les NPE D3D (Prism) sur certains pilotes Windows -->
+                    <options>
+                        <option>-Dprism.order=sw</option>
+                    </options>
                 </configuration>
                 <executions>
                     <execution>
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>com.esports.MainApp</mainClass>
+                            <options>
+                                <option>-Dprism.order=sw</option>
+                            </options>
                         </configuration>
                     </execution>
                 </executions>

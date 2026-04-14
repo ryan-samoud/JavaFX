@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17"
+      fx:controller="com.esports.controller.GameFormController"
+      spacing="0" style="-fx-background-color: #0d0b1e; -fx-border-color: #a855f7; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12;"
+      prefWidth="550">
+
+    <stylesheets>
+        <URL value="@../css/dashboard.css"/>
+    </stylesheets>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #14112b; -fx-padding: 20; -fx-background-radius: 12 12 0 0;">
+        <Label fx:id="lblHeaderIcon" text="🎮" style="-fx-font-size: 24;"/>
+        <Label fx:id="lblHeaderTitle" text="Ajouter un Nouveau Jeu" style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;" prefHeight="600">
+        <VBox spacing="18" style="-fx-padding: 25;">
+            
+            <!-- NOM -->
+            <VBox spacing="6">
+                <Label text="Titre du Jeu *" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                <TextField fx:id="fieldNom" styleClass="modern-field" prefHeight="45" promptText="Ex: Valorant"/>
+                <Label fx:id="errNom" style="-fx-text-fill: #f87171; -fx-font-size: 11;" visible="false" managed="false"/>
+            </VBox>
+
+            <HBox spacing="15">
+                <!-- AGE -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Tranche d'Âge *" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                    <TextField fx:id="fieldAge" styleClass="modern-field" prefHeight="45" promptText="12"/>
+                    <Label fx:id="errAge" style="-fx-text-fill: #f87171; -fx-font-size: 11;" visible="false" managed="false"/>
+                </VBox>
+                <!-- MODE -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Mode de Jeu *" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                    <ComboBox fx:id="comboMode" maxWidth="Infinity" styleClass="modern-combo" prefHeight="45"/>
+                    <Label fx:id="errMode" style="-fx-text-fill: #f87171; -fx-font-size: 11;" visible="false" managed="false"/>
+                </VBox>
+            </HBox>
+
+            <!-- CATEGORY -->
+            <VBox spacing="6">
+                <Label text="Catégorie *" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                <ComboBox fx:id="comboCat" maxWidth="Infinity" styleClass="modern-combo" prefHeight="45"/>
+                <Label fx:id="errCat" style="-fx-text-fill: #f87171; -fx-font-size: 11;" visible="false" managed="false"/>
+            </VBox>
+
+            <HBox spacing="15">
+                <!-- PLAYERS -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Nb Joueurs Max *" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                    <TextField fx:id="fieldPlayers" styleClass="modern-field" prefHeight="45" promptText="10"/>
+                    <Label fx:id="errPlayers" style="-fx-text-fill: #f87171; -fx-font-size: 11;" visible="false" managed="false"/>
+                </VBox>
+                <!-- NOTE -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <Label text="Note ⭐ (0-5) *" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                    <TextField fx:id="fieldNote" styleClass="modern-field" prefHeight="45" promptText="4.5"/>
+                    <Label fx:id="errNote" style="-fx-text-fill: #f87171; -fx-font-size: 11;" visible="false" managed="false"/>
+                </VBox>
+            </HBox>
+
+            <!-- IMAGE -->
+            <VBox spacing="6">
+                <Label text="Image de Couverture" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                <HBox spacing="10">
+                    <TextField fx:id="fieldImage" styleClass="modern-field" prefHeight="45" HBox.hgrow="ALWAYS" editable="false" promptText="Aucun fichier sélectionné"/>
+                    <Button text="Parcourir..." onAction="#onUploadImage" styleClass="btn-secondary" prefHeight="45"/>
+                </HBox>
+            </VBox>
+
+            <!-- DESCRIPTION -->
+            <VBox spacing="6">
+                <Label text="Description du Jeu" style="-fx-text-fill: #9ca3af; -fx-font-weight: bold;"/>
+                <TextArea fx:id="fieldDesc" styleClass="modern-area" prefHeight="100" wrapText="true"/>
+            </VBox>
+
+        </VBox>
+    </ScrollPane>
+
+    <!-- Footer Actions -->
+    <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-background-color: #14112b; -fx-padding: 20; -fx-background-radius: 0 0 12 12;">
+        <Button text="Annuler" onAction="#onCancel" styleClass="btn-outline-sm" prefHeight="40" prefWidth="100"/>
+        <Button fx:id="btnSubmit" text="Enregistrer" onAction="#onSubmit" styleClass="btn-primary" prefHeight="40" prefWidth="140"/>
+    </HBox>
+</VBox>
