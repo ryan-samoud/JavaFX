@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+
+<?import java.net.URL?>
+<ScrollPane fx:id="rootScroll"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.HomeController"
+            styleClass="home-scroll">
+
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+    </stylesheets>
+
+    <VBox styleClass="home-root" spacing="0">
+
+        <!-- NAVBAR -->
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+
+            <!-- Logo : N shield icon + NexUS text -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white;
+                       -fx-font-size: 15px; -fx-font-weight: bold;
+                       -fx-background-radius: 6px; -fx-padding: 4 9 4 9;
+                       -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.8), 10, 0.4, 0, 0);"/>
+                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18px;
+                       -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Accueil" styleClass="nav-link"/>
+            <Button text="Jeux" styleClass="nav-link"/>
+            <Button text="Tournois" onAction="#onViewTournaments" styleClass="nav-link"/>
+            <Button text="Boutique" onAction="#onShop" styleClass="nav-link"/>
+            <Button text="Événements" styleClass="nav-link"/>
+
+            <!-- Trophy / Cart icons -->
+            <Label text="🏆" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
+            <Button text="🛒" onAction="#onShop" style="-fx-background-color: transparent; -fx-font-size: 18px; -fx-cursor: hand; -fx-border-color: transparent; -fx-padding: 2 6 2 6;"/>
+
+            <Label fx:id="lblConnectedUser" text="" 
+                   style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"
+                   visible="false" managed="false"/>
+
+            <!-- Bouton Déconnexion — visible seulement si connecté -->
+            <Button fx:id="btnDeconnexion"
+                    text="Déconnexion"
+                    onAction="#onLogout"
+                    visible="false" managed="false"
+                    style="-fx-background-color: rgba(248,113,113,0.15);
+                           -fx-text-fill: #f87171;
+                           -fx-border-color: rgba(248,113,113,0.5);
+                           -fx-border-width: 1.5px;
+                           -fx-border-radius: 8px;
+                           -fx-background-radius: 8px;
+                           -fx-font-size: 13px;
+                           -fx-font-weight: bold;
+                           -fx-padding: 7 20 7 20;
+                           -fx-cursor: hand;"/>
+
+            <!-- Connexion + S'inscrire — cachés si connecté -->
+            <Button fx:id="btnConnexion" text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
+
+            <Button fx:id="btnInscrire" text="S'inscrire"
+                    style="-fx-background-color: transparent;
+                           -fx-text-fill: white;
+                           -fx-border-color: rgba(255,255,255,0.5);
+                           -fx-border-width: 1.5px;
+                           -fx-border-radius: 8px;
+                           -fx-background-radius: 8px;
+                           -fx-font-size: 13px;
+                           -fx-font-weight: bold;
+                           -fx-padding: 7 20 7 20;
+                           -fx-cursor: hand;"/>
+
+            <Button fx:id="btnAdmin"
+                    text="⚙"
+                    visible="false"
+                    managed="false"
+                    onAction="#onAdminBackoffice"
+                    styleClass="btn-neon-sm"/>
+        </HBox>
+
+        <!-- HERO — Bienvenue sur NexUS Gaming Arena -->
+        <VBox styleClass="hero-section" alignment="CENTER" spacing="14">
+
+            <VBox alignment="CENTER" spacing="4">
+                <Label text="Bienvenue sur"
+                       style="-fx-text-fill: white; -fx-font-size: 32px;
+                              -fx-font-weight: bold; -fx-font-family: 'Arial';"/>
+                <Label text="NexUS Gaming Arena"
+                       style="-fx-text-fill: #a855f7; -fx-font-size: 36px;
+                              -fx-font-weight: bold; -fx-font-family: 'Arial Black';
+                              -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.7), 20, 0.4, 0, 0);"/>
+            </VBox>
+
+            <Label text="Participez aux meilleurs tournois d'eSports!"
+                   styleClass="hero-subtitle"/>
+
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Explorer les Tournois" onAction="#onViewTournaments" styleClass="btn-hero-primary"/>
+                <Button text="Voir les Jeux" styleClass="btn-hero-ghost"/>
+            </HBox>
+
+        </VBox>
+
+        <!-- LOGIN -->
+        <VBox styleClass="login-section" alignment="CENTER" spacing="10">
+
+            <Label text="CONNEXION JOUEUR" styleClass="section-title-center"/>
+            <Label text="Accédez à votre espace tournoi" styleClass="section-subtitle-center"/>
+
+            <VBox spacing="10" maxWidth="320">
+
+                <TextField fx:id="fieldUsername"
+                           promptText="Pseudo / Email"
+                           styleClass="input-field"/>
+
+                <PasswordField fx:id="fieldPassword"
+                               promptText="Mot de passe"
+                               styleClass="input-field"/>
+
+                <Label fx:id="lblLoginError" styleClass="error-label"/>
+                <Label fx:id="lblLoginSuccess" styleClass="hero-stat-value"/>
+
+                <Button fx:id="btnSubmitLogin"
+                        text="SE CONNECTER"
+                        onAction="#onLogin"
+                        styleClass="btn-neon"
+                        maxWidth="Infinity"/>
+            </VBox>
+
+        </VBox>
+
+        <!-- MODULES SECTION -->
+        <VBox spacing="30"
+              style="-fx-background-color: #110f28; -fx-padding: 60 40 70 40;">
+
+            <Label text="Nos Modules"
+                   style="-fx-text-fill: white; -fx-font-size: 28px;
+                          -fx-font-weight: bold; -fx-alignment: CENTER;"/>
+
+            <HBox spacing="20" alignment="CENTER">
+
+                <!-- Jeux -->
+                <VBox alignment="CENTER" spacing="14"
+                      style="-fx-background-color: rgba(26,18,58,0.85);
+                             -fx-border-color: rgba(139,92,246,0.2);
+                             -fx-border-width: 1.5px; -fx-border-radius: 16px;
+                             -fx-background-radius: 16px; -fx-padding: 36 28 36 28;
+                             -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="260">
+                    <Label text="🎮" style="-fx-font-size: 44px;"/>
+                    <Label text="Jeux"
+                           style="-fx-text-fill: #a855f7; -fx-font-size: 20px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Découvrez notre collection de jeux compétitifs"
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;
+                                  -fx-wrap-text: true; -fx-text-alignment: CENTER;
+                                  -fx-alignment: CENTER;" wrapText="true"/>
+                    <Button text="Accéder →" styleClass="btn-hero-primary"/>
+                </VBox>
+
+                <!-- Tournois -->
+                <VBox alignment="CENTER" spacing="14"
+                      style="-fx-background-color: rgba(26,18,58,0.85);
+                             -fx-border-color: rgba(139,92,246,0.2);
+                             -fx-border-width: 1.5px; -fx-border-radius: 16px;
+                             -fx-background-radius: 16px; -fx-padding: 36 28 36 28;
+                             -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="260">
+                    <Label text="🏆" style="-fx-font-size: 44px;"/>
+                    <Label text="Tournois"
+                           style="-fx-text-fill: #a855f7; -fx-font-size: 20px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Participez aux meilleurs tournois eSports"
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;
+                                  -fx-wrap-text: true; -fx-text-alignment: CENTER;
+                                  -fx-alignment: CENTER;" wrapText="true"/>
+                    <Button text="Accéder →" onAction="#onViewTournaments" styleClass="btn-hero-primary"/>
+                </VBox>
+
+                <!-- Boutique -->
+                <VBox alignment="CENTER" spacing="14"
+                      style="-fx-background-color: rgba(26,18,58,0.85);
+                             -fx-border-color: rgba(139,92,246,0.2);
+                             -fx-border-width: 1.5px; -fx-border-radius: 16px;
+                             -fx-background-radius: 16px; -fx-padding: 36 28 36 28;
+                             -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="260">
+                    <Label text="🛍️" style="-fx-font-size: 44px;"/>
+                    <Label text="Boutique"
+                           style="-fx-text-fill: #a855f7; -fx-font-size: 20px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Équipez-vous avec le meilleur équipement gaming"
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;
+                                  -fx-wrap-text: true; -fx-text-alignment: CENTER;
+                                  -fx-alignment: CENTER;" wrapText="true"/>
+                    <Button text="Accéder →" onAction="#onShop" styleClass="btn-hero-primary"/>
+                </VBox>
+
+                <!-- Événements -->
+                <VBox alignment="CENTER" spacing="14"
+                      style="-fx-background-color: rgba(26,18,58,0.85);
+                             -fx-border-color: rgba(139,92,246,0.2);
+                             -fx-border-width: 1.5px; -fx-border-radius: 16px;
+                             -fx-background-radius: 16px; -fx-padding: 36 28 36 28;
+                             -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="260">
+                    <Label text="📅" style="-fx-font-size: 44px;"/>
+                    <Label text="Événements"
+                           style="-fx-text-fill: #a855f7; -fx-font-size: 20px;
+                                  -fx-font-weight: bold;"/>
+                    <Label text="Découvrez nos événements et live gaming"
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;
+                                  -fx-wrap-text: true; -fx-text-alignment: CENTER;
+                                  -fx-alignment: CENTER;" wrapText="true"/>
+                    <Button text="Accéder →" styleClass="btn-hero-primary"/>
+                </VBox>
+
+            </HBox>
+        </VBox>
+
+    </VBox>
+</ScrollPane>
