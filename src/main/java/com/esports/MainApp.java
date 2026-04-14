@@ -16,8 +16,6 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
 
 
-        DatabaseConnection.getInstance();
-        System.out.println("DB = " + DatabaseConnection.getInstance());
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/esports/fxml/HomeView.fxml") // ← page d'accueil
         );

@@ -110,6 +110,60 @@ public class UserService implements IUserService {
     }
 
     // ─────────────────────────────
+    // UPDATE USER
+    // ─────────────────────────────
+    public boolean update(User user) {
+
+        String sql = "UPDATE user SET nom=?, prenom=?, email=?, age=?, password=?, photo=? WHERE id=?";
+
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, user.getNom());
+            stmt.setString(2, user.getPrenom());
+            stmt.setString(3, user.getEmail());
+            stmt.setInt(4,    user.getAge());
+            stmt.setString(5, user.getPassword());
+            stmt.setString(6, user.getPhoto());
+            stmt.setInt(7,    user.getId());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.err.println("[UserService] update: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    // ─────────────────────────────
+    // SAVE NEW USER
+    // ─────────────────────────────
+    public boolean save(User user) {
+
+        String sql = "INSERT INTO user (nom, prenom, email, age, role, password, is_active, date_creation) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, 1, NOW())";
+
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, user.getNom());
+            stmt.setString(2, user.getPrenom());
+            stmt.setString(3, user.getEmail());
+            stmt.setInt(4,    user.getAge());
+            stmt.setString(5, user.getRole());
+            stmt.setString(6, user.getPassword());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.err.println("[UserService] save: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    // ─────────────────────────────
     // DEACTIVATE USER (soft delete)
     // ─────────────────────────────
     public boolean deactivate(int id) {
@@ -145,7 +199,8 @@ public class UserService implements IUserService {
                 rs.getString("role"),
                 rs.getString("password"),
                 ts != null ? ts.toLocalDateTime() : null,
-                rs.getBoolean("is_active")
+                rs.getBoolean("is_active"),
+                rs.getString("photo")
         );
     }
 }

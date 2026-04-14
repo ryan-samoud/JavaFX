@@ -142,9 +142,8 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <!-- Classe principale de votre application -->
-                    <mainClass>com.esports.MainApp</mainClass>
-                    <!-- Évite les NPE D3D (Prism) sur certains pilotes Windows -->
+                    <!-- Module/MainClass format required for modular projects -->
+                    <mainClass>com.esports/com.esports.MainApp</mainClass>
                     <options>
                         <option>-Dprism.order=sw</option>
                     </options>
@@ -153,9 +152,13 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.esports.MainApp</mainClass>
+                            <mainClass>com.esports/com.esports.MainApp</mainClass>
                             <options>
                                 <option>-Dprism.order=sw</option>
+                                <option>-Xms128m</option>
+                                <option>-Xmx512m</option>
+                                <option>-XX:ReservedCodeCacheSize=128m</option>
+                                <option>-XX:HeapBaseMinAddress=0x100000000</option>
                             </options>
                         </configuration>
                     </execution>
@@ -185,6 +188,7 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
