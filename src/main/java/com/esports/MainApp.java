@@ -37,6 +37,11 @@ public class MainApp extends Application {
         DatabaseConnection.closeConnection();
     }
 
+    static {
+        // Fix for "com.sun.prism.d3d.D3DRTTexture.contentsUseful()" error on Windows
+        System.setProperty("prism.order", "sw");
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
