@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * SERVICE — EvenementService.java
  *
- * Table SQL :
+ * Table SQL (à créer via create_tables.sql) :
  *   CREATE TABLE evenement (
  *     id              INT AUTO_INCREMENT PRIMARY KEY,
  *     nom             VARCHAR(100) NOT NULL,
@@ -33,7 +33,8 @@ public class EvenementService implements IEvenementService {
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) list.add(map(rs));
         } catch (SQLException e) {
-            System.err.println("[EvenementService] findAll : " + e.getMessage());
+            System.err.println("[EvenementService] findAll ERROR : " + e.getMessage());
+            e.printStackTrace();
         }
         return list;
     }
@@ -46,7 +47,7 @@ public class EvenementService implements IEvenementService {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) return map(rs);
         } catch (SQLException e) {
-            System.err.println("[EvenementService] findById : " + e.getMessage());
+            System.err.println("[EvenementService] findById ERROR : " + e.getMessage());
         }
         return null;
     }
@@ -58,7 +59,7 @@ public class EvenementService implements IEvenementService {
              ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            System.err.println("[EvenementService] countAll : " + e.getMessage());
+            System.err.println("[EvenementService] countAll ERROR : " + e.getMessage());
         }
         return 0;
     }
@@ -80,7 +81,8 @@ public class EvenementService implements IEvenementService {
                 return true;
             }
         } catch (SQLException ex) {
-            System.err.println("[EvenementService] save : " + ex.getMessage());
+            System.err.println("[EvenementService] save ERROR : " + ex.getMessage());
+            ex.printStackTrace();
         }
         return false;
     }
@@ -98,35 +100,68 @@ public class EvenementService implements IEvenementService {
             stmt.setInt(7, e.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException ex) {
-            System.err.println("[EvenementService] update : " + ex.getMessage());
+            System.err.println("[EvenementService] update ERROR : " + ex.getMessage());
+            ex.printStackTrace();
         }
         return false;
     }
 
     public boolean delete(int id) {
-        String sql = "DELETE FROM evenement WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getInstance();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+        String deleteSponsors = "DELETE FROM sponsor WHERE evenement_id = ?";
+        String deleteEvent = "DELETE FROM evenement WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance()) {
+
+            PreparedStatement ps1 = conn.prepareStatement(deleteSponsors);
+            ps1.setInt(1, id);
+            ps1.executeUpdate();
+
+            PreparedStatement ps2 = conn.prepareStatement(deleteEvent);
+            ps2.setInt(1, id);
+
+            return ps2.executeUpdate() > 0;
+
         } catch (SQLException e) {
-            System.err.println("[EvenementService] delete : " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
 
     private Evenement map(ResultSet rs) throws SQLException {
-        Date d = rs.getDate("date");
-        Timestamp ca = rs.getTimestamp("created_at");
+        Date d       = rs.getDate("date");
         return new Evenement(
                 rs.getInt("id"),
                 rs.getString("nom"),
                 rs.getString("description"),
-                d != null ? d.toLocalDate() : null,
+                d  != null ? d.toLocalDate()           : null,
                 rs.getString("lieu"),
                 rs.getInt("nbr_participant"),
-                rs.getString("image"),
-                ca != null ? ca.toLocalDateTime() : java.time.LocalDateTime.now()
+                rs.getString("image")
         );
     }
+    public void incrementParticipants(int id) {
+        String sql = "UPDATE evenement SET nbr_participant = nbr_participant + 1 WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void decrementParticipants(int id) {
+        String sql = "UPDATE evenement SET nbr_participant = CASE WHEN nbr_participant > 0 THEN nbr_participant - 1 ELSE 0 END WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

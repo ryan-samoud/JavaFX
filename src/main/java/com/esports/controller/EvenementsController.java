@@ -22,11 +22,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,12 +42,16 @@ import java.util.ResourceBundle;
 /**
  * CONTROLLER — EvenementsController.java
  * CRUD complet pour les événements + sponsors.
+ * Fixes : description label color, FileChooser for image, confirmation dialogs.
  */
 public class EvenementsController implements Initializable {
 
-    @FXML private Label              lblEventCount;
-    @FXML private TextField          fieldSearch;
-    @FXML private ComboBox<String>   comboSort;
+    // ── Images stockées dans src/main/resources/images/events/ ──
+    private static final String IMAGES_FOLDER = "src/main/resources/images/events/";
+
+    @FXML private Label            lblEventCount;
+    @FXML private TextField        fieldSearch;
+    @FXML private ComboBox<String> comboSort;
 
     @FXML private TableView<Evenement>            tableEvents;
     @FXML private TableColumn<Evenement, Integer> colId;
@@ -54,7 +65,7 @@ public class EvenementsController implements Initializable {
     private final IEvenementService evenementService = new EvenementService();
     private final ISponsorService   sponsorService   = new SponsorService();
 
-    private ObservableList<Evenement> masterList   = FXCollections.observableArrayList();
+    private ObservableList<Evenement> masterList  = FXCollections.observableArrayList();
     private FilteredList<Evenement>   filteredList;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -65,6 +76,7 @@ public class EvenementsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try { new File(IMAGES_FOLDER).mkdirs(); } catch (Exception ignored) {}
         setupColumns();
         setupFilters();
         loadEvents();
@@ -83,7 +95,6 @@ public class EvenementsController implements Initializable {
         colLieu.setCellValueFactory(new PropertyValueFactory<>("lieu"));
         colParticipants.setCellValueFactory(new PropertyValueFactory<>("nbrParticipant"));
 
-        // Badge statut A VENIR / PASSÉ
         colStatut.setCellValueFactory(data ->
                 new SimpleStringProperty(data.getValue().isPast() ? "PASSÉ" : "À VENIR"));
         colStatut.setCellFactory(col -> new TableCell<>() {
@@ -97,26 +108,16 @@ public class EvenementsController implements Initializable {
             }
         });
 
-        // Colonne actions
         colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEdit    = new Button("Éditer");
-            private final Button btnDelete  = new Button("Supprimer");
+            private final Button btnEdit     = new Button("Éditer");
+            private final Button btnDelete   = new Button("Supprimer");
             private final Button btnSponsors = new Button("Sponsors");
-            private final HBox   box        = new HBox(6, btnEdit, btnDelete, btnSponsors);
+            private final HBox   box         = new HBox(6, btnEdit, btnDelete, btnSponsors);
 
             {
-                btnEdit.setStyle("-fx-background-color: transparent; -fx-text-fill: #00b8ff;" +
-                        "-fx-font-family: 'Courier New'; -fx-font-size: 11px;" +
-                        "-fx-border-color: #00b8ff; -fx-border-width: 1; -fx-border-radius: 4;" +
-                        "-fx-background-radius: 4; -fx-padding: 4 10 4 10; -fx-cursor: hand;");
-                btnDelete.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff4757;" +
-                        "-fx-font-family: 'Courier New'; -fx-font-size: 11px;" +
-                        "-fx-border-color: #ff4757; -fx-border-width: 1; -fx-border-radius: 4;" +
-                        "-fx-background-radius: 4; -fx-padding: 4 10 4 10; -fx-cursor: hand;");
-                btnSponsors.setStyle("-fx-background-color: transparent; -fx-text-fill: #a855f7;" +
-                        "-fx-font-family: 'Courier New'; -fx-font-size: 11px;" +
-                        "-fx-border-color: #a855f7; -fx-border-width: 1; -fx-border-radius: 4;" +
-                        "-fx-background-radius: 4; -fx-padding: 4 10 4 10; -fx-cursor: hand;");
+                btnEdit.setStyle(actionBtnStyle("#00b8ff"));
+                btnDelete.setStyle(actionBtnStyle("#ff4757"));
+                btnSponsors.setStyle(actionBtnStyle("#a855f7"));
 
                 btnEdit.setOnAction(e    -> onEditEvent(getTableView().getItems().get(getIndex())));
                 btnDelete.setOnAction(e  -> onDeleteEvent(getTableView().getItems().get(getIndex())));
@@ -131,9 +132,17 @@ public class EvenementsController implements Initializable {
         });
     }
 
+    private String actionBtnStyle(String color) {
+        return "-fx-background-color: transparent; -fx-text-fill: " + color + ";" +
+                "-fx-font-family: 'Courier New'; -fx-font-size: 11px;" +
+                "-fx-border-color: " + color + "; -fx-border-width: 1; -fx-border-radius: 4;" +
+                "-fx-background-radius: 4; -fx-padding: 4 10 4 10; -fx-cursor: hand;";
+    }
+
     private void setupFilters() {
         comboSort.setItems(FXCollections.observableArrayList(
-                "Date (récent)", "Date (ancien)", "Nom A→Z", "Nom Z→A", "Participants ↑", "Participants ↓"));
+                "Date (récent)", "Date (ancien)", "Nom A→Z", "Nom Z→A",
+                "Participants ↑", "Participants ↓"));
         comboSort.setValue("Date (récent)");
 
         filteredList = new FilteredList<>(masterList, p -> true);
@@ -166,12 +175,12 @@ public class EvenementsController implements Initializable {
         if (sort == null) return;
         List<Evenement> sorted = new java.util.ArrayList<>(masterList);
         switch (sort) {
-            case "Date (récent)"    -> sorted.sort((a, b) -> b.getDate().compareTo(a.getDate()));
-            case "Date (ancien)"    -> sorted.sort((a, b) -> a.getDate().compareTo(b.getDate()));
-            case "Nom A→Z"          -> sorted.sort((a, b) -> a.getNom().compareToIgnoreCase(b.getNom()));
-            case "Nom Z→A"          -> sorted.sort((a, b) -> b.getNom().compareToIgnoreCase(a.getNom()));
-            case "Participants ↑"   -> sorted.sort((a, b) -> Integer.compare(a.getNbrParticipant(), b.getNbrParticipant()));
-            case "Participants ↓"   -> sorted.sort((a, b) -> Integer.compare(b.getNbrParticipant(), a.getNbrParticipant()));
+            case "Date (récent)"  -> sorted.sort((a, b) -> b.getDate().compareTo(a.getDate()));
+            case "Date (ancien)"  -> sorted.sort((a, b) -> a.getDate().compareTo(b.getDate()));
+            case "Nom A→Z"        -> sorted.sort((a, b) -> a.getNom().compareToIgnoreCase(b.getNom()));
+            case "Nom Z→A"        -> sorted.sort((a, b) -> b.getNom().compareToIgnoreCase(a.getNom()));
+            case "Participants ↑" -> sorted.sort((a, b) -> Integer.compare(a.getNbrParticipant(), b.getNbrParticipant()));
+            case "Participants ↓" -> sorted.sort((a, b) -> Integer.compare(b.getNbrParticipant(), a.getNbrParticipant()));
         }
         masterList.setAll(sorted);
     }
@@ -181,13 +190,9 @@ public class EvenementsController implements Initializable {
     // ══════════════════════════════════════════════════
 
     @FXML
-    private void onAddEvent() {
-        showEventForm(null);
-    }
+    private void onAddEvent() { showEventForm(null); }
 
-    private void onEditEvent(Evenement e) {
-        showEventForm(e);
-    }
+    private void onEditEvent(Evenement e) { showEventForm(e); }
 
     private void onDeleteEvent(Evenement e) {
         boolean confirmed = NexusDialog.showConfirm(
@@ -205,7 +210,7 @@ public class EvenementsController implements Initializable {
     }
 
     // ══════════════════════════════════════════════════
-    // FORMULAIRE ÉVÉNEMENT (Ajout / Édition)
+    // FORMULAIRE ÉVÉNEMENT
     // ══════════════════════════════════════════════════
 
     private void showEventForm(Evenement existing) {
@@ -218,40 +223,67 @@ public class EvenementsController implements Initializable {
         stage.setResizable(false);
 
         // ── Champs ──
-        TextField    fieldNom    = styledField("Nom de l'événement");
-        TextArea     fieldDesc   = new TextArea();
-        fieldDesc.setPromptText("Description");
+        TextField   fieldNom   = styledField("Nom de l'événement");
+        TextArea    fieldDesc  = new TextArea();
+        fieldDesc.setPromptText("Description de l'événement...");
         fieldDesc.setPrefRowCount(3);
         fieldDesc.setStyle(textAreaStyle());
-        DatePicker   datePicker  = new DatePicker();
-        datePicker.setStyle(fieldStyle());
-        datePicker.setPromptText("Date");
-        TextField    fieldLieu   = styledField("Lieu (ville, adresse...)");
-        TextField    fieldPart   = styledField("Nombre de participants");
-        TextField    fieldImage  = styledField("Image (URL ou chemin)");
-        Label        lblError    = errorLabel();
 
+        DatePicker  datePicker = new DatePicker();
+        datePicker.setStyle(fieldStyle());
+        datePicker.setPromptText("Choisir une date");
+
+        TextField   fieldLieu  = styledField("Lieu (ville, adresse...)");
+
+        // Image — affichage du nom du fichier choisi
+        final String[] selectedImagePath = {null};
+        HBox imageRow = new HBox(10);
+        imageRow.setAlignment(Pos.CENTER_LEFT);
+        Label lblImageName = new Label("Aucune image choisie");
+        lblImageName.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12px; -fx-font-family: 'Courier New';");
+        Button btnPickImage = new Button("📁 Choisir une image");
+        btnPickImage.setStyle("-fx-background-color: rgba(168,85,247,0.15); -fx-text-fill: #c084fc;" +
+                "-fx-border-color: rgba(168,85,247,0.4); -fx-border-width: 1; -fx-border-radius: 6;" +
+                "-fx-background-radius: 6; -fx-font-size: 12px; -fx-padding: 8 14 8 14; -fx-cursor: hand;" +
+                "-fx-font-family: 'Courier New';");
+        btnPickImage.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Choisir une image");
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                    "Images", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp"));
+            File file = fc.showOpenDialog(stage);
+            if (file != null) {
+                selectedImagePath[0] = file.getAbsolutePath();
+                lblImageName.setText(file.getName());
+                lblImageName.setStyle("-fx-text-fill: #a855f7; -fx-font-size: 12px; -fx-font-family: 'Courier New';");
+            }
+        });
+        imageRow.getChildren().addAll(btnPickImage, lblImageName);
+
+        Label lblError = errorLabel();
+
+        // Pré-remplissage si édition
         if (isEdit) {
             fieldNom.setText(existing.getNom());
-            fieldDesc.setText(existing.getDescription());
+            fieldDesc.setText(existing.getDescription() != null ? existing.getDescription() : "");
             datePicker.setValue(existing.getDate());
             fieldLieu.setText(existing.getLieu());
-            fieldPart.setText(String.valueOf(existing.getNbrParticipant()));
-            fieldImage.setText(existing.getImage() != null ? existing.getImage() : "");
+            if (existing.getImage() != null && !existing.getImage().isEmpty()) {
+                lblImageName.setText(existing.getImage());
+                lblImageName.setStyle("-fx-text-fill: #a855f7; -fx-font-size: 12px; -fx-font-family: 'Courier New';");
+            }
         }
 
         // ── Layout ──
         Label title = formTitle(isEdit ? "MODIFIER ÉVÉNEMENT" : "NOUVEL ÉVÉNEMENT");
 
-        VBox form = new VBox(12,
-                title,
-                gradientSep(),
-                formLabel("Nom *"), fieldNom,
-                formLabel("Description"), fieldDesc,
-                formLabel("Date *"), datePicker,
-                formLabel("Lieu *"), fieldLieu,
-                formLabel("Participants"), fieldPart,
-                formLabel("Image"), fieldImage,
+        VBox form = new VBox(8,
+                title, gradientSep(),
+                formLabel("Nom *"),          fieldNom,
+                formLabel("Description"),    fieldDesc,
+                formLabel("Date *"),         datePicker,
+                formLabel("Lieu *"),         fieldLieu,
+                formLabel("Image"),          imageRow,
                 lblError
         );
         form.setPadding(new Insets(28, 30, 10, 30));
@@ -267,51 +299,68 @@ public class EvenementsController implements Initializable {
 
         // ── Validation & Sauvegarde ──
         btnSave.setOnAction(e -> {
-            String nom    = fieldNom.getText().trim();
-            String desc   = fieldDesc.getText().trim();
-            LocalDate date = datePicker.getValue();
-            String lieu   = fieldLieu.getText().trim();
-            String partStr = fieldPart.getText().trim();
-            String image  = fieldImage.getText().trim();
+            String    nom     = fieldNom.getText().trim();
+            String    desc    = fieldDesc.getText().trim();
+            LocalDate date    = datePicker.getValue();
+            String    lieu    = fieldLieu.getText().trim();
 
-            // Validations
-            if (nom.isEmpty()) { lblError.setText("Le nom est obligatoire."); return; }
-            if (nom.length() < 3) { lblError.setText("Le nom doit contenir au moins 3 caractères."); return; }
-            if (date == null) { lblError.setText("La date est obligatoire."); return; }
-            if (lieu.isEmpty()) { lblError.setText("Le lieu est obligatoire."); return; }
+            if (nom.isEmpty())     { lblError.setText("Le nom est obligatoire.");                          return; }
+            if (nom.length() < 3)  { lblError.setText("Le nom doit contenir au moins 3 caractères.");     return; }
+            if (date == null)      { lblError.setText("La date est obligatoire.");                          return; }
+            if (lieu.isEmpty())    { lblError.setText("Le lieu est obligatoire.");                          return; }
 
             int nbr = 0;
-            if (!partStr.isEmpty()) {
+
+            // Copier l'image dans le dossier events si une nouvelle image a été choisie
+            String imageName = isEdit ? existing.getImage() : null;
+            if (selectedImagePath[0] != null) {
                 try {
-                    nbr = Integer.parseInt(partStr);
-                    if (nbr < 0) { lblError.setText("Le nombre de participants doit être positif."); return; }
-                } catch (NumberFormatException ex) {
-                    lblError.setText("Le nombre de participants doit être un entier.");
+                    File src  = new File(selectedImagePath[0]);
+                    File dest = new File(IMAGES_FOLDER + src.getName());
+                    dest.getParentFile().mkdirs();
+                    Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    imageName = src.getName();
+                } catch (IOException ex) {
+                    lblError.setText("Erreur lors de la copie de l'image : " + ex.getMessage());
                     return;
                 }
             }
 
-            Evenement ev = isEdit ? existing
-                    : new Evenement(nom, desc, date, lieu, nbr, image.isEmpty() ? null : image);
+            // Confirmation avant sauvegarde
+            boolean confirmed = NexusDialog.showConfirm(
+                    isEdit ? "Modifier l'événement" : "Créer l'événement",
+                    isEdit ? "Modifier « " + nom + " » ?" : "Créer l'événement « " + nom + " » ?",
+                    "Veuillez confirmer cette action."
+            );
+            if (!confirmed) return;
+
+            Evenement ev;
+
             if (isEdit) {
-                ev.setNom(nom); ev.setDescription(desc); ev.setDate(date);
-                ev.setLieu(lieu); ev.setNbrParticipant(nbr);
-                ev.setImage(image.isEmpty() ? null : image);
+                ev = existing;
+
+                ev.setNom(nom);
+                ev.setDescription(desc);
+                ev.setDate(date);
+                ev.setLieu(lieu);
+                ev.setImage(imageName);
+
+            } else {
+                ev = new Evenement(nom, desc, date, lieu, 0, imageName);
             }
 
             boolean ok = isEdit ? evenementService.update(ev) : evenementService.save(ev);
             if (ok) {
                 stage.close();
                 loadEvents();
-                NexusDialog.showInfo("Succès", isEdit ? "Événement modifié." : "Événement créé.");
             } else {
-                lblError.setText("Erreur lors de la sauvegarde.");
+                lblError.setText("Erreur lors de la sauvegarde. Vérifiez la console.");
             }
         });
 
         btnCancel.setOnAction(e -> stage.close());
 
-        Scene scene = new Scene(root, 480, 620);
+        Scene scene = new Scene(root, 480, 600);
         scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
         stage.setScene(scene);
         stage.showAndWait();
@@ -328,27 +377,26 @@ public class EvenementsController implements Initializable {
         stage.setTitle("Sponsors — " + ev.getNom());
         stage.setResizable(false);
 
-        // Table sponsors
         TableView<Sponsor> table = new TableView<>();
         table.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;" +
                 "-fx-font-family: 'Courier New'; -fx-font-size: 12px;");
         table.setPrefHeight(220);
 
-        TableColumn<Sponsor, Integer> cId    = new TableColumn<>("ID");
-        TableColumn<Sponsor, String>  cNom   = new TableColumn<>("NOM");
-        TableColumn<Sponsor, String>  cType  = new TableColumn<>("TYPE");
-        TableColumn<Sponsor, String>  cEmail = new TableColumn<>("EMAIL");
-        TableColumn<Sponsor, String>  cTel   = new TableColumn<>("TÉL");
-        TableColumn<Sponsor, String>  cPrix  = new TableColumn<>("BUDGET");
+        TableColumn<Sponsor, Integer> cId    = col("ID",      40);
+        TableColumn<Sponsor, String>  cNom   = col("NOM",     120);
+        TableColumn<Sponsor, String>  cType  = col("TYPE",    90);
+        TableColumn<Sponsor, String>  cEmail = col("EMAIL",   140);
+        TableColumn<Sponsor, String>  cTel   = col("TÉL",    90);
+        TableColumn<Sponsor, String>  cPrix  = col("BUDGET", 70);
         TableColumn<Sponsor, Void>    cAct   = new TableColumn<>("ACTIONS");
+        cAct.setPrefWidth(120);
 
-        cId.setCellValueFactory(new PropertyValueFactory<>("id"));        cId.setPrefWidth(40);
-        cNom.setCellValueFactory(new PropertyValueFactory<>("nom"));      cNom.setPrefWidth(120);
-        cType.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTypeLabel())); cType.setPrefWidth(90);
-        cEmail.setCellValueFactory(new PropertyValueFactory<>("email"));  cEmail.setPrefWidth(140);
-        cTel.setCellValueFactory(new PropertyValueFactory<>("tel"));      cTel.setPrefWidth(90);
-        cPrix.setCellValueFactory(d -> new SimpleStringProperty(
-                String.format("%.0f €", d.getValue().getPrix())));        cPrix.setPrefWidth(70);
+        cId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        cNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
+        cType.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTypeLabel()));
+        cEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        cTel.setCellValueFactory(new PropertyValueFactory<>("tel"));
+        cPrix.setCellValueFactory(d -> new SimpleStringProperty(String.format("%.0f €", d.getValue().getPrix())));
 
         ObservableList<Sponsor> sponsorList = FXCollections.observableArrayList(
                 sponsorService.findByEvenement(ev.getId()));
@@ -359,12 +407,8 @@ public class EvenementsController implements Initializable {
             private final Button btnD = new Button("Suppr.");
             private final HBox   box  = new HBox(6, btnE, btnD);
             {
-                btnE.setStyle("-fx-background-color: transparent; -fx-text-fill: #00b8ff;" +
-                        "-fx-border-color: #00b8ff; -fx-border-width: 1; -fx-border-radius: 4;" +
-                        "-fx-background-radius: 4; -fx-font-size: 10px; -fx-padding: 3 8 3 8; -fx-cursor: hand;");
-                btnD.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff4757;" +
-                        "-fx-border-color: #ff4757; -fx-border-width: 1; -fx-border-radius: 4;" +
-                        "-fx-background-radius: 4; -fx-font-size: 10px; -fx-padding: 3 8 3 8; -fx-cursor: hand;");
+                btnE.setStyle(actionBtnStyle("#00b8ff").replace("11px", "10px"));
+                btnD.setStyle(actionBtnStyle("#ff4757").replace("11px", "10px"));
                 btnE.setOnAction(e -> showSponsorForm(getTableView().getItems().get(getIndex()), ev, sponsorList));
                 btnD.setOnAction(e -> {
                     Sponsor s = getTableView().getItems().get(getIndex());
@@ -372,6 +416,7 @@ public class EvenementsController implements Initializable {
                             "Supprimer « " + s.getNom() + " » ?", "Cette action est irréversible.");
                     if (ok && sponsorService.delete(s.getId())) {
                         sponsorList.remove(s);
+                        NexusDialog.showInfo("Succès", "Sponsor supprimé.");
                     }
                 });
             }
@@ -379,7 +424,6 @@ public class EvenementsController implements Initializable {
                 super.updateItem(item, empty); setGraphic(empty ? null : box);
             }
         });
-        cAct.setPrefWidth(120);
 
         table.getColumns().addAll(cId, cNom, cType, cEmail, cTel, cPrix, cAct);
 
@@ -398,10 +442,16 @@ public class EvenementsController implements Initializable {
         root.setPadding(new Insets(28, 30, 28, 30));
         root.setStyle(dialogStyle());
 
-        Scene scene = new Scene(root, 720, 400);
+        Scene scene = new Scene(root, 730, 400);
         scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
         stage.setScene(scene);
         stage.showAndWait();
+    }
+
+    private <T> TableColumn<Sponsor, T> col(String text, int width) {
+        TableColumn<Sponsor, T> c = new TableColumn<>(text);
+        c.setPrefWidth(width);
+        return c;
     }
 
     private void showSponsorForm(Sponsor existing, Evenement ev, ObservableList<Sponsor> list) {
@@ -412,31 +462,31 @@ public class EvenementsController implements Initializable {
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setResizable(false);
 
-        TextField         fieldNom   = styledField("Nom du sponsor");
-        ComboBox<String>  comboType  = new ComboBox<>(FXCollections.observableArrayList("entreprise", "humain"));
+        TextField        fieldNom   = styledField("Nom du sponsor");
+        ComboBox<String> comboType  = new ComboBox<>(FXCollections.observableArrayList("entreprise", "humain"));
         comboType.setStyle(fieldStyle()); comboType.setValue("entreprise");
-        TextField         fieldEmail = styledField("Email");
-        TextField         fieldTel   = styledField("Téléphone (8 chiffres)");
-        TextField         fieldPrix  = styledField("Budget (€)");
-        Label             lblError   = errorLabel();
+        TextField        fieldEmail = styledField("Email");
+        TextField        fieldTel   = styledField("Téléphone (8 chiffres)");
+        TextField        fieldPrix  = styledField("Budget (€)");
+        Label            lblError   = errorLabel();
 
         if (isEdit) {
             fieldNom.setText(existing.getNom());
             comboType.setValue(existing.getType());
-            fieldEmail.setText(existing.getEmail() != null ? existing.getEmail() : "");
-            fieldTel.setText(existing.getTel() != null ? existing.getTel() : "");
+            fieldEmail.setText(existing.getEmail()  != null ? existing.getEmail()  : "");
+            fieldTel.setText(existing.getTel()    != null ? existing.getTel()    : "");
             fieldPrix.setText(String.valueOf((int) existing.getPrix()));
         }
 
         Label title = formTitle(isEdit ? "MODIFIER SPONSOR" : "NOUVEAU SPONSOR");
 
-        VBox form = new VBox(10,
+        VBox form = new VBox(8,
                 title, gradientSep(),
-                formLabel("Nom *"), fieldNom,
-                formLabel("Type *"), comboType,
-                formLabel("Email"), fieldEmail,
-                formLabel("Téléphone"), fieldTel,
-                formLabel("Budget (€) *"), fieldPrix,
+                formLabel("Nom *"),          fieldNom,
+                formLabel("Type *"),         comboType,
+                formLabel("Email"),          fieldEmail,
+                formLabel("Téléphone"),      fieldTel,
+                formLabel("Budget (€) *"),   fieldPrix,
                 lblError
         );
         form.setPadding(new Insets(28, 30, 10, 30));
@@ -451,24 +501,21 @@ public class EvenementsController implements Initializable {
         root.setStyle(dialogStyle());
 
         btnSave.setOnAction(e -> {
-            String nom   = fieldNom.getText().trim();
-            String type  = comboType.getValue();
-            String email = fieldEmail.getText().trim();
-            String tel   = fieldTel.getText().trim();
+            String nom     = fieldNom.getText().trim();
+            String type    = comboType.getValue();
+            String email   = fieldEmail.getText().trim();
+            String tel     = fieldTel.getText().trim();
             String prixStr = fieldPrix.getText().trim();
 
-            // Validations
-            if (nom.isEmpty())   { lblError.setText("Le nom est obligatoire."); return; }
-            if (nom.length() < 2){ lblError.setText("Le nom doit contenir au moins 2 caractères."); return; }
+            if (nom.isEmpty())    { lblError.setText("Le nom est obligatoire.");               return; }
+            if (nom.length() < 2) { lblError.setText("Le nom doit contenir au moins 2 caractères."); return; }
 
             if (!email.isEmpty() && !email.matches("^[\\w._%+\\-]+@[\\w.\\-]+\\.[a-zA-Z]{2,}$")) {
                 lblError.setText("Format d'email invalide."); return;
             }
 
-            if (!tel.isEmpty()) {
-                if (!tel.matches("\\d{8}")) {
-                    lblError.setText("Le téléphone doit contenir exactement 8 chiffres."); return;
-                }
+            if (!tel.isEmpty() && !tel.matches("\\d{8}")) {
+                lblError.setText("Le téléphone doit contenir exactement 8 chiffres."); return;
             }
 
             double prix = 0;
@@ -481,13 +528,20 @@ public class EvenementsController implements Initializable {
                 }
             }
 
+            boolean confirmed = NexusDialog.showConfirm(
+                    isEdit ? "Modifier le sponsor" : "Créer le sponsor",
+                    isEdit ? "Modifier « " + nom + " » ?" : "Créer le sponsor « " + nom + " » ?",
+                    "Veuillez confirmer cette action."
+            );
+            if (!confirmed) return;
+
             Sponsor s = isEdit ? existing
                     : new Sponsor(nom, type, email.isEmpty() ? null : email,
-                            tel.isEmpty() ? null : tel, prix, ev.getId());
+                    tel.isEmpty() ? null : tel, prix, ev.getId());
             if (isEdit) {
                 s.setNom(nom); s.setType(type);
                 s.setEmail(email.isEmpty() ? null : email);
-                s.setTel(tel.isEmpty() ? null : tel);
+                s.setTel(tel.isEmpty()     ? null : tel);
                 s.setPrix(prix);
             }
 
@@ -502,7 +556,7 @@ public class EvenementsController implements Initializable {
 
         btnCancel.setOnAction(e -> stage.close());
 
-        Scene scene = new Scene(root, 420, 480);
+        Scene scene = new Scene(root, 420, 550);
         scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
         stage.setScene(scene);
         stage.showAndWait();
@@ -521,29 +575,31 @@ public class EvenementsController implements Initializable {
 
     private String fieldStyle() {
         return "-fx-background-color: #1a1035; -fx-text-fill: #e2e8f0;" +
-               "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
-               "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;" +
-               "-fx-font-family: 'Courier New'; -fx-font-size: 13px; -fx-padding: 10 14 10 14;";
+                "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
+                "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;" +
+                "-fx-font-family: 'Courier New'; -fx-font-size: 13px; -fx-padding: 10 14 10 14;";
     }
 
     private String textAreaStyle() {
         return "-fx-background-color: #1a1035; -fx-text-fill: #e2e8f0;" +
-               "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
-               "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;" +
-               "-fx-font-family: 'Courier New'; -fx-font-size: 13px; -fx-padding: 10 14 10 14;";
+                "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
+                "-fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;" +
+                "-fx-font-family: 'Courier New'; -fx-font-size: 13px; -fx-padding: 10 14 10 14;" +
+                "-fx-control-inner-background: #1a1035;";
     }
 
+    // FIX: description label — same style as all other labels
     private Label formLabel(String text) {
         Label l = new Label(text);
         l.setStyle("-fx-text-fill: #c4b5fd; -fx-font-size: 11px; -fx-font-weight: bold;" +
-                   "-fx-font-family: 'Courier New'; -fx-letter-spacing: 1px;");
+                "-fx-font-family: 'Courier New'; -fx-letter-spacing: 1px;");
         return l;
     }
 
     private Label formTitle(String text) {
         Label l = new Label(text);
         l.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" +
-                   "-fx-font-family: 'Courier New'; -fx-letter-spacing: 2px;");
+                "-fx-font-family: 'Courier New'; -fx-letter-spacing: 2px;");
         return l;
     }
 
@@ -557,22 +613,21 @@ public class EvenementsController implements Initializable {
     private Button primaryBtn(String text) {
         Button b = new Button(text);
         String s = "-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);" +
-                   "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
-                   "-fx-background-radius: 8px; -fx-padding: 9 28 9 28; -fx-cursor: hand;" +
-                   "-fx-border-color: transparent;";
+                "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 8px; -fx-padding: 9 28 9 28; -fx-cursor: hand;" +
+                "-fx-border-color: transparent;";
         b.setStyle(s);
-        b.setOnMouseEntered(e -> b.setStyle(s.replace("#7c3aed", "#6d28d9").replace("#ec4899","#db2777")));
+        b.setOnMouseEntered(e -> b.setStyle(s.replace("#7c3aed","#6d28d9").replace("#ec4899","#db2777")));
         b.setOnMouseExited(e  -> b.setStyle(s));
         return b;
     }
 
     private Button cancelBtn(String text) {
         Button b = new Button(text);
-        String s = "-fx-background-color: transparent; -fx-text-fill: #9ca3af;" +
-                   "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8px;" +
-                   "-fx-padding: 9 28 9 28; -fx-cursor: hand;" +
-                   "-fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 1.5px; -fx-border-radius: 8px;";
-        b.setStyle(s);
+        b.setStyle("-fx-background-color: transparent; -fx-text-fill: #9ca3af;" +
+                "-fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8px;" +
+                "-fx-padding: 9 28 9 28; -fx-cursor: hand;" +
+                "-fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 1.5px; -fx-border-radius: 8px;");
         return b;
     }
 
@@ -587,8 +642,8 @@ public class EvenementsController implements Initializable {
 
     private String dialogStyle() {
         return "-fx-background-color: #110f28;" +
-               "-fx-border-color: rgba(139,92,246,0.45);" +
-               "-fx-border-width: 1.5px; -fx-border-radius: 14px; -fx-background-radius: 14px;" +
-               "-fx-effect: dropshadow(gaussian, rgba(139,92,246,0.5), 30, 0.3, 0, 6);";
+                "-fx-border-color: rgba(139,92,246,0.45); -fx-border-width: 1.5px;" +
+                "-fx-border-radius: 14px; -fx-background-radius: 14px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(139,92,246,0.5), 30, 0.3, 0, 6);";
     }
 }

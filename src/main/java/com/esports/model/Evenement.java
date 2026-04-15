@@ -15,10 +15,9 @@ public class Evenement {
     private String        lieu;
     private int           nbrParticipant;
     private String        image;
-    private LocalDateTime createdAt;
 
     public Evenement(int id, String nom, String description, LocalDate date,
-                     String lieu, int nbrParticipant, String image, LocalDateTime createdAt) {
+                     String lieu, int nbrParticipant, String image) {
         this.id            = id;
         this.nom           = nom;
         this.description   = description;
@@ -26,7 +25,6 @@ public class Evenement {
         this.lieu          = lieu;
         this.nbrParticipant = nbrParticipant;
         this.image         = image;
-        this.createdAt     = createdAt;
     }
 
     public Evenement(String nom, String description, LocalDate date,
@@ -37,7 +35,6 @@ public class Evenement {
         this.lieu          = lieu;
         this.nbrParticipant = nbrParticipant;
         this.image         = image;
-        this.createdAt     = LocalDateTime.now();
     }
 
     public int           getId()              { return id; }
@@ -54,8 +51,6 @@ public class Evenement {
     public void          setNbrParticipant(int n) { this.nbrParticipant = n; }
     public String        getImage()           { return image; }
     public void          setImage(String i)   { this.image = i; }
-    public LocalDateTime getCreatedAt()       { return createdAt; }
-    public void          setCreatedAt(LocalDateTime d) { this.createdAt = d; }
 
     public boolean isPast() {
         return date != null && date.isBefore(LocalDate.now());
