@@ -87,9 +87,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void onEvents() {
-        navigate("/com/esports/fxml/EvenementsView.fxml", btnEvents);
-    }
+    private void onEvents() { navigate("/com/esports/fxml/EvenementsView.fxml", btnEvents); }
 
 
     @FXML
