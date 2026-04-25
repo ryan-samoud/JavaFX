@@ -2,6 +2,7 @@ package com.esports.controller;
 
 import com.esports.model.User;
 import com.esports.service.UserService;
+import com.esports.utils.CaptchaDialog;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -139,7 +140,13 @@ public class RegisterController implements Initializable {
 
         if (!valid) return;
 
-        // ── Envoi async ─────────────────────────────────────────────
+        // ── CAPTCHA ─────────────────────────────────────────────────────────
+        if (!CaptchaDialog.show(btnRegister.getScene().getWindow())) {
+            lblError.setText("⚠ Vérification de sécurité requise pour créer un compte.");
+            return;
+        }
+
+        //mail comp ── Envoi async ─────────────────────────────────────────────
         btnRegister.setDisable(true);
         btnRegister.setText("Inscription...");
 

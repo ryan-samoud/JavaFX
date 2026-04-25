@@ -3,6 +3,7 @@ package com.esports.service;
 import com.esports.interfaces.IUserService;
 import com.esports.model.User;
 import com.esports.utils.DatabaseConnection;
+import com.esports.utils.PasswordUtil;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -29,6 +30,10 @@ public class UserService implements IUserService {
             try { stmt.execute("ALTER TABLE user ADD COLUMN ban_reason VARCHAR(500) NULL"); }
             catch (SQLException ignored) {}
             try { stmt.execute("ALTER TABLE user ADD COLUMN suspended_until DATETIME NULL"); }
+            catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE user ADD COLUMN reset_token VARCHAR(10) NULL"); }
+            catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE user ADD COLUMN reset_token_expiry DATETIME NULL"); }
             catch (SQLException ignored) {}
         } catch (Exception e) {
             System.err.println("[UserService] ensureColumns: " + e.getMessage());
@@ -144,7 +149,11 @@ public class UserService implements IUserService {
             stmt.setString(3, user.getEmail());
             stmt.setInt(4,    user.getAge());
             stmt.setString(5, user.getRole());
-            stmt.setString(6, user.getPassword());
+            // Hash password if not already hashed
+            String pwd = PasswordUtil.isHashed(user.getPassword())
+                    ? user.getPassword()
+                    : PasswordUtil.hash(user.getPassword());
+            stmt.setString(6, pwd); //injection
             return stmt.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("[UserService] save: " + e.getMessage());
@@ -163,7 +172,10 @@ public class UserService implements IUserService {
             stmt.setString(2, user.getPrenom());
             stmt.setString(3, user.getEmail());
             stmt.setInt(4,    user.getAge());
-            stmt.setString(5, user.getPassword());
+            String pwd = PasswordUtil.isHashed(user.getPassword())
+                    ? user.getPassword()
+                    : PasswordUtil.hash(user.getPassword());
+            stmt.setString(5, pwd);
             stmt.setString(6, user.getPhoto());
             stmt.setInt(7,    user.getId());
             return stmt.executeUpdate() > 0;
@@ -232,6 +244,79 @@ public class UserService implements IUserService {
             return stmt.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("[UserService] suspend: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // ─────────────────────────────
+    // PASSWORD RESET — save token
+    // ─────────────────────────────
+    public boolean saveResetToken(String email, String token, LocalDateTime expiry) {
+        String sql = "UPDATE user SET reset_token=?, reset_token_expiry=? WHERE email=?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, token);
+            stmt.setTimestamp(2, Timestamp.valueOf(expiry));
+            stmt.setString(3, email);
+            return stmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("[UserService] saveResetToken ERROR: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // ─────────────────────────────
+    // PASSWORD RESET — find by token (not expired)
+    // Expiry is checked in Java to avoid MySQL NOW() timezone issues.
+    // ─────────────────────────────
+    public Optional<User> findByResetToken(String token) {
+        String sql = "SELECT * FROM user WHERE reset_token=?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, token);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Timestamp expiry = null;
+                try { expiry = rs.getTimestamp("reset_token_expiry"); } catch (SQLException ignored) {}
+                if (expiry == null || expiry.toLocalDateTime().isBefore(LocalDateTime.now())) {
+                    System.err.println("[UserService] findByResetToken: token expired or no expiry");
+                    return Optional.empty();
+                }
+                return Optional.of(map(rs));
+            }
+        } catch (Exception e) {
+            System.err.println("[UserService] findByResetToken: " + e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    // ─────────────────────────────
+    // PASSWORD RESET — clear token after use
+    // ─────────────────────────────
+    public boolean clearResetToken(int userId) {
+        String sql = "UPDATE user SET reset_token=NULL, reset_token_expiry=NULL WHERE id=?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("[UserService] clearResetToken: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // ─────────────────────────────
+    // PASSWORD RESET — update password only
+    // ─────────────────────────────
+    public boolean updatePassword(int userId, String hashedPassword) {
+        String sql = "UPDATE user SET password=? WHERE id=?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, hashedPassword);
+            stmt.setInt(2, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("[UserService] updatePassword: " + e.getMessage());
         }
         return false;
     }

@@ -88,6 +88,13 @@
             <version>${jbcrypt.version}</version>
         </dependency>
 
+        <!-- ── Email (JavaMail / SMTP) ──────────────────────────── -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
         <!-- ── Tests — JUnit 5 ──────────────────────────────────── -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

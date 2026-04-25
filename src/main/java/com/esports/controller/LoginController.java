@@ -1,6 +1,7 @@
 package com.esports.controller;
 
 import com.esports.service.AuthService;
+import com.esports.utils.CaptchaDialog;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -51,6 +52,12 @@ public class LoginController implements Initializable {
 
         if (email.isEmpty() || password.isEmpty()) {
             lblError.setText("⚠ Veuillez remplir tous les champs.");
+            return;
+        }
+
+        // CAPTCHA verification before login
+        if (!CaptchaDialog.show(btnLogin.getScene().getWindow())) {
+            lblError.setText("⚠ Vérification de sécurité requise.");
             return;
         }
 
@@ -308,6 +315,11 @@ public class LoginController implements Initializable {
     @FXML
     private void onGoRegister() {
         navigateTo("/com/esports/fxml/RegisterView.fxml", "Inscription");
+    }
+
+    @FXML
+    private void onForgotPassword() {
+        navigateTo("/com/esports/fxml/ForgotPasswordView.fxml", "Mot de passe oublié");
     }
 
     private void goHome() {

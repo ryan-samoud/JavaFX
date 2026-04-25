@@ -1,6 +1,7 @@
 package com.esports.service;
 
 import com.esports.model.User;
+import com.esports.utils.PasswordUtil;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class AuthService {
 
         User user = anyOpt.get();
 
-        if (!user.getPassword().equals(password))
+        if (!PasswordUtil.verify(password, user.getPassword()))
             return AuthResult.failure("Mot de passe incorrect");
 
         // Banned
