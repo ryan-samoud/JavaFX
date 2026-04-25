@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import java.net.URL?>
+
+<ScrollPane fitToWidth="true" fitToHeight="true"
+            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            minWidth="1280" minHeight="800"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.EditProfileController"
+            styleClass="home-scroll">
+
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+        <URL value="@../css/register.css"/>
+    </stylesheets>
+
+    <VBox styleClass="home-root" spacing="0" minWidth="1280" minHeight="800">
+
+        <!-- NAVBAR -->
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white;
+                       -fx-font-size: 15px; -fx-font-weight: bold;
+                       -fx-background-radius: 6px; -fx-padding: 4 9 4 9;"/>
+                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18px;
+                       -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="← Retour" onAction="#onBack" styleClass="btn-outline-sm"/>
+        </HBox>
+
+        <!-- EDIT FORM -->
+        <VBox alignment="CENTER" spacing="24" VBox.vgrow="ALWAYS"
+              style="-fx-background-color: linear-gradient(to bottom, #100c2a, #0d0b1e);
+                     -fx-padding: 40 40 60 40;">
+
+            <Label text="MODIFIER MON PROFIL"
+                   style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+            <!-- PHOTO -->
+            <VBox alignment="CENTER" spacing="12">
+
+                <StackPane alignment="CENTER">
+                    <!-- Avatar initiales (fallback) -->
+                    <Label fx:id="lblAvatarEdit"
+                           text=""
+                           style="-fx-background-color: linear-gradient(to bottom right,#7c3aed,#ec4899);
+                                  -fx-text-fill: white; -fx-font-size: 30px; -fx-font-weight: bold;
+                                  -fx-background-radius: 50%; -fx-alignment: center;
+                                  -fx-min-width: 90px; -fx-min-height: 90px;
+                                  -fx-max-width: 90px; -fx-max-height: 90px;"/>
+                    <!-- Photo si disponible -->
+                    <ImageView fx:id="imgPhoto"
+                               fitWidth="90" fitHeight="90"
+                               preserveRatio="false"
+                               style="-fx-background-radius: 50%;"
+                               visible="false"/>
+                </StackPane>
+
+                <Button text="📷  Choisir une photo"
+                        onAction="#onPickPhoto"
+                        style="-fx-background-color: rgba(168,85,247,0.15);
+                               -fx-text-fill: #c084fc;
+                               -fx-border-color: rgba(168,85,247,0.5);
+                               -fx-border-width: 1.5px; -fx-border-radius: 8px;
+                               -fx-background-radius: 8px;
+                               -fx-font-size: 13px; -fx-font-weight: bold;
+                               -fx-padding: 8 20 8 20; -fx-cursor: hand;"/>
+                <Label fx:id="lblPhotoPath"
+                       text=""
+                       style="-fx-text-fill: #6b7280; -fx-font-size: 11px;"/>
+            </VBox>
+
+            <!-- FIELDS -->
+            <VBox spacing="12" maxWidth="420">
+
+                <HBox spacing="10">
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Nom" styleClass="field-label"/>
+                        <TextField fx:id="fieldNom" styleClass="input-field"/>
+                        <Label fx:id="errNom" styleClass="error-label"/>
+                    </VBox>
+                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                        <Label text="Prénom" styleClass="field-label"/>
+                        <TextField fx:id="fieldPrenom" styleClass="input-field"/>
+                        <Label fx:id="errPrenom" styleClass="error-label"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="4">
+                    <Label text="Email" styleClass="field-label"/>
+                    <TextField fx:id="fieldEmail" styleClass="input-field"/>
+                    <Label fx:id="errEmail" styleClass="error-label"/>
+                </VBox>
+
+                <VBox spacing="4">
+                    <Label text="Âge" styleClass="field-label"/>
+                    <TextField fx:id="fieldAge" styleClass="input-field"/>
+                    <Label fx:id="errAge" styleClass="error-label"/>
+                </VBox>
+
+                <VBox spacing="4">
+                    <Label text="Nouveau mot de passe (laisser vide = inchangé)"
+                           styleClass="field-label"/>
+                    <PasswordField fx:id="fieldPassword" promptText="Nouveau mot de passe"
+                                  styleClass="input-field"/>
+                    <Label fx:id="errPassword" styleClass="error-label"/>
+                </VBox>
+
+                <VBox spacing="4">
+                    <Label text="Confirmer le mot de passe" styleClass="field-label"/>
+                    <PasswordField fx:id="fieldConfirm" promptText="Répéter le mot de passe"
+                                  styleClass="input-field"/>
+                    <Label fx:id="errConfirm" styleClass="error-label"/>
+                </VBox>
+
+                <Label fx:id="lblSuccess" styleClass="hero-stat-value" wrapText="true"/>
+                <Label fx:id="lblError"   styleClass="error-label"     wrapText="true"/>
+
+                <Button fx:id="btnSave"
+                        text="ENREGISTRER"
+                        onAction="#onSave"
+                        styleClass="btn-neon"
+                        maxWidth="Infinity"/>
+
+                <Button text="Annuler"
+                        onAction="#onBack"
+                        styleClass="btn-hero-ghost"
+                        maxWidth="Infinity"/>
+            </VBox>
+
+        </VBox>
+    </VBox>
+</ScrollPane>

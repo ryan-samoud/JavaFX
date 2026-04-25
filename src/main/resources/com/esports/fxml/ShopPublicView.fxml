@@ -44,9 +44,19 @@
                            -fx-padding: 7 14 5 14; -fx-background-radius: 6px;"/>
             <Button text="Événements" styleClass="nav-link"/>
 
-            <!-- Icônes Trophée / Panier -->
+            <!-- Icône Trophée -->
             <Label text="🏆" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
-            <Label text="🛒" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
+
+            <!-- Icône Panier avec badge -->
+            <StackPane onMouseClicked="#onOpenPanier" style="-fx-cursor: hand;">
+                <Label text="🛒" style="-fx-font-size: 18px;"/>
+                <Label fx:id="lblPanierCount" text=""
+                       visible="false" managed="false"
+                       style="-fx-background-color: #ec4899; -fx-text-fill: white;
+                              -fx-font-size: 9px; -fx-font-weight: bold;
+                              -fx-background-radius: 10px; -fx-padding: 1 4 1 4;"
+                       StackPane.alignment="TOP_RIGHT"/>
+            </StackPane>
 
             <!-- Nom utilisateur connecté -->
             <Label fx:id="lblConnectedUser" text=""
@@ -73,6 +83,7 @@
             <Button fx:id="btnConnexion" text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
 
             <Button fx:id="btnInscrire" text="S'inscrire"
+                    onAction="#onRegister"
                     style="-fx-background-color: transparent;
                            -fx-text-fill: white;
                            -fx-border-color: rgba(255,255,255,0.5);
