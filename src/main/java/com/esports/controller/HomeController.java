@@ -87,7 +87,7 @@ public class HomeController implements Initializable {
 
     @FXML
     private void onShop() {
-        navigateTo("/com/esports/fxml/ShopView.fxml", "Shop");
+        navigateTo("/com/esports/fxml/ShopPublicView.fxml", "Shop");
     }
 
     // ================= LOGOUT =================
