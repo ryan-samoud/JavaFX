@@ -50,6 +50,7 @@ public class EvenementsController implements Initializable {
     private static final String IMAGES_FOLDER = "src/main/resources/images/events/";
 
     @FXML private Label            lblEventCount;
+    @FXML private Label            lblFlagCount;
     @FXML private TextField        fieldSearch;
     @FXML private ComboBox<String> comboSort;
 
@@ -64,6 +65,7 @@ public class EvenementsController implements Initializable {
 
     private final IEvenementService evenementService = new EvenementService();
     private final ISponsorService   sponsorService   = new SponsorService();
+    private final com.esports.service.CommentaireService commentaireService = new com.esports.service.CommentaireService();
 
     private ObservableList<Evenement> masterList  = FXCollections.observableArrayList();
     private FilteredList<Evenement>   filteredList;
@@ -80,6 +82,7 @@ public class EvenementsController implements Initializable {
         setupColumns();
         setupFilters();
         loadEvents();
+        loadFlagCount();
     }
 
     // ══════════════════════════════════════════════════
@@ -306,6 +309,11 @@ public class EvenementsController implements Initializable {
 
             if (nom.isEmpty())     { lblError.setText("Le nom est obligatoire.");                          return; }
             if (nom.length() < 3)  { lblError.setText("Le nom doit contenir au moins 3 caractères.");     return; }
+            int excludeId = isEdit ? existing.getId() : 0;
+            if (evenementService.existsByNom(nom, excludeId)) {
+                lblError.setText("Un événement avec ce nom existe déjà. Veuillez choisir un nom unique.");
+                return;
+            }
             if (date == null)      { lblError.setText("La date est obligatoire.");                          return; }
             if (lieu.isEmpty())    { lblError.setText("Le lieu est obligatoire.");                          return; }
 
@@ -645,5 +653,135 @@ public class EvenementsController implements Initializable {
                 "-fx-border-color: rgba(139,92,246,0.45); -fx-border-width: 1.5px;" +
                 "-fx-border-radius: 14px; -fx-background-radius: 14px;" +
                 "-fx-effect: dropshadow(gaussian, rgba(139,92,246,0.5), 30, 0.3, 0, 6);";
+    }
+
+    // ══════════════════════════════════════════════════
+    // FLAGGED COMMENTS NOTIFICATION
+    // ══════════════════════════════════════════════════
+
+    private void loadFlagCount() {
+        if (lblFlagCount == null) return;
+        int count = commentaireService.findFlagged().size();
+        if (count > 0) {
+            lblFlagCount.setText(String.valueOf(count));
+            lblFlagCount.setVisible(true);
+            lblFlagCount.setManaged(true);
+        } else {
+            lblFlagCount.setVisible(false);
+            lblFlagCount.setManaged(false);
+        }
+    }
+
+    @FXML
+    private void onShowFlagged() {
+        java.util.List<com.esports.model.Commentaire> flagged = commentaireService.findFlagged();
+
+        Stage stage = new Stage();
+        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        stage.setTitle("Commentaires signalés");
+        stage.setResizable(false);
+
+        Label title = formTitle("🚩 COMMENTAIRES SIGNALÉS");
+
+        javafx.scene.Node sep = gradientSep();
+
+        javafx.scene.layout.VBox list = new javafx.scene.layout.VBox(10);
+        list.setMaxHeight(420);
+
+        if (flagged.isEmpty()) {
+            Label empty = new Label("Aucun commentaire signalé.");
+            empty.setStyle("-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 13px;");
+            list.getChildren().add(empty);
+        } else {
+            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            for (com.esports.model.Commentaire c : flagged) {
+                javafx.scene.layout.VBox card = new javafx.scene.layout.VBox(6);
+                card.setPadding(new javafx.geometry.Insets(12, 14, 12, 14));
+                card.setStyle("-fx-background-color: rgba(239,68,68,0.08);" +
+                        "-fx-border-color: rgba(239,68,68,0.3); -fx-border-width: 1;" +
+                        "-fx-border-radius: 8px; -fx-background-radius: 8px;");
+
+                javafx.scene.layout.HBox header = new javafx.scene.layout.HBox(10);
+                header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+                Label auteur = new Label("👤 " + (c.getAuteurNom() != null ? c.getAuteurNom() : "Utilisateur"));
+                auteur.setStyle("-fx-text-fill: #c084fc; -fx-font-weight: bold; -fx-font-size: 12px; -fx-font-family: 'Courier New';");
+
+                javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+                javafx.scene.layout.HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
+                Label dateLabel = new Label(c.getCreatedAt() != null ? c.getCreatedAt().format(fmt) : "");
+                dateLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 10px; -fx-font-family: 'Courier New';");
+
+                // Approve button
+                Button btnApprove = new Button("✓ Approuver");
+                btnApprove.setStyle("-fx-background-color: rgba(74,222,128,0.15); -fx-text-fill: #4ade80;" +
+                        "-fx-border-color: rgba(74,222,128,0.3); -fx-border-width: 1;" +
+                        "-fx-border-radius: 4; -fx-background-radius: 4;" +
+                        "-fx-font-size: 10px; -fx-padding: 3 10 3 10; -fx-cursor: hand; -fx-font-family: 'Courier New';");
+                btnApprove.setOnAction(e -> {
+                    commentaireService.approveFlagged(c.getId());
+                    list.getChildren().remove(card);
+                    loadFlagCount();
+                    if (list.getChildren().isEmpty()) {
+                        Label empty = new Label("Aucun commentaire signalé.");
+                        empty.setStyle("-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 13px;");
+                        list.getChildren().add(empty);
+                    }
+                });
+
+                // Delete button
+                Button btnDel = new Button("🗑 Supprimer");
+                btnDel.setStyle("-fx-background-color: rgba(239,68,68,0.15); -fx-text-fill: #f87171;" +
+                        "-fx-border-color: rgba(239,68,68,0.3); -fx-border-width: 1;" +
+                        "-fx-border-radius: 4; -fx-background-radius: 4;" +
+                        "-fx-font-size: 10px; -fx-padding: 3 10 3 10; -fx-cursor: hand; -fx-font-family: 'Courier New';");
+                btnDel.setOnAction(e -> {
+                    boolean ok = NexusDialog.showConfirm("Supprimer", "Supprimer ce commentaire ?", "Cette action est irréversible.");
+                    if (ok && commentaireService.delete(c.getId())) {
+                        list.getChildren().remove(card);
+                        loadFlagCount();
+                        if (list.getChildren().isEmpty()) {
+                            Label empty = new Label("Aucun commentaire signalé.");
+                            empty.setStyle("-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 13px;");
+                            list.getChildren().add(empty);
+                        }
+                    }
+                });
+
+                header.getChildren().addAll(auteur, spacer, dateLabel, btnApprove, btnDel);
+
+                Label contenu = new Label(c.getContenu());
+                contenu.setStyle("-fx-text-fill: #d1d5db; -fx-font-size: 12px; -fx-font-family: 'Courier New';");
+                contenu.setWrapText(true);
+
+                card.getChildren().addAll(header, contenu);
+                list.getChildren().add(card);
+            }
+        }
+
+        javafx.scene.control.ScrollPane scroll = new javafx.scene.control.ScrollPane(list);
+        scroll.setFitToWidth(true);
+        scroll.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-background: transparent;");
+        scroll.setMaxHeight(420);
+
+        Button btnClose = cancelBtn("Fermer");
+        btnClose.setOnAction(e -> stage.close());
+        javafx.scene.layout.HBox btnRow = new javafx.scene.layout.HBox(btnClose);
+        btnRow.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        btnRow.setPadding(new javafx.geometry.Insets(10, 30, 28, 30));
+
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(0);
+        javafx.scene.layout.VBox inner = new javafx.scene.layout.VBox(10, title, sep, scroll);
+        inner.setPadding(new javafx.geometry.Insets(28, 30, 10, 30));
+        content.getChildren().addAll(inner, btnRow);
+        content.setStyle(dialogStyle());
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(content, 560, 560);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 }
