@@ -31,8 +31,15 @@ import javafx.util.Duration;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+
+import com.esports.service.VisionService;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.stage.FileChooser;
+import java.io.File;
 
 public class ShopPublicController implements Initializable {
 
@@ -46,14 +53,24 @@ public class ShopPublicController implements Initializable {
     @FXML private ComboBox<String> comboTri;
     @FXML private FlowPane flowProduits;
     @FXML private Label lblEmpty;
+    @FXML private HBox hboxLoading;
 
     private final ProduitService          produitService = new ProduitService();
     private final CategorieProduitService catService     = new CategorieProduitService();
     private final PanierService           panierService  = new PanierService();
+    private final VisionService           visionService  = new VisionService();
 
     private List<Produit> allProduits;
+
+    // Garde la dernière liste affichée (résultats vision ou tous les produits)
+    private List<Produit> currentDisplayList;
+
+    // true = on est en mode résultats vision, false = mode normal
+    private boolean modeRecherche = false;
+
     private int selectedCategorieId = 0;
     private int panierId = 0;
+
     static {
         System.out.println("[DEBUG] ShopPublicController CLASS LOADED");
     }
@@ -82,10 +99,112 @@ public class ShopPublicController implements Initializable {
         refreshNavbar();
         setupTri();
         allProduits = produitService.findAll();
+        currentDisplayList = new ArrayList<>(allProduits);
         buildCategoryPills();
         renderCards(allProduits);
         updatePanierBadge();
     }
+
+    // ══════════════════════════════════════════════════════════════
+    // RECHERCHE PAR IMAGE
+    // ══════════════════════════════════════════════════════════════
+
+    @FXML
+    private void onRechercherParImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image de produit");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Images", "*.jpg", "*.jpeg", "*.png", "*.webp")
+        );
+
+        Stage stage = (Stage) flowProduits.getScene().getWindow();
+        File imageFile = fileChooser.showOpenDialog(stage);
+        if (imageFile == null) return;
+
+        // Snapshot immédiat de allProduits pour éviter toute modification concurrente
+        final List<Produit> produitsPourRecherche = new ArrayList<>(allProduits);
+
+        setLoadingState(true);
+
+        Task<List<Produit>> task = new Task<>() {
+            @Override
+            protected List<Produit> call() throws Exception {
+                System.out.println("[VISION] Fichier: " + imageFile.getName());
+                List<String> labels = visionService.analyserImage(imageFile);
+                System.out.println("[VISION] Labels retournes: " + labels);
+
+                if (labels.isEmpty()) {
+                    System.out.println("[VISION] Aucun label — API probablement pas configuree");
+                    return new ArrayList<>();
+                }
+
+                List<Produit> resultats = visionService.chercherProduitsParLabels(labels, produitsPourRecherche);
+                System.out.println("[VISION] Resultats matching: " + resultats.size() + " produit(s)");
+                resultats.forEach(p -> System.out.println("[VISION]   -> " + p.getId() + " | " + p.getNom()));
+                return resultats;
+            }
+        };
+
+        task.setOnSucceeded(workerStateEvent -> {
+            setLoadingState(false);
+
+            // getValue() sur le thread JavaFX — aucun risque de race condition
+            List<Produit> resultats = task.getValue();
+
+            System.out.println("[VISION] setOnSucceeded — " + resultats.size() + " produit(s) a afficher");
+
+            if (resultats.isEmpty()) {
+                modeRecherche = false;
+                showNotifRecherche("❌ Aucun produit correspondant trouvé.", false);
+                // Reafficher tous les produits sans toucher au filtre catégorie
+                renderCards(allProduits);
+            } else {
+                modeRecherche = true;
+                // Stocker pour que applyFilter() ne l'écrase pas pendant qu'on affiche
+                currentDisplayList = new ArrayList<>(resultats);
+                showNotifRecherche("✅ " + resultats.size() + " produit(s) trouvé(s) !", true);
+                // Appel direct et synchrone sur le thread JavaFX
+                renderCards(currentDisplayList);
+            }
+        });
+
+        task.setOnFailed(workerStateEvent -> {
+            setLoadingState(false);
+            Throwable ex = task.getException();
+            System.out.println("[VISION] ERREUR Task: " + (ex != null ? ex.getMessage() : "inconnue"));
+            if (ex != null) ex.printStackTrace();
+            showNotifRecherche("❌ Erreur lors de l'analyse de l'image.", false);
+        });
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
+    }
+
+    @FXML
+    private void onResetRecherche() {
+        modeRecherche = false;
+        selectedCategorieId = 0;
+        // Remettre la pill "Tous" active visuellement
+        if (boxCategories != null) {
+            boxCategories.getChildren().forEach(node -> {
+                if (node instanceof Button b) stylePill(b, b.getText().equals("Tous"));
+            });
+        }
+        currentDisplayList = new ArrayList<>(allProduits);
+        renderCards(allProduits);
+        showNotifRecherche("↺ Tous les produits affichés", true);
+    }
+
+    private void setLoadingState(boolean loading) {
+        if (hboxLoading != null) {
+            hboxLoading.setVisible(loading);
+            hboxLoading.setManaged(loading);
+        }
+        flowProduits.setOpacity(loading ? 0.4 : 1.0);
+        flowProduits.setMouseTransparent(loading);
+    }
+
     // ══════════════════════════════════════════════════════════════
     // PANIER
     // ══════════════════════════════════════════════════════════════
@@ -120,7 +239,6 @@ public class ShopPublicController implements Initializable {
         showNexusNotification(p.getNom());
     }
 
-    // ── Notification stylisée NexUS ───────────────────────────────
     private void showNexusNotification(String nomProduit) {
         Stage notif = new Stage();
         notif.initStyle(StageStyle.TRANSPARENT);
@@ -128,7 +246,6 @@ public class ShopPublicController implements Initializable {
 
         Stage mainStage = (Stage) flowProduits.getScene().getWindow();
 
-        // Icône + message
         Label icon = new Label("🛒");
         icon.setStyle("-fx-font-size: 26px;");
 
@@ -142,7 +259,6 @@ public class ShopPublicController implements Initializable {
         texts.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(texts, Priority.ALWAYS);
 
-        // Bouton fermer
         Button btnClose = new Button("✕");
         btnClose.setStyle(
                 "-fx-background-color: transparent; -fx-text-fill: #9ca3af;" +
@@ -168,24 +284,20 @@ public class ShopPublicController implements Initializable {
         scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
         notif.setScene(scene);
 
-        // Position bas droite
         notif.setX(mainStage.getX() + mainStage.getWidth() - 370);
         notif.setY(mainStage.getY() + mainStage.getHeight() - 110);
         notif.show();
 
-        // Fermeture auto 3 secondes
         PauseTransition pause = new PauseTransition(Duration.seconds(3));
         pause.setOnFinished(e -> notif.close());
         pause.play();
     }
 
-    // ── Popup détail produit ───────────────────────────────────────
     private void showDetailAvecPanier(Produit p) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initStyle(StageStyle.TRANSPARENT);
 
-        // Image
         ImageView imgView = new ImageView();
         imgView.setFitWidth(440);
         imgView.setFitHeight(260);
@@ -207,7 +319,6 @@ public class ShopPublicController implements Initializable {
             } catch (Exception ignored) {}
         }
 
-        // Infos
         Label lblNom = new Label(p.getNom());
         lblNom.setStyle(
                 "-fx-text-fill: white; -fx-font-size: 22px;" +
@@ -231,7 +342,6 @@ public class ShopPublicController implements Initializable {
                 : "-fx-text-fill: #f87171; -fx-font-size: 13px; -fx-font-weight: bold;"
         );
 
-        // Bouton ajouter
         Button btnAjouter = new Button("🛒  Ajouter au panier");
         btnAjouter.setMaxWidth(Double.MAX_VALUE);
         btnAjouter.setStyle(
@@ -240,12 +350,8 @@ public class ShopPublicController implements Initializable {
                         "-fx-background-radius: 10px; -fx-padding: 13 0 13 0; -fx-cursor: hand;" +
                         "-fx-border-color: transparent;"
         );
-        btnAjouter.setOnAction(e -> {
-            ajouterAuPanier(p);
-            dialog.close();
-        });
+        btnAjouter.setOnAction(e -> { ajouterAuPanier(p); dialog.close(); });
 
-        // Bouton fermer
         Button btnFermer = new Button("✕  Fermer");
         btnFermer.setMaxWidth(Double.MAX_VALUE);
         btnFermer.setStyle(
@@ -287,14 +393,22 @@ public class ShopPublicController implements Initializable {
 
     private void renderCards(List<Produit> list) {
         if (flowProduits == null) return;
+
+        // Toujours opérer sur une copie locale pour éviter les modifications externes
+        List<Produit> snapshot = new ArrayList<>(list);
+
         flowProduits.getChildren().clear();
-        boolean empty = list.isEmpty();
+
+        boolean empty = snapshot.isEmpty();
         if (lblEmpty != null) {
             lblEmpty.setVisible(empty);
             lblEmpty.setManaged(empty);
         }
         if (empty) return;
-        for (Produit p : list) {
+
+        System.out.println("[RENDER] Affichage de " + snapshot.size() + " carte(s):");
+        for (Produit p : snapshot) {
+            System.out.println("[RENDER]   -> id=" + p.getId() + " nom=" + p.getNom());
             flowProduits.getChildren().add(buildCard(p));
         }
     }
@@ -366,7 +480,6 @@ public class ShopPublicController implements Initializable {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         bottomRow.getChildren().addAll(prixBox, spacer, lblStock);
 
-        // ── Bouton Voir plus ──
         Button btnVoir = new Button("👁  Voir plus");
         btnVoir.setMaxWidth(Double.MAX_VALUE);
         btnVoir.setStyle(
@@ -376,9 +489,10 @@ public class ShopPublicController implements Initializable {
                         "-fx-border-radius: 10px; -fx-background-radius: 10px;" +
                         "-fx-padding: 9 0 9 0; -fx-cursor: hand;"
         );
-        btnVoir.setOnAction(e -> showDetailAvecPanier(p));
+        // Capture explicite du produit pour éviter toute ambiguité de closure
+        final Produit produitCapture = p;
+        btnVoir.setOnAction(e -> showDetailAvecPanier(produitCapture));
 
-        // ── Bouton Ajouter au panier ──
         Button btnAjouter = new Button("🛒  Ajouter au panier");
         btnAjouter.setMaxWidth(Double.MAX_VALUE);
         btnAjouter.setStyle(
@@ -387,7 +501,7 @@ public class ShopPublicController implements Initializable {
                         "-fx-background-radius: 10px; -fx-padding: 11 0 11 0;" +
                         "-fx-cursor: hand; -fx-border-color: transparent;"
         );
-        btnAjouter.setOnAction(e -> ajouterAuPanier(p));
+        btnAjouter.setOnAction(e -> ajouterAuPanier(produitCapture));
 
         body.getChildren().addAll(lblNom, lblDesc, bottomRow, btnVoir, btnAjouter);
 
@@ -443,6 +557,8 @@ public class ShopPublicController implements Initializable {
         pill.setCursor(javafx.scene.Cursor.HAND);
         stylePill(pill, active);
         pill.setOnAction(e -> {
+            // Cliquer sur une catégorie quitte le mode recherche
+            modeRecherche = false;
             selectedCategorieId = categorieId;
             boxCategories.getChildren().forEach(node -> {
                 if (node instanceof Button b) stylePill(b, false);
@@ -473,17 +589,23 @@ public class ShopPublicController implements Initializable {
     }
 
     private void applyFilter() {
+        // En mode recherche, le filtre catégorie et le tri ne s'appliquent pas
+        if (modeRecherche) return;
+
         List<Produit> filtered = allProduits.stream()
                 .filter(p -> selectedCategorieId == 0
                         || p.getIdCategoriesProduitId() == selectedCategorieId)
                 .collect(Collectors.toList());
+
         String tri = comboTri != null ? comboTri.getValue() : "Par défaut";
         switch (tri) {
             case "Prix croissant"   -> filtered.sort(Comparator.comparingDouble(Produit::getPrix));
             case "Prix décroissant" -> filtered.sort(Comparator.comparingDouble(Produit::getPrix).reversed());
             case "Nom A→Z"          -> filtered.sort(Comparator.comparing(Produit::getNom));
         }
-        renderCards(filtered);
+
+        currentDisplayList = new ArrayList<>(filtered);
+        renderCards(currentDisplayList);
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -564,5 +686,54 @@ public class ShopPublicController implements Initializable {
         if (src.length() > 1 && src.charAt(1) == ':') return "file:///" + src;
         if (src.startsWith("/")) return "file://" + src;
         return "file:///" + src;
+    }
+
+    private void showNotifRecherche(String message, boolean success) {
+        Stage notif = new Stage();
+        notif.initStyle(StageStyle.TRANSPARENT);
+        notif.initModality(Modality.NONE);
+
+        Stage mainStage = (Stage) flowProduits.getScene().getWindow();
+
+        Label lblMsg = new Label(message);
+        lblMsg.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+        Label lblSub = new Label(success
+                ? "Résultats de recherche par image"
+                : "Essayez avec une autre image ou vérifiez l'API Imagga");
+        lblSub.setStyle("-fx-text-fill: #c4b5fd; -fx-font-size: 11px;");
+
+        Button btnClose = new Button("✕");
+        btnClose.setStyle("-fx-background-color: transparent; -fx-text-fill: #9ca3af;" +
+                "-fx-font-size: 13px; -fx-cursor: hand; -fx-border-color: transparent;");
+        btnClose.setOnAction(e -> notif.close());
+
+        VBox texts = new VBox(4, lblMsg, lblSub);
+        texts.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(texts, Priority.ALWAYS);
+
+        HBox root = new HBox(12, texts, btnClose);
+        root.setAlignment(Pos.CENTER_LEFT);
+        root.setPadding(new Insets(16, 20, 16, 20));
+        root.setPrefWidth(400);
+        root.setStyle(
+                "-fx-background-color: #1a0a3e;" +
+                        "-fx-border-color: " + (success ? "#a855f7" : "#f87171") + ";" +
+                        "-fx-border-width: 1.5px; -fx-border-radius: 14px;" +
+                        "-fx-background-radius: 14px;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(168,85,247,0.7), 24, 0.4, 0, 4);"
+        );
+
+        Scene scene = new Scene(root);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        notif.setScene(scene);
+
+        notif.setX(mainStage.getX() + mainStage.getWidth() - 430);
+        notif.setY(mainStage.getY() + mainStage.getHeight() - 110);
+        notif.show();
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(4));
+        pause.setOnFinished(e -> notif.close());
+        pause.play();
     }
 }

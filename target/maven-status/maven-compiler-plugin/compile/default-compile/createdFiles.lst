@@ -12,6 +12,7 @@ com\esports\dao\TournamentDAO.class
 com\esports\interfaces\IProduitService.class
 com\esports\service\CategorieProduitService.class
 com\esports\controller\ShopController$1.class
+com\esports\controller\ShopPublicController$1.class
 com\esports\controller\ShopPublicController.class
 com\esports\service\PanierSession.class
 com\esports\controller\CategorieProduitController.class
@@ -25,6 +26,7 @@ com\esports\model\CategorieProduit.class
 com\esports\service\CommandeService.class
 com\esports\interfaces\ICategorieProduitService.class
 com\esports\model\Commande.class
+com\esports\service\VisionService.class
 com\esports\controller\UsersController.class
 com\esports\controller\ShopController$2.class
 com\esports\service\TournamentService.class
