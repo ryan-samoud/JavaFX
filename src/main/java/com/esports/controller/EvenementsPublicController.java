@@ -4,6 +4,8 @@ import com.esports.interfaces.IEvenementService;
 import com.esports.model.Evenement;
 import com.esports.service.EvenementService;
 
+import com.esports.utils.Eventpredictionengine;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -251,9 +253,19 @@ public class EvenementsPublicController implements Initializable {
         btnDetails.setStyle(outlineBtn());
         btnDetails.setOnAction(ev -> openDetails(e));
 
+        Button btnPredict = new Button("🤖 Prédiction");
+        btnPredict.setStyle("-fx-background-color: rgba(168,85,247,0.12); -fx-text-fill: #c084fc;" +
+                "-fx-border-color: rgba(168,85,247,0.35); -fx-border-width: 1px;" +
+                "-fx-border-radius: 8px; -fx-background-radius: 8px;" +
+                "-fx-font-size: 12px; -fx-padding: 8 0 8 0; -fx-cursor: hand;");
+        btnPredict.setOnAction(ev -> showPrediction(e));
+        HBox.setHgrow(btnPredict, Priority.ALWAYS);
+        btnPredict.setMaxWidth(Double.MAX_VALUE);
+
         if (e.isPast()) {
-            btnDetails.setMaxWidth(Double.MAX_VALUE);
-            content.getChildren().add(btnDetails);
+            HBox.setHgrow(btnDetails, Priority.ALWAYS); btnDetails.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(btnPredict, Priority.ALWAYS); btnPredict.setMaxWidth(Double.MAX_VALUE);
+            content.getChildren().add(new HBox(8, btnDetails, btnPredict));
         } else {
             // Two buttons side by side for upcoming events
             boolean isParticipating = participatedEvents.contains(e.getId());
@@ -273,6 +285,8 @@ public class EvenementsPublicController implements Initializable {
             HBox.setHgrow(btnDetails, Priority.ALWAYS); btnDetails.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(btnPart,    Priority.ALWAYS); btnPart.setMaxWidth(Double.MAX_VALUE);
             content.getChildren().add(new HBox(8, btnDetails, btnPart));
+            // Prediction on its own row below
+            content.getChildren().add(new HBox(btnPredict));
         }
 
         card.getChildren().add(content);
@@ -291,6 +305,86 @@ public class EvenementsPublicController implements Initializable {
                 "-fx-border-radius:14px;-fx-background-radius:14px;-fx-cursor:hand;";
         if (hovered) s += "-fx-effect:dropshadow(gaussian," + borderColor + ",18,0.3,0,4);";
         return s;
+    }
+
+    // ── Prediction popup ──────────────────────────────────────────
+
+    private void showPrediction(Evenement e) {
+        Eventpredictionengine.Prediction p = Eventpredictionengine.predict(e);
+
+        Stage stage = new Stage();
+        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        stage.setResizable(false);
+
+        Label title = new Label("🤖 PRÉDICTION IA");
+        title.setStyle("-fx-text-fill: #c084fc; -fx-font-size: 14px; -fx-font-weight: bold;" +
+                "-fx-font-family: 'Courier New'; -fx-letter-spacing: 2px;");
+
+        Label eventName = new Label(e.getNom());
+        eventName.setStyle("-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;");
+        eventName.setWrapText(true);
+
+        Region sep = new Region();
+        sep.setPrefHeight(1.5); sep.setMaxWidth(Double.MAX_VALUE);
+        sep.setStyle("-fx-background-color: linear-gradient(to right, #7c3aed, rgba(236,72,153,0.4), transparent);");
+        VBox.setMargin(sep, new Insets(4, 0, 4, 0));
+
+        // Stars
+        double rating = p.rating;
+        int fullStars = (int) rating;
+        boolean halfStar = (rating - fullStars) >= 0.5;
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < fullStars; i++) stars.append("★");
+        if (halfStar) stars.append("½");
+        for (int i = fullStars + (halfStar ? 1 : 0); i < 5; i++) stars.append("☆");
+
+        Label lblStars = new Label(stars.toString());
+        lblStars.setStyle("-fx-font-size: 28px; -fx-text-fill: #f59e0b;");
+
+        Label lblRating = new Label(rating + " / 5  —  " + p.ratingLabel);
+        lblRating.setStyle("-fx-text-fill: #e2e8f0; -fx-font-size: 14px; -fx-font-weight: bold;" +
+                "-fx-font-family: 'Courier New';");
+
+        // Progress bar
+        String barColor = rating >= 4.0 ? "#4ade80" : rating >= 2.5 ? "#f59e0b" : "#f87171";
+        Region barFill = new Region();
+        barFill.setPrefHeight(8);
+        barFill.setStyle("-fx-background-color: " + barColor + "; -fx-background-radius: 4px;");
+        HBox barBox = new HBox(barFill);
+        barFill.prefWidthProperty().bind(barBox.widthProperty().multiply(rating / 5.0));
+        barBox.setStyle("-fx-background-color: rgba(255,255,255,0.06); -fx-background-radius: 4px;");
+        barBox.setPrefHeight(8);
+
+        Label lblStatement = new Label(p.statement);
+        lblStatement.setStyle("-fx-text-fill: #d1d5db; -fx-font-size: 13px; -fx-line-spacing: 4;");
+        lblStatement.setWrapText(true);
+
+        Label disclaimer = new Label("Analyse de l'IA NexUs");
+        disclaimer.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 10px; -fx-font-style: italic;");
+        disclaimer.setWrapText(true);
+
+        Button btnClose = new Button("Fermer");
+        btnClose.setStyle("-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);" +
+                "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 8px; -fx-padding: 9 28 9 28; -fx-cursor: hand;");
+        btnClose.setOnAction(ev -> stage.close());
+        HBox btnRow = new HBox(btnClose);
+        btnRow.setAlignment(Pos.CENTER_RIGHT);
+        btnRow.setPadding(new Insets(8, 0, 0, 0));
+
+        VBox root = new VBox(12, title, eventName, sep, lblStars, lblRating, barBox,
+                lblStatement, disclaimer, btnRow);
+        root.setPadding(new Insets(28, 30, 28, 30));
+        root.setStyle("-fx-background-color: #110f28;" +
+                "-fx-border-color: rgba(168,85,247,0.45); -fx-border-width: 1.5px;" +
+                "-fx-border-radius: 14px; -fx-background-radius: 14px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(168,85,247,0.5), 30, 0.3, 0, 6);");
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root, 420, 420);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     @FXML
