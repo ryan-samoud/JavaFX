@@ -4,6 +4,7 @@ module com.esports {
     requires javafx.graphics;
     requires java.sql;
     requires mysql.connector.j;
+    requires javafx.web;
     opens com.esports to javafx.fxml;
     opens com.esports.controller to javafx.fxml;
     opens com.esports.model to javafx.fxml;

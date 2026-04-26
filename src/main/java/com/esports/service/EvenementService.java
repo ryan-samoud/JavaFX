@@ -8,21 +8,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * SERVICE — EvenementService.java
- *
- * Table SQL (à créer via create_tables.sql) :
- *   CREATE TABLE evenement (
- *     id              INT AUTO_INCREMENT PRIMARY KEY,
- *     nom             VARCHAR(100) NOT NULL,
- *     description     TEXT,
- *     date            DATE NOT NULL,
- *     lieu            VARCHAR(200) NOT NULL,
- *     nbr_participant INT DEFAULT 0,
- *     image           VARCHAR(255),
- *     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
- *   );
- */
 public class EvenementService implements IEvenementService {
 
     public List<Evenement> findAll() {
@@ -62,6 +47,26 @@ public class EvenementService implements IEvenementService {
             System.err.println("[EvenementService] countAll ERROR : " + e.getMessage());
         }
         return 0;
+    }
+
+    /**
+     * Check if an event name already exists (for unique validation).
+     * excludeId = 0 for new events, or the current event's id for edits.
+     */
+    public boolean existsByNom(String nom, int excludeId) {
+        String sql = excludeId == 0
+                ? "SELECT COUNT(*) FROM evenement WHERE LOWER(nom) = LOWER(?)"
+                : "SELECT COUNT(*) FROM evenement WHERE LOWER(nom) = LOWER(?) AND id != ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nom.trim());
+            if (excludeId != 0) stmt.setInt(2, excludeId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            System.err.println("[EvenementService] existsByNom ERROR : " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean save(Evenement e) {
@@ -108,60 +113,54 @@ public class EvenementService implements IEvenementService {
 
     public boolean delete(int id) {
         String deleteSponsors = "DELETE FROM sponsor WHERE evenement_id = ?";
-        String deleteEvent = "DELETE FROM evenement WHERE id = ?";
-
+        String deleteEvent    = "DELETE FROM evenement WHERE id = ?";
         try (Connection conn = DatabaseConnection.getInstance()) {
-
             PreparedStatement ps1 = conn.prepareStatement(deleteSponsors);
-            ps1.setInt(1, id);
-            ps1.executeUpdate();
-
+            ps1.setInt(1, id); ps1.executeUpdate();
             PreparedStatement ps2 = conn.prepareStatement(deleteEvent);
             ps2.setInt(1, id);
-
             return ps2.executeUpdate() > 0;
-
         } catch (SQLException e) {
+            System.err.println("[EvenementService] delete ERROR : " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
+    public void incrementParticipants(int id) {
+        String sql = "UPDATE evenement SET nbr_participant = nbr_participant + 1 WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("[EvenementService] incrementParticipants ERROR : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void decrementParticipants(int id) {
+        String sql = "UPDATE evenement SET nbr_participant = CASE WHEN nbr_participant > 0 THEN nbr_participant - 1 ELSE 0 END WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("[EvenementService] decrementParticipants ERROR : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private Evenement map(ResultSet rs) throws SQLException {
-        Date d       = rs.getDate("date");
+        Date d = rs.getDate("date");
         return new Evenement(
                 rs.getInt("id"),
                 rs.getString("nom"),
                 rs.getString("description"),
-                d  != null ? d.toLocalDate()           : null,
+                d != null ? d.toLocalDate() : null,
                 rs.getString("lieu"),
                 rs.getInt("nbr_participant"),
                 rs.getString("image")
         );
     }
-    public void incrementParticipants(int id) {
-        String sql = "UPDATE evenement SET nbr_participant = nbr_participant + 1 WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getInstance();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void decrementParticipants(int id) {
-        String sql = "UPDATE evenement SET nbr_participant = CASE WHEN nbr_participant > 0 THEN nbr_participant - 1 ELSE 0 END WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getInstance();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

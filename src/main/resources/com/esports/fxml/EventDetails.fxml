@@ -3,29 +3,121 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
-<?import java.net.URL?>
-<VBox spacing="15" alignment="CENTER"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.esports.controller.EventDetailsController"
-      style="-fx-background-color: #0d0b1e; -fx-padding: 30;">
+<?import javafx.scene.web.*?>
 
-    <Label fx:id="lblNom"
-           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+<!--
+    EventDetails.fxml — Détails d'un événement passé
+    Map OpenStreetMap + Section commentaires
+    Contrôleur : com.esports.controller.EventDetailsController
+-->
 
-    <ImageView fx:id="imageView" fitWidth="300" preserveRatio="true"/>
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.EventDetailsController"
+            style="-fx-background: #0d0b1e; -fx-background-color: #0d0b1e; -fx-border-color: transparent;">
 
-    <Label fx:id="lblLieu" style="-fx-text-fill: #c084fc;"/>
-    <Label fx:id="lblDate" style="-fx-text-fill: #9ca3af;"/>
+    <VBox spacing="0" style="-fx-background-color: #0d0b1e;">
 
-    <Label fx:id="lblDesc"
-           wrapText="true"
-           maxWidth="320"
-           style="-fx-text-fill: #d1d5db;"/>
+        <!-- ══════════ HEADER ══════════ -->
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color: #110f28; -fx-padding: 20 30 20 30;
+                     -fx-border-color: transparent transparent rgba(139,92,246,0.2) transparent;
+                     -fx-border-width: 0 0 1 0;">
+            <Label fx:id="lblNom"
+                   style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;
+                          -fx-font-family: 'Arial Black';" HBox.hgrow="ALWAYS"/>
+            <Button text="✕ Fermer" onAction="#onClose"
+                    style="-fx-background-color: rgba(248,113,113,0.15); -fx-text-fill: #f87171;
+                           -fx-border-color: rgba(248,113,113,0.3); -fx-border-width: 1;
+                           -fx-border-radius: 6; -fx-background-radius: 6;
+                           -fx-font-size: 13px; -fx-padding: 7 16 7 16; -fx-cursor: hand;"/>
+        </HBox>
 
-    <Label fx:id="lblParticipants"
-           style="-fx-text-fill: #4ade80; -fx-font-weight: bold;"/>
+        <!-- ══════════ BODY ══════════ -->
+        <VBox spacing="24" style="-fx-padding: 30 40 40 40; -fx-background-color: #0d0b1e;">
 
-    <Button text="Fermer" onAction="#onClose"
-            style="-fx-background-color: #a855f7; -fx-text-fill: white;"/>
+            <!-- Image + Info côte à côte -->
+            <HBox spacing="24" alignment="TOP_LEFT">
 
-</VBox>
+                <!-- Image -->
+                <VBox spacing="0" minWidth="260" maxWidth="260">
+                    <ImageView fx:id="imageView" fitWidth="260" fitHeight="180"
+                               preserveRatio="false"
+                               style="-fx-effect: dropshadow(gaussian,rgba(168,85,247,0.3),12,0.2,0,4);"/>
+                </VBox>
+
+                <!-- Info -->
+                <VBox spacing="14" HBox.hgrow="ALWAYS">
+                    <Label fx:id="lblLieu"
+                           style="-fx-text-fill: #c084fc; -fx-font-size: 15px; -fx-font-weight: bold;"/>
+                    <Label fx:id="lblDate"
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 14px;"/>
+                    <Label fx:id="lblParticipants"
+                           style="-fx-text-fill: #4ade80; -fx-font-weight: bold; -fx-font-size: 14px;"/>
+
+                    <Label fx:id="lblDesc" wrapText="true" maxWidth="340"
+                           style="-fx-text-fill: #d1d5db; -fx-font-size: 13px; -fx-line-spacing: 4;"/>
+                </VBox>
+            </HBox>
+
+            <!-- ══════════ MAP ══════════ -->
+            <VBox spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="▌" style="-fx-text-fill: #a855f7; -fx-font-size: 18px;"/>
+                    <Label text="LOCALISATION"
+                           style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;
+                                  -fx-font-family: 'Courier New'; -fx-letter-spacing: 2px;"/>
+                </HBox>
+
+                <WebView fx:id="mapView" prefHeight="260" maxHeight="260"
+                         style="-fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 1;
+                                -fx-border-radius: 12px; -fx-background-radius: 12px;"/>
+            </VBox>
+
+            <!-- ══════════ COMMENTS ══════════ -->
+            <VBox spacing="14">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="▌" style="-fx-text-fill: #a855f7; -fx-font-size: 18px;"/>
+                    <Label text="COMMENTAIRES"
+                           style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;
+                                  -fx-font-family: 'Courier New'; -fx-letter-spacing: 2px;"/>
+                </HBox>
+
+                <!-- Existing comments -->
+                <VBox fx:id="paneComments" spacing="10"/>
+
+                <!-- Add comment form -->
+                <VBox fx:id="vboxCommentForm" spacing="10"
+                      style="-fx-background-color: rgba(26,14,55,0.5);
+                             -fx-border-color: rgba(139,92,246,0.25); -fx-border-width: 1;
+                             -fx-border-radius: 12px; -fx-background-radius: 12px;
+                             -fx-padding: 18 20 18 20;">
+
+                    <Label text="LAISSER UN COMMENTAIRE"
+                           style="-fx-text-fill: #c4b5fd; -fx-font-size: 11px; -fx-font-weight: bold;
+                                  -fx-font-family: 'Courier New'; -fx-letter-spacing: 1px;"/>
+
+                    <TextArea fx:id="fieldCommentaire" promptText="Partagez votre avis..."
+                              prefRowCount="3"
+                              style="-fx-background-color: #1a1035; -fx-text-fill: #e2e8f0;
+                                     -fx-prompt-text-fill: #4b5563;
+                                     -fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 1;
+                                     -fx-border-radius: 8; -fx-background-radius: 8;
+                                     -fx-font-family: 'Courier New'; -fx-font-size: 13px;
+                                     -fx-padding: 10 14 10 14;
+                                     -fx-control-inner-background: #1a1035;"/>
+
+                    <Label fx:id="lblCommentError" text=""
+                           style="-fx-text-fill: #f87171; -fx-font-size: 12px; -fx-font-family: 'Courier New';"/>
+
+                    <Button text="Envoyer le commentaire" onAction="#onAddComment"
+                            style="-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);
+                                   -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
+                                   -fx-background-radius: 8px; -fx-padding: 10 28 10 28; -fx-cursor: hand;"/>
+                </VBox>
+            </VBox>
+
+        </VBox>
+    </VBox>
+</ScrollPane>
