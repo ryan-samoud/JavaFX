@@ -56,6 +56,11 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
 
         <!-- Pour jouer des médias (vidéo/audio) — décommentez si nécessaire -->
         <!--
@@ -102,6 +107,20 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- ── Tests — Mockito ──────────────────────────────────── -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <!-- ══════════════════════════════════════════════════════════ -->
@@ -128,14 +147,23 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <!-- Classe principale de votre application -->
                     <mainClass>com.esports.MainApp</mainClass>
+                    <options>
+                        <option>-Dprism.order=sw</option>
+                    </options>
                 </configuration>
                 <executions>
                     <execution>
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>com.esports.MainApp</mainClass>
+                            <options>
+                                <option>-Dprism.order=sw</option>
+                                <option>-Xms128m</option>
+                                <option>-Xmx512m</option>
+                                <option>-XX:ReservedCodeCacheSize=128m</option>
+                                <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                            </options>
                         </configuration>
                     </execution>
                 </executions>
@@ -164,6 +192,7 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

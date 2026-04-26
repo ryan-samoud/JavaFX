@@ -1,27 +1,39 @@
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\CategorieProduitController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\DashboardController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\HomeController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\MainController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\ShopController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\ShopPublicController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\TournamentsController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\TournamentsPublicController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\controller\UsersController.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\interfaces\ICategorieProduitService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\interfaces\IProduitService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\interfaces\ITournamentService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\interfaces\IUserService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\MainApp.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\model\CategorieProduit.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\model\Player.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\model\Produit.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\model\Team.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\model\Tournament.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\model\User.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\service\AuthService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\service\CategorieProduitService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\service\ProduitService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\service\TournamentService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\service\UserService.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\utils\DatabaseConnection.java
-C:\Users\Rayen\Downloads\JavaFX-produit-with-validation (4)\javafx-shop\JavaFX\src\main\java\com\esports\utils\NexusDialog.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\CategorieProduitController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\CommandeSuccesController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\DashboardController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\HomeController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\MainController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\PaiementController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\PanierController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\ShopController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\ShopPublicController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\TournamentsController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\TournamentsPublicController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\UsersController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\dao\TournamentDAO.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\dao\UserDAO.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\interfaces\ICategorieProduitService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\interfaces\IProduitService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\interfaces\ITournamentService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\interfaces\IUserService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\MainApp.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\CategorieProduit.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\Commande.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\LigneCommande.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\Panier.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\PanierItem.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\Player.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\Produit.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\Team.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\Tournament.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\model\User.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\AuthService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\CategorieProduitService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\CommandeService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\PanierService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\PanierSession.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\ProduitService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\TournamentService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\UserService.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\utils\DatabaseConnection.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\utils\NexusDialog.java
