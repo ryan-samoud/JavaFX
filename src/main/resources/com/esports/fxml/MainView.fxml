@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx/17"
+      fx:controller="com.esports.controller.MainController"
+      prefWidth="1280" prefHeight="800"
+      style="-fx-background-color: #0a0818;">
+
+    <!-- SIDEBAR -->
+    <VBox fx:id="sidebar" minWidth="230" maxWidth="230"
+          style="-fx-background-color: #0f0d22;
+                 -fx-border-color: transparent rgba(139,92,246,0.18) transparent transparent;
+                 -fx-border-width: 0 1 0 0;">
+
+        <!-- Logo -->
+        <HBox alignment="CENTER_LEFT" spacing="10"
+              style="-fx-padding: 26 20 22 20;
+                     -fx-border-color: transparent transparent rgba(139,92,246,0.15) transparent;
+                     -fx-border-width: 0 0 1 0;">
+            <Button text="N" onAction="#onHome"
+                   style="-fx-background-color: linear-gradient(to bottom right, #7c3aed, #ec4899);
+                          -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                          -fx-background-radius: 8px; -fx-padding: 6 11 6 11;
+                          -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.7), 12, 0.4, 0, 0); -fx-cursor: hand; -fx-border-color: transparent;"/>
+            <VBox spacing="1">
+                <Label text="NexUS"
+                       style="-fx-text-fill: white; -fx-font-size: 16px;
+                              -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+                <Label text="ADMIN"
+                       style="-fx-text-fill: #a855f7; -fx-font-size: 10px;
+                              -fx-font-weight: bold; -fx-letter-spacing: 2px;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Navigation -->
+        <VBox spacing="2" style="-fx-padding: 16 10 16 10;" VBox.vgrow="ALWAYS">
+
+            <Label text="NAVIGATION"
+                   style="-fx-text-fill: rgba(124,111,168,0.6);
+                          -fx-font-size: 10px; -fx-font-weight: bold;
+                          -fx-letter-spacing: 2px; -fx-padding: 6 10 8 10;"/>
+
+            <Button fx:id="btnDashboard" text="  📊   Dashboard"
+                    maxWidth="Infinity" onAction="#onDashboard"
+                    style="-fx-background-color: rgba(168,85,247,0.15);
+                           -fx-text-fill: #c084fc; -fx-font-size: 13px;
+                           -fx-font-weight: bold;
+                           -fx-border-color: transparent transparent transparent #a855f7;
+                           -fx-border-width: 0 0 0 3;
+                           -fx-background-radius: 6px; -fx-padding: 10 16 10 16;
+                           -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnUsers" text="  👥   Utilisateurs"
+                    maxWidth="Infinity" onAction="#onUsers"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnTournaments" text="  🏆   Tournois"
+                    maxWidth="Infinity" onAction="#onTournaments"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnMatches" text="  ⚔️   Matchs"
+                    maxWidth="Infinity" onAction="#onMatches"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnTeams" text="  ⚡   Équipes"
+                    maxWidth="Infinity" onAction="#onTeams"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnShop" text="  🛒   Boutique"
+                    maxWidth="Infinity" onAction="#onShop"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnEvents" text="  📅   Événements"
+                    maxWidth="Infinity" onAction="#onEvents"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnGames" text="  🎮   Jeux"
+                    maxWidth="Infinity" onAction="#onGames"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Button fx:id="btnStatistiques" text="  📈   Statistiques"
+                    maxWidth="Infinity" onAction="#onStatistiques"
+                    style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Divider -->
+            <HBox style="-fx-background-color: rgba(139,92,246,0.15);
+                         -fx-min-height: 1; -fx-max-height: 1; -fx-margin: 4 0 4 0;"/>
+
+            <!-- User info -->
+            <VBox spacing="3" style="-fx-padding: 12 10 4 14;">
+                <Label text="CONNECTÉ EN TANT QUE"
+                       style="-fx-text-fill: rgba(124,111,168,0.6); -fx-font-size: 9px;
+                              -fx-letter-spacing: 1px;"/>
+                <Label fx:id="lblCurrentUser" text="admin"
+                       style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                <Label text="ADMINISTRATEUR"
+                       style="-fx-text-fill: #7c6fa8; -fx-font-size: 10px;"/>
+            </VBox>
+
+            <!-- Logout -->
+            <Button text="  🚪   Déconnexion" maxWidth="Infinity"
+                    onAction="#onLogout"
+                    style="-fx-background-color: transparent; -fx-text-fill: #f87171;
+                           -fx-font-size: 13px; -fx-background-radius: 6px;
+                           -fx-padding: 10 16 10 16; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;
+                           -fx-border-color: rgba(139,92,246,0.15) transparent transparent transparent;
+                           -fx-border-width: 1 0 0 0;"/>
+        </VBox>
+    </VBox>
+
+    <!-- CONTENT AREA -->
+    <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS"
+               style="-fx-background-color: #0a0818;"/>
+
+</HBox>

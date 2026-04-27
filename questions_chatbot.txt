@@ -1,0 +1,42 @@
+--- QUESTIONS POUR LE CHATBOT NEXUS (PROJET ESPORTS) ---
+
+Ce chatbot est conçu pour répondre aux questions sur les tournois, les inscriptions et les jeux. Voici les questions que vous pouvez lui poser :
+
+1. SALUTATIONS ET AIDE :
+- Bonjour chatbot !
+- Salut !
+- Que peux-tu faire ?
+- Aide
+- Help
+
+2. INFORMATIONS SUR LES TOURNOIS :
+- Quels sont les tournois disponibles ?
+- Liste-moi les tournois programmés.
+- Y a-t-il des tournois en ce moment ?
+- Voir les tournois tournoi.
+
+3. MES INSCRIPTIONS (Utilisateur connecté) :
+- Est-ce que je suis inscrit à un tournoi ?
+- Voir mes inscriptions.
+- Montre-moi mes tournois.
+- Je suis inscrit à quoi ?
+
+4. CASH PRIZE ET RÉCOMPENSES :
+- Quel est le prize pool total ?
+- Combien d'argent y a-t-il en jeu ?
+- C'est quoi le cash prize global ?
+- Montre-moi le prize money.
+
+5. QUESTIONS PAR JEU :
+- Parle-moi de League of Legends.
+- Est-ce qu'il y a des tournois LoL ?
+- Je veux jouer à Valorant.
+- Infos sur Valorant.
+
+6. RÉSULTATS ET SCORES :
+- Quels sont les scores ?
+- Qui a gagné le dernier match ?
+- Voir les résultats.
+
+---
+Note : Le chatbot utilise des mots-clés comme "tournoi", "inscrit", "prize", "LoL", "Valorant" et "score" pour identifier vos demandes.

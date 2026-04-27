@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.esports.controller.TournamentFormController"
+      style="-fx-background-color: #0d0b21; -fx-padding: 30; -fx-border-color: #3b2b5a; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10;"
+      prefWidth="500">
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Rectangle width="4" height="24" arcWidth="2" arcHeight="2" style="-fx-fill: #00b8ff;"/>
+        <Label fx:id="lblTitle" text="GÉRER LE TOURNOI"
+               style="-fx-text-fill: white; -fx-font-family: 'Courier New'; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+        <VBox spacing="15" style="-fx-padding: 5;">
+            <VBox spacing="5">
+                <Label text="Nom (min 5 chars) :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+                <TextField fx:id="fieldNom" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+                <Label fx:id="errNom" text="Min 5 caractères" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+            </VBox>
+            <VBox spacing="5">
+                <Label text="Jeu (min 5 chars) :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+                <TextField fx:id="fieldJeu" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+                <Label fx:id="errJeu" text="Min 5 caractères" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+            </VBox>
+            <HBox spacing="15">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Date Début :" style="-fx-text-fill: #7c6fa8;"/>
+                    <HBox spacing="5">
+                        <DatePicker fx:id="pickerDebut" prefWidth="120" style="-fx-background-color: #1a1635;"/>
+                        <TextField fx:id="timeDebut" promptText="HH:mm" prefWidth="60" style="-fx-background-color: #1a1635; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Date Fin (>= Début) :" style="-fx-text-fill: #7c6fa8;"/>
+                    <HBox spacing="5">
+                        <DatePicker fx:id="pickerFin" prefWidth="120" style="-fx-background-color: #1a1635;"/>
+                        <TextField fx:id="timeFin" promptText="HH:mm" prefWidth="60" style="-fx-background-color: #1a1635; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+            <Label fx:id="errDates" text="La date de fin doit être après le début" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+            <HBox spacing="15">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Statut :" style="-fx-text-fill: #7c6fa8;"/>
+                    <ComboBox fx:id="comboStatut" maxWidth="Infinity" style="-fx-background-color: #1a1635;"/>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Nb Matchs :" style="-fx-text-fill: #7c6fa8;"/>
+                    <TextField fx:id="fieldNbMatchs" style="-fx-background-color: #1a1635; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+            <HBox spacing="15">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Prize Pool (€) :" style="-fx-text-fill: #7c6fa8;"/>
+                    <TextField fx:id="fieldPrize" style="-fx-background-color: #1a1635; -fx-text-fill: #fbbf24;"/>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Participants Max :" style="-fx-text-fill: #7c6fa8;"/>
+                    <TextField fx:id="fieldMaxPart" style="-fx-background-color: #1a1635; -fx-text-fill: white;"/>
+                </VBox>
+            </HBox>
+            <Label fx:id="errNumeric" text="Les champs numériques doivent être des chiffres" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+            <VBox spacing="5">
+                <Label text="Image du tournoi :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+                <HBox spacing="10">
+                    <TextField fx:id="fieldImage" HBox.hgrow="ALWAYS" editable="false" promptText="Aucune image sélectionnée"
+                               style="-fx-background-color: #1a1635; -fx-text-fill: #a855f7;"/>
+                    <Button text="Parcourir..." onAction="#onBrowseImage"
+                            style="-fx-background-color: #3b2b5a; -fx-text-fill: white; -fx-cursor: hand;"/>
+                </HBox>
+            </VBox>
+            <VBox spacing="5">
+                <Label text="📍 Lieu / Location :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+                <HBox spacing="10">
+                    <TextField fx:id="fieldLocation" promptText="Ex: 36.8, 10.2 (ou cliquez sur la carte)" HBox.hgrow="ALWAYS"
+                               style="-fx-background-color: #1a1635; -fx-text-fill: #4ade80; -fx-border-color: #3b2b5a;"/>
+                    <Button text="🗺️" onAction="#onOpenMapPicker"
+                            style="-fx-background-color: #3b2b5a; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 5 12;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 20 0 0 0;">
+        <Button text="Annuler" onAction="#onCancel"
+                style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8; -fx-cursor: hand;"/>
+        <Button fx:id="btnSave" text="Enregistrer" onAction="#onSave"
+                style="-fx-background-color: linear-gradient(to right, #00b8ff, #00ff9d); -fx-text-fill: #0a0a0f; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 10 30 10 30; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>

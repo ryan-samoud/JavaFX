@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+
+<VBox spacing="0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17" fx:controller="com.esports.controller.TournamentsController" style="-fx-background-color: #0a0a0f;">
+    <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 28 40 20 40; -fx-border-color: transparent transparent #1a1a2e transparent; -fx-border-width: 0 0 1 0;">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Rectangle width="4" height="26" arcWidth="2" arcHeight="2" style="-fx-fill: #00b8ff;"/>
+                <Label text="GESTION TOURNOIS" style="-fx-text-fill: #ffffff; -fx-font-family: 'Courier New'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-letter-spacing: 3px;"/>
+            </HBox>
+            <Label fx:id="lblTournamentCount" text="Chargement…" style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 12px; -fx-padding: 0 0 0 14;"/>
+        </VBox>
+        <TextField fx:id="fieldSearch" promptText="🔍  Rechercher…" prefWidth="150" style="-fx-background-color: #111122; -fx-text-fill: white; -fx-border-color: #1a1a2e; -fx-border-radius: 6; -fx-padding: 8 12;"/>
+        <ComboBox fx:id="comboStatusFilter" promptText="Statut" prefWidth="100" style="-fx-background-color: #111122; -fx-text-fill: white;"/>
+        <ComboBox fx:id="comboSortOrder" promptText="Tri" prefWidth="110" style="-fx-background-color: #111122; -fx-text-fill: white;"/>
+        <Button text="📜 Certificat" onAction="#onOpenCertificateDialog" style="-fx-background-color: transparent; -fx-text-fill: #ec4899; -fx-font-family: 'Courier New'; -fx-font-weight: bold; -fx-border-color: #ec4899; -fx-border-radius: 6; -fx-padding: 9 16; -fx-cursor: hand;"/>
+        <Button text="📊 Stats" onAction="#onShowStats" style="-fx-background-color: transparent; -fx-text-fill: #00b8ff; -fx-font-family: 'Courier New'; -fx-font-weight: bold; -fx-border-color: #00b8ff; -fx-border-radius: 6; -fx-padding: 9 16; -fx-cursor: hand;"/>
+        <Button text="＋ Nouveau" onAction="#onAddTournament" style="-fx-background-color: linear-gradient(to right, #00b8ff, #00ff9d); -fx-text-fill: #0a0a0f; -fx-font-family: 'Courier New'; -fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 6; -fx-cursor: hand;"/>
+    </HBox>
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20 40;">
+        <FlowPane fx:id="cardsContainer" hgap="25" vgap="25" alignment="TOP_LEFT" style="-fx-background-color: transparent;"/>
+    </ScrollPane>
+</VBox>

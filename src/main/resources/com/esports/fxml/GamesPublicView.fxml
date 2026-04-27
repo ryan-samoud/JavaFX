@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import java.net.URL?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            style="-fx-background: #0d0b1e; -fx-background-color: #0d0b1e; -fx-border-color: transparent;"
+            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.GamesPublicController">
+
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+    </stylesheets>
+
+    <VBox style="-fx-background-color: #0d0b1e;" spacing="0">
+
+        <!-- NAVBAR -->
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+            <HBox alignment="CENTER_LEFT" spacing="6" onMouseClicked="#onBackHome" style="-fx-cursor: hand;">
+                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white; -fx-font-size: 15; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 4 9;"/>
+                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Accueil" onAction="#onBackHome" styleClass="nav-link"/>
+            <Button text="Jeux" style="-fx-background-color: rgba(168,85,247,0.12); -fx-text-fill: #c084fc; -fx-font-size: 14; -fx-font-weight: bold; -fx-border-color: transparent transparent #a855f7 transparent; -fx-border-width: 0 0 2 0; -fx-padding: 7 14 5 14;"/>
+            <Button text="Tournois" styleClass="nav-link"/>
+            <Button text="Boutique" styleClass="nav-link"/>
+            <Button text="Connexion" onAction="#onBackHome" styleClass="btn-outline-sm"/>
+        </HBox>
+
+        <!-- HERO -->
+        <VBox alignment="CENTER" spacing="15" style="-fx-background-color: linear-gradient(to bottom, #100c2a, #1a0a3e 50%, #0d0b1e); -fx-padding: 60 40;">
+            <HBox alignment="CENTER" spacing="10">
+                <Rectangle width="4" height="40" style="-fx-fill: linear-gradient(to bottom, #a855f7, #ec4899);"/>
+                <Label text="BIBLIOTHÈQUE DE JEUX" style="-fx-text-fill: white; -fx-font-size: 36; -fx-font-weight: bold; -fx-font-family: 'Arial Black'; -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.6), 20, 0.3, 0, 0);"/>
+            </HBox>
+            <Label text="Découvrez les titres les plus populaires de l'eSports et de la NexUS Arena" style="-fx-text-fill: #c4b5fd; -fx-font-size: 16;"/>
+            
+            <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20 0 0 0;">
+                <TextField fx:id="fieldSearch" promptText="🔍 Rechercher un jeu..." prefWidth="400" 
+                           style="-fx-background-color: rgba(26,18,58,0.9); -fx-text-fill: white; -fx-prompt-text-fill: #6b7280; -fx-border-color: rgba(139,92,246,0.4); -fx-border-width: 1.5; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 20;"/>
+            </HBox>
+        </VBox>
+
+        <!-- CATEGORIES SECTION -->
+        <VBox spacing="15" alignment="CENTER" style="-fx-padding: 0 60 30 60;">
+            <Label text="PARCOURIR PAR CATÉGORIE" style="-fx-text-fill: #9ca3af; -fx-font-size: 12; -fx-font-weight: bold; -fx-letter-spacing: 2px;"/>
+            <FlowPane fx:id="paneCategories" alignment="CENTER" hgap="15" vgap="15"/>
+        </VBox>
+
+        <!-- GAMES GRID -->
+        <VBox spacing="20" alignment="CENTER" style="-fx-padding: 20 60 60 60;">
+            <HBox alignment="CENTER" spacing="10">
+                <Circle radius="4" style="-fx-fill: #a855f7;"/>
+                <Label fx:id="lblCategoryTitle" text="Tous les Jeux" style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;"/>
+            </HBox>
+            
+            <Label fx:id="lblEmpty" text="Aucun jeu ne correspond à votre recherche." visible="false" managed="false" style="-fx-text-fill: #6b7280; -fx-font-size: 16;"/>
+            
+            <FlowPane fx:id="paneGames" alignment="CENTER" hgap="25" vgap="25" prefWrapLength="1100"/>
+        </VBox>
+
+        <!-- FOOTER -->
+        <HBox alignment="CENTER" spacing="20" style="-fx-background-color: #080714; -fx-border-color: rgba(139,92,246,0.15) transparent transparent transparent; -fx-padding: 30 40;">
+            <Label text="NexUS Gaming Arena © 2024" style="-fx-text-fill: #4b5563; -fx-font-size: 12;"/>
+        </HBox>
+    </VBox>
+</ScrollPane>
