@@ -6,24 +6,29 @@ import com.esports.service.CategorieProduitService;
 import com.esports.service.ProduitService;
 
 import javafx.beans.property.SimpleStringProperty;
-import java.time.format.DateTimeFormatter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import java.net.URL;
 
 public class ShopController implements Initializable {
 
@@ -32,13 +37,13 @@ public class ShopController implements Initializable {
     @FXML private Label lblCatCount;
 
     // ── Filtres ───────────────────────────────────────────────────
-    @FXML private TextField              fieldSearch;
-    @FXML private TextField              fieldSearchCat;
-    @FXML private ComboBox<String>       comboStock;
+    @FXML private TextField                  fieldSearch;
+    @FXML private TextField                  fieldSearchCat;
+    @FXML private ComboBox<String>           comboStock;
     @FXML private ComboBox<CategorieProduit> comboCategorie;
 
     // ── Table catégories ──────────────────────────────────────────
-    @FXML private TableView<CategorieProduit>        tableCategories;
+    @FXML private TableView<CategorieProduit>            tableCategories;
     @FXML private TableColumn<CategorieProduit, Integer> colCatId;
     @FXML private TableColumn<CategorieProduit, String>  colCatNom;
     @FXML private TableColumn<CategorieProduit, String>  colCatDesc;
@@ -47,19 +52,22 @@ public class ShopController implements Initializable {
     @FXML private TableColumn<CategorieProduit, String>  colCatActions;
 
     // ── Table produits ────────────────────────────────────────────
-    @FXML private TableView<Produit>              tableProduits;
-    @FXML private TableColumn<Produit, Integer>   colId;
-    @FXML private TableColumn<Produit, String>    colNom;
-    @FXML private TableColumn<Produit, String>    colCategorie;
-    @FXML private TableColumn<Produit, String>    colPrix;
-    @FXML private TableColumn<Produit, String>    colStock;
-    @FXML private TableColumn<Produit, String>    colImage;
-    @FXML private TableColumn<Produit, String>    colModel3d;
-    @FXML private TableColumn<Produit, String>    colIdCat;
-    @FXML private TableColumn<Produit, String>    colActions;
+    @FXML private TableView<Produit>            tableProduits;
+    @FXML private TableColumn<Produit, Integer> colId;
+    @FXML private TableColumn<Produit, String>  colNom;
+    @FXML private TableColumn<Produit, String>  colCategorie;
+    @FXML private TableColumn<Produit, String>  colPrix;
+    @FXML private TableColumn<Produit, String>  colStock;
+    @FXML private TableColumn<Produit, String>  colImage;
+    @FXML private TableColumn<Produit, String>  colModel3d;
+    @FXML private TableColumn<Produit, String>  colIdCat;
+    @FXML private TableColumn<Produit, String>  colActions;
 
-    // ── VBox racine (pour accéder au StackPane parent) ────────────
+    // ── VBox racine ───────────────────────────────────────────────
     @FXML private VBox rootVBox;
+
+    // ── ✦ NOUVEAU : bouton Prédire Prix IA ───────────────────────
+    @FXML private Button btnPredirePrix;
 
     // ── Services ──────────────────────────────────────────────────
     private final ProduitService          produitService = new ProduitService();
@@ -83,7 +91,7 @@ public class ShopController implements Initializable {
     private TextField fieldModel3d;
     private Label     lblFormError;
     private Button    btnConfirmer;
-    private ImageView imgPreview;      // prévisualisation image dans le formulaire produit
+    private ImageView imgPreview;
 
     // ── Champs dialog Catégorie (créés programmatiquement) ────────
     private StackPane overlayCat;
@@ -109,11 +117,34 @@ public class ShopController implements Initializable {
     }
 
     // ══════════════════════════════════════════════════════════════
+    // ✦ NOUVEAU — NAVIGATION VERS LE PRÉDICTEUR IA
+    // ══════════════════════════════════════════════════════════════
+
+    @FXML
+    private void onPredirePrix() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getClassLoader().getResource("com/esports/fxml/PrixPredicteurView.fxml")
+            );
+            Parent root = loader.load();
+            Stage stage = (Stage) btnPredirePrix.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur de navigation");
+            alert.setHeaderText(null);
+            alert.setContentText("Impossible d'ouvrir le prédicteur de prix : " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════
     // CONSTRUCTION DES DIALOGS PROGRAMMATIQUE
     // ══════════════════════════════════════════════════════════════
 
     private void buildDialogProduit() {
-        // Champs
         fieldNom         = styledField("Ex: Souris Gaming");
         fieldDescription = styledArea("Description du produit…");
         fieldPrix        = styledField("ex: 29.99");
@@ -137,7 +168,6 @@ public class ShopController implements Initializable {
         Button btnAnnuler = dialogSecondaryBtn("Annuler");
         btnAnnuler.setOnAction(e -> hideOverlay(overlayProduit));
 
-        // Layout
         HBox titleRow = new HBox(10, new Label("🛍️"), lblFormTitle);
         titleRow.setAlignment(Pos.CENTER_LEFT);
         ((Label)titleRow.getChildren().get(0)).setStyle("-fx-font-size: 22px;");
@@ -147,12 +177,11 @@ public class ShopController implements Initializable {
         sep.widthProperty().bind(titleRow.widthProperty());
 
         HBox prixStock = new HBox(14,
-            formGroup("Prix (DT) *", fieldPrix),
-            formGroup("Stock *", comboStockForm));
+                formGroup("Prix (DT) *", fieldPrix),
+                formGroup("Stock *", comboStockForm));
         HBox.setHgrow(prixStock.getChildren().get(0), Priority.ALWAYS);
         HBox.setHgrow(prixStock.getChildren().get(1), Priority.ALWAYS);
 
-        // ── Prévisualisation image ─────────────────────────────────
         imgPreview = new ImageView();
         imgPreview.setFitWidth(100);
         imgPreview.setFitHeight(70);
@@ -162,16 +191,15 @@ public class ShopController implements Initializable {
         previewPane.setPrefSize(100, 70);
         previewPane.setMinSize(100, 70);
         previewPane.setStyle(
-            "-fx-background-color: rgba(139,92,246,0.08);" +
-            "-fx-border-color: rgba(139,92,246,0.25);" +
-            "-fx-border-width: 1px; -fx-border-radius: 8px;" +
-            "-fx-background-radius: 8px;"
+                "-fx-background-color: rgba(139,92,246,0.08);" +
+                        "-fx-border-color: rgba(139,92,246,0.25);" +
+                        "-fx-border-width: 1px; -fx-border-radius: 8px;" +
+                        "-fx-background-radius: 8px;"
         );
         Label lblNoImg = new Label("Aperçu");
         lblNoImg.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 11px;");
-        previewPane.getChildren().add(lblNoImg); // affiché si pas d'image
+        previewPane.getChildren().add(lblNoImg);
 
-        // Mise à jour en temps réel quand on saisit le chemin
         fieldImage.textProperty().addListener((obs, old, val) -> {
             lblNoImg.setVisible(false);
             String v = val.trim();
@@ -187,15 +215,14 @@ public class ShopController implements Initializable {
             } catch (Exception ignored) { imgPreview.setImage(null); lblNoImg.setVisible(true); }
         });
 
-        // Champ image + preview côte à côte
         VBox imgFieldGroup = formGroup("Image (chemin/URL)", fieldImage);
         HBox imgWithPreview = new HBox(10, imgFieldGroup, previewPane);
         imgWithPreview.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(imgFieldGroup, Priority.ALWAYS);
 
         HBox catImage = new HBox(14,
-            formGroup("Catégorie *", comboCategorieForm),
-            imgWithPreview);
+                formGroup("Catégorie *", comboCategorieForm),
+                imgWithPreview);
         HBox.setHgrow(catImage.getChildren().get(0), Priority.ALWAYS);
         HBox.setHgrow(catImage.getChildren().get(1), Priority.ALWAYS);
 
@@ -203,19 +230,19 @@ public class ShopController implements Initializable {
         btnRow.setAlignment(Pos.CENTER_RIGHT);
 
         VBox card = new VBox(16,
-            titleRow, sep,
-            formGroup("Nom du Produit *", fieldNom),
-            formGroup("Description", fieldDescription),
-            prixStock, catImage,
-            formGroup("Modèle 3D (optionnel)", fieldModel3d),
-            lblFormError, btnRow);
+                titleRow, sep,
+                formGroup("Nom du Produit *", fieldNom),
+                formGroup("Description", fieldDescription),
+                prixStock, catImage,
+                formGroup("Modèle 3D (optionnel)", fieldModel3d),
+                lblFormError, btnRow);
         card.setMaxWidth(580);
         card.setStyle(
-            "-fx-background-color: #14112b;" +
-            "-fx-border-color: rgba(139,92,246,0.45);" +
-            "-fx-border-width: 1.5px; -fx-border-radius: 16px;" +
-            "-fx-background-radius: 16px; -fx-padding: 32 36 28 36;" +
-            "-fx-effect: dropshadow(gaussian,rgba(139,92,246,0.5),40,0.3,0,0);");
+                "-fx-background-color: #14112b;" +
+                        "-fx-border-color: rgba(139,92,246,0.45);" +
+                        "-fx-border-width: 1.5px; -fx-border-radius: 16px;" +
+                        "-fx-background-radius: 16px; -fx-padding: 32 36 28 36;" +
+                        "-fx-effect: dropshadow(gaussian,rgba(139,92,246,0.5),40,0.3,0,0);");
 
         overlayProduit = new StackPane(card);
         overlayProduit.setStyle("-fx-background-color: rgba(0,0,0,0.65);");
@@ -249,17 +276,17 @@ public class ShopController implements Initializable {
         btnRow.setAlignment(Pos.CENTER_RIGHT);
 
         VBox card = new VBox(16,
-            titleRow, sep,
-            formGroup("Nom *", fieldCatNom),
-            formGroup("Description", fieldCatDescription),
-            lblCatFormError, btnRow);
+                titleRow, sep,
+                formGroup("Nom *", fieldCatNom),
+                formGroup("Description", fieldCatDescription),
+                lblCatFormError, btnRow);
         card.setMaxWidth(460);
         card.setStyle(
-            "-fx-background-color: #14112b;" +
-            "-fx-border-color: rgba(139,92,246,0.45);" +
-            "-fx-border-width: 1.5px; -fx-border-radius: 16px;" +
-            "-fx-background-radius: 16px; -fx-padding: 32 36 28 36;" +
-            "-fx-effect: dropshadow(gaussian,rgba(139,92,246,0.5),40,0.3,0,0);");
+                "-fx-background-color: #14112b;" +
+                        "-fx-border-color: rgba(139,92,246,0.45);" +
+                        "-fx-border-width: 1.5px; -fx-border-radius: 16px;" +
+                        "-fx-background-radius: 16px; -fx-padding: 32 36 28 36;" +
+                        "-fx-effect: dropshadow(gaussian,rgba(139,92,246,0.5),40,0.3,0,0);");
 
         overlayCat = new StackPane(card);
         overlayCat.setStyle("-fx-background-color: rgba(0,0,0,0.65);");
@@ -267,7 +294,6 @@ public class ShopController implements Initializable {
         overlayCat.setManaged(false);
     }
 
-    /** Injecte les overlays dans le StackPane contentArea du parent */
     private void injectOverlays() {
         if (rootVBox.getScene() == null) return;
         javafx.scene.Node parent = rootVBox.getParent();
@@ -298,24 +324,15 @@ public class ShopController implements Initializable {
             java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private void setupTableCategories() {
-        // ID
         if (colCatId  != null) colCatId.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        // Nom
         if (colCatNom != null) colCatNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-
-        // Description
         if (colCatDesc != null) colCatDesc.setCellValueFactory(
                 d -> new SimpleStringProperty(
-                    d.getValue().getDescription() != null ? d.getValue().getDescription() : ""));
-
-        // Date création
+                        d.getValue().getDescription() != null ? d.getValue().getDescription() : ""));
         if (colCatDate != null) colCatDate.setCellValueFactory(d -> {
             var date = d.getValue().getDateCreation();
             return new SimpleStringProperty(date != null ? date.format(CAT_DATE_FMT) : "—");
         });
-
-        // Statut — badge coloré
         if (colCatStatut != null) {
             colCatStatut.setCellFactory(col -> new TableCell<>() {
                 @Override protected void updateItem(String item, boolean empty) {
@@ -326,42 +343,39 @@ public class ShopController implements Initializable {
                     CategorieProduit c = getTableView().getItems().get(getIndex());
                     Label badge = new Label(c.isActive() ? "● Actif" : "○ Inactif");
                     badge.setStyle(c.isActive()
-                        ? "-fx-text-fill:#4ade80;-fx-font-size:11px;-fx-font-weight:bold;" +
-                          "-fx-background-color:rgba(74,222,128,0.12);" +
-                          "-fx-border-color:rgba(74,222,128,0.3);-fx-border-width:1px;" +
-                          "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
-                        : "-fx-text-fill:#f87171;-fx-font-size:11px;-fx-font-weight:bold;" +
-                          "-fx-background-color:rgba(248,113,113,0.12);" +
-                          "-fx-border-color:rgba(248,113,113,0.3);-fx-border-width:1px;" +
-                          "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
+                            ? "-fx-text-fill:#4ade80;-fx-font-size:11px;-fx-font-weight:bold;" +
+                            "-fx-background-color:rgba(74,222,128,0.12);" +
+                            "-fx-border-color:rgba(74,222,128,0.3);-fx-border-width:1px;" +
+                            "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
+                            : "-fx-text-fill:#f87171;-fx-font-size:11px;-fx-font-weight:bold;" +
+                            "-fx-background-color:rgba(248,113,113,0.12);" +
+                            "-fx-border-color:rgba(248,113,113,0.3);-fx-border-width:1px;" +
+                            "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
                     );
                     setGraphic(badge);
                 }
             });
         }
-
-        // Actions
         if (colCatActions != null) {
             colCatActions.setCellFactory(col -> new TableCell<>() {
                 private final Button btnEdit   = buildBtn("=  Modifier", "#f59e0b", "#422006");
                 private final Button btnDelete = buildIconBtn("X", "#f87171", "#450a0a");
                 private final HBox   box       = new HBox(8, btnEdit, btnDelete);
                 { box.setAlignment(Pos.CENTER_LEFT);
-                  btnEdit.setOnAction(e -> {
-                      CategorieProduit c = getTableView().getItems().get(getIndex());
-                      boolean ok = com.esports.utils.NexusDialog.showConfirm(
-                          "Modifier la cat\u00e9gorie",
-                          "Modifier \"" + c.getNom() + "\" ?",
-                          "Vous allez ouvrir le formulaire de modification."
-                      );
-                      if (ok) onEditCat(c);
-                  });
-                  btnDelete.setOnAction(e -> onDeleteCat(getTableView().getItems().get(getIndex()))); }
+                    btnEdit.setOnAction(e -> {
+                        CategorieProduit c = getTableView().getItems().get(getIndex());
+                        boolean ok = com.esports.utils.NexusDialog.showConfirm(
+                                "Modifier la catégorie",
+                                "Modifier \"" + c.getNom() + "\" ?",
+                                "Vous allez ouvrir le formulaire de modification."
+                        );
+                        if (ok) onEditCat(c);
+                    });
+                    btnDelete.setOnAction(e -> onDeleteCat(getTableView().getItems().get(getIndex()))); }
                 @Override protected void updateItem(String i, boolean empty) {
                     super.updateItem(i, empty); setGraphic(empty ? null : box); }
             });
         }
-
         if (tableCategories != null) tableCategories.setItems(categories);
     }
 
@@ -369,8 +383,6 @@ public class ShopController implements Initializable {
         List<CategorieProduit> cats = catService.findAll();
         categories.setAll(cats);
         if (lblCatCount != null) lblCatCount.setText(cats.size() + " catégorie(s)");
-
-        // Alimenter combos
         ObservableList<CategorieProduit> catList = FXCollections.observableArrayList(cats);
         if (comboCategorieForm != null) {
             comboCategorieForm.setItems(catList);
@@ -390,25 +402,14 @@ public class ShopController implements Initializable {
     // ══════════════════════════════════════════════════════════════
 
     private void setupTableProduits() {
-        // ID
         if (colId    != null) colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        // ID Catégorie
         if (colIdCat != null) colIdCat.setCellValueFactory(
                 d -> new SimpleStringProperty(String.valueOf(d.getValue().getIdCategoriesProduitId())));
-
-        // Nom
         if (colNom   != null) colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-
-        // Catégorie (nom)
         if (colCategorie != null) colCategorie.setCellValueFactory(
                 d -> new SimpleStringProperty(d.getValue().getNomCategorie()));
-
-        // Prix formaté
         if (colPrix != null) colPrix.setCellValueFactory(
                 d -> new SimpleStringProperty(d.getValue().getPrixFormate()));
-
-        // Stock badge coloré
         if (colStock != null) {
             colStock.setCellFactory(col -> new TableCell<>() {
                 @Override protected void updateItem(String item, boolean empty) {
@@ -417,35 +418,26 @@ public class ShopController implements Initializable {
                     Produit p = getTableView().getItems().get(getIndex());
                     Label badge = new Label(p.getStockLabel());
                     badge.setStyle(p.isDisponible()
-                        ? "-fx-text-fill:#4ade80;-fx-font-size:11px;-fx-font-weight:bold;" +
-                          "-fx-background-color:rgba(74,222,128,0.12);" +
-                          "-fx-border-color:rgba(74,222,128,0.3);-fx-border-width:1px;" +
-                          "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
-                        : "-fx-text-fill:#f87171;-fx-font-size:11px;-fx-font-weight:bold;" +
-                          "-fx-background-color:rgba(248,113,113,0.12);" +
-                          "-fx-border-color:rgba(248,113,113,0.3);-fx-border-width:1px;" +
-                          "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
+                            ? "-fx-text-fill:#4ade80;-fx-font-size:11px;-fx-font-weight:bold;" +
+                            "-fx-background-color:rgba(74,222,128,0.12);" +
+                            "-fx-border-color:rgba(74,222,128,0.3);-fx-border-width:1px;" +
+                            "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
+                            : "-fx-text-fill:#f87171;-fx-font-size:11px;-fx-font-weight:bold;" +
+                            "-fx-background-color:rgba(248,113,113,0.12);" +
+                            "-fx-border-color:rgba(248,113,113,0.3);-fx-border-width:1px;" +
+                            "-fx-border-radius:20px;-fx-background-radius:20px;-fx-padding:3 10 3 10;"
                     );
                     setGraphic(badge);
                 }
             });
         }
-
-        // IMAGE — miniature réelle 60×45
         if (colImage != null) {
             colImage.setCellFactory(col -> new TableCell<>() {
                 private final ImageView iv = new ImageView();
-                {
-                    iv.setFitWidth(60);
-                    iv.setFitHeight(45);
-                    iv.setPreserveRatio(true);
-                    iv.setSmooth(true);
-                }
+                { iv.setFitWidth(60); iv.setFitHeight(45); iv.setPreserveRatio(true); iv.setSmooth(true); }
                 @Override protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
-                    if (empty || getIndex() >= getTableView().getItems().size()) {
-                        setGraphic(null); return;
-                    }
+                    if (empty || getIndex() >= getTableView().getItems().size()) { setGraphic(null); return; }
                     Produit p = getTableView().getItems().get(getIndex());
                     String src = p.getImage();
                     if (src != null && !src.isBlank()) {
@@ -461,52 +453,42 @@ public class ShopController implements Initializable {
                             iv.setImage(img);
                             setGraphic(iv);
                         } catch (Exception ex) {
-                            Label lbl = new Label("—");
-                            lbl.setStyle("-fx-text-fill:#6b7280;");
-                            setGraphic(lbl);
+                            Label lbl = new Label("—"); lbl.setStyle("-fx-text-fill:#6b7280;"); setGraphic(lbl);
                         }
                     } else {
-                        Label lbl = new Label("—");
-                        lbl.setStyle("-fx-text-fill:#6b7280;");
-                        setGraphic(lbl);
+                        Label lbl = new Label("—"); lbl.setStyle("-fx-text-fill:#6b7280;"); setGraphic(lbl);
                     }
                 }
             });
         }
-
-        // MODÈLE 3D — affiche le nom du fichier ou "—"
         if (colModel3d != null) {
             colModel3d.setCellValueFactory(d -> {
                 String m = d.getValue().getModel3d();
                 if (m == null || m.isBlank()) return new SimpleStringProperty("—");
-                // Afficher seulement le nom du fichier
                 int idx = Math.max(m.lastIndexOf('/'), m.lastIndexOf('\\'));
                 return new SimpleStringProperty(idx >= 0 ? m.substring(idx + 1) : m);
             });
         }
-
-        // ACTIONS
         if (colActions != null) {
             colActions.setCellFactory(col -> new TableCell<>() {
                 private final Button btnEdit   = buildBtn("=  Modifier", "#f59e0b", "#422006");
                 private final Button btnDelete = buildIconBtn("X", "#f87171", "#450a0a");
                 private final HBox   box       = new HBox(8, btnEdit, btnDelete);
                 { box.setAlignment(Pos.CENTER_LEFT);
-                  btnEdit.setOnAction(e -> {
-                      Produit p = getTableView().getItems().get(getIndex());
-                      boolean ok = com.esports.utils.NexusDialog.showConfirm(
-                          "Modifier le produit",
-                          "Modifier \"" + p.getNom() + "\" ?",
-                          "Vous allez ouvrir le formulaire de modification."
-                      );
-                      if (ok) onEdit(p);
-                  });
-                  btnDelete.setOnAction(e -> onDelete(getTableView().getItems().get(getIndex()))); }
+                    btnEdit.setOnAction(e -> {
+                        Produit p = getTableView().getItems().get(getIndex());
+                        boolean ok = com.esports.utils.NexusDialog.showConfirm(
+                                "Modifier le produit",
+                                "Modifier \"" + p.getNom() + "\" ?",
+                                "Vous allez ouvrir le formulaire de modification."
+                        );
+                        if (ok) onEdit(p);
+                    });
+                    btnDelete.setOnAction(e -> onDelete(getTableView().getItems().get(getIndex()))); }
                 @Override protected void updateItem(String i, boolean empty) {
                     super.updateItem(i, empty); setGraphic(empty ? null : box); }
             });
         }
-
         if (tableProduits != null) tableProduits.setItems(produits);
     }
 
@@ -538,8 +520,8 @@ public class ShopController implements Initializable {
         for (Produit p : produitService.findAll()) {
             boolean mNom   = q.isEmpty() || p.getNom().toLowerCase().contains(q);
             boolean mStock = "Tous".equals(stock)
-                || ("Disponible".equals(stock) && p.isDisponible())
-                || ("En rupture".equals(stock) && !p.isDisponible());
+                    || ("Disponible".equals(stock) && p.isDisponible())
+                    || ("En rupture".equals(stock) && !p.isDisponible());
             boolean mCat   = cat == null || cat.getId() == 0 || p.getIdCategoriesProduitId() == cat.getId();
             if (mNom && mStock && mCat) filtered.add(p);
         }
@@ -551,7 +533,7 @@ public class ShopController implements Initializable {
         String q = fieldSearchCat != null ? fieldSearchCat.getText().trim().toLowerCase() : "";
         List<CategorieProduit> all = catService.findAll();
         categories.setAll(q.isEmpty() ? all :
-            all.stream().filter(c -> c.getNom().toLowerCase().contains(q)).toList());
+                all.stream().filter(c -> c.getNom().toLowerCase().contains(q)).toList());
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -577,16 +559,16 @@ public class ShopController implements Initializable {
         comboStockForm.setValue(p.getStock());
         fieldModel3d.setText(p.getModel3d() != null ? p.getModel3d() : "");
         comboCategorieForm.getItems().stream()
-            .filter(c -> c.getId() == p.getIdCategoriesProduitId())
-            .findFirst().ifPresent(comboCategorieForm::setValue);
+                .filter(c -> c.getId() == p.getIdCategoriesProduitId())
+                .findFirst().ifPresent(comboCategorieForm::setValue);
         showOverlay(overlayProduit);
     }
 
     private void onDelete(Produit p) {
         boolean confirmed = com.esports.utils.NexusDialog.showConfirm(
-            "Supprimer le produit",
-            "Supprimer \"" + p.getNom() + "\" ?",
-            "Cette action est irréversible."
+                "Supprimer le produit",
+                "Supprimer \"" + p.getNom() + "\" ?",
+                "Cette action est irréversible."
         );
         if (confirmed)
             if (produitService.delete(p.getId())) loadProduits();
@@ -640,9 +622,9 @@ public class ShopController implements Initializable {
 
     private void onDeleteCat(CategorieProduit c) {
         boolean confirmed = com.esports.utils.NexusDialog.showConfirm(
-            "Supprimer la catégorie",
-            "Supprimer \"" + c.getNom() + "\" ?",
-            "Les produits associés perdront leur catégorie."
+                "Supprimer la catégorie",
+                "Supprimer \"" + c.getNom() + "\" ?",
+                "Les produits associés perdront leur catégorie."
         );
         if (confirmed)
             if (catService.delete(c.getId())) { loadCategories(); loadProduits(); }
@@ -650,62 +632,43 @@ public class ShopController implements Initializable {
 
     @FXML private void onSaveCat() {
         lblCatFormError.setText("");
-
-        // ── Nom obligatoire ───────────────────────────────────────
         String nom = fieldCatNom.getText().trim();
         if (nom.isEmpty()) {
             lblCatFormError.setText("✗ Le nom de la catégorie est obligatoire.");
-            fieldCatNom.requestFocus();
-            return;
+            fieldCatNom.requestFocus(); return;
         }
         if (nom.length() < 2) {
             lblCatFormError.setText("✗ Le nom doit contenir au moins 2 caractères.");
-            fieldCatNom.requestFocus();
-            return;
+            fieldCatNom.requestFocus(); return;
         }
-
-        // ── Caractères spéciaux interdits (chiffres seuls, etc.) ──
         if (nom.matches("^[0-9]+$")) {
             lblCatFormError.setText("✗ Le nom ne peut pas être composé uniquement de chiffres.");
-            fieldCatNom.requestFocus();
-            return;
+            fieldCatNom.requestFocus(); return;
         }
-
-
-        // ── Description catégorie : obligatoire, min 10, max 300 caractères ──
         String descCat = fieldCatDescription.getText().trim();
         if (descCat.isEmpty()) {
             lblCatFormError.setText("✗ La description est obligatoire.");
-            fieldCatDescription.requestFocus();
-            return;
+            fieldCatDescription.requestFocus(); return;
         }
         if (descCat.length() < 10) {
             lblCatFormError.setText("✗ La description doit contenir au moins 10 caractères (actuellement : " + descCat.length() + ").");
-            fieldCatDescription.requestFocus();
-            return;
+            fieldCatDescription.requestFocus(); return;
         }
         if (descCat.length() > 300) {
             lblCatFormError.setText("✗ La description ne doit pas dépasser 300 caractères (actuellement : " + descCat.length() + ").");
-            fieldCatDescription.requestFocus();
-            return;
+            fieldCatDescription.requestFocus(); return;
         }
-        // ── Test d'unicité ────────────────────────────────────────
-        // Une catégorie est un doublon si elle a le même nom (insensible à la casse).
         int excludeId = (selectedCat != null) ? selectedCat.getId() : -1;
         if (catService.existsByNom(nom, excludeId)) {
-            lblCatFormError.setText("✗ Une catégorie nommée \"" + nom + "\" existe déjà. Choisissez un nom différent.");
-            fieldCatNom.requestFocus();
-            return;
+            lblCatFormError.setText("✗ Une catégorie nommée \"" + nom + "\" existe déjà.");
+            fieldCatNom.requestFocus(); return;
         }
-
-        // ── Enregistrement ────────────────────────────────────────
         String desc = fieldCatDescription.getText().trim();
         boolean ok;
         if (selectedCat == null) {
             ok = catService.create(new CategorieProduit(nom, desc));
         } else {
-            selectedCat.setNom(nom);
-            selectedCat.setDescription(desc);
+            selectedCat.setNom(nom); selectedCat.setDescription(desc);
             ok = catService.update(selectedCat);
         }
         if (ok) { hideOverlay(overlayCat); clearCatForm(); loadCategories(); loadProduits(); }
@@ -720,88 +683,28 @@ public class ShopController implements Initializable {
 
     private boolean validateProduit() {
         lblFormError.setText("");
-
-        // ── Champs obligatoires ───────────────────────────────────
         String nom = fieldNom.getText().trim();
-        if (nom.isEmpty()) {
-            lblFormError.setText("✗ Le nom du produit est obligatoire.");
-            fieldNom.requestFocus();
-            return false;
-        }
-        if (nom.length() < 2) {
-            lblFormError.setText("✗ Le nom doit contenir au moins 2 caractères.");
-            fieldNom.requestFocus();
-            return false;
-        }
-
-        // ── Description : obligatoire, min 10, max 500 caractères ────
+        if (nom.isEmpty()) { lblFormError.setText("✗ Le nom du produit est obligatoire."); fieldNom.requestFocus(); return false; }
+        if (nom.length() < 2) { lblFormError.setText("✗ Le nom doit contenir au moins 2 caractères."); fieldNom.requestFocus(); return false; }
         String desc = fieldDescription.getText().trim();
-        if (desc.isEmpty()) {
-            lblFormError.setText("✗ La description est obligatoire.");
-            fieldDescription.requestFocus();
-            return false;
-        }
-        if (desc.length() < 10) {
-            lblFormError.setText("✗ La description doit contenir au moins 10 caractères (actuellement : " + desc.length() + ").");
-            fieldDescription.requestFocus();
-            return false;
-        }
-        if (desc.length() > 500) {
-            lblFormError.setText("✗ La description ne doit pas dépasser 500 caractères (actuellement : " + desc.length() + ").");
-            fieldDescription.requestFocus();
-            return false;
-        }
-
-        // ── Prix : obligatoire + type numérique + valeur positive ─
+        if (desc.isEmpty()) { lblFormError.setText("✗ La description est obligatoire."); fieldDescription.requestFocus(); return false; }
+        if (desc.length() < 10) { lblFormError.setText("✗ La description doit contenir au moins 10 caractères (actuellement : " + desc.length() + ")."); fieldDescription.requestFocus(); return false; }
+        if (desc.length() > 500) { lblFormError.setText("✗ La description ne doit pas dépasser 500 caractères (actuellement : " + desc.length() + ")."); fieldDescription.requestFocus(); return false; }
         String prixStr = fieldPrix.getText().trim();
-        if (prixStr.isEmpty()) {
-            lblFormError.setText("✗ Le prix est obligatoire.");
-            fieldPrix.requestFocus();
-            return false;
-        }
+        if (prixStr.isEmpty()) { lblFormError.setText("✗ Le prix est obligatoire."); fieldPrix.requestFocus(); return false; }
         double prix;
-        try {
-            prix = Double.parseDouble(prixStr.replace(",", "."));
-        } catch (NumberFormatException e) {
-            lblFormError.setText("✗ Prix invalide — entrez un nombre (ex: 29.99).");
-            fieldPrix.requestFocus();
-            return false;
-        }
-        if (prix < 0) {
-            lblFormError.setText("✗ Le prix ne peut pas être négatif.");
-            fieldPrix.requestFocus();
-            return false;
-        }
-        if (prix > 99999.99) {
-            lblFormError.setText("✗ Le prix semble trop élevé (max 99 999.99 DT).");
-            fieldPrix.requestFocus();
-            return false;
-        }
-
-        // ── Catégorie obligatoire ─────────────────────────────────
-        if (comboCategorieForm.getValue() == null) {
-            lblFormError.setText("✗ Veuillez sélectionner une catégorie.");
-            comboCategorieForm.requestFocus();
-            return false;
-        }
-
-        // ── Stock obligatoire ─────────────────────────────────────
-        if (comboStockForm.getValue() == null) {
-            lblFormError.setText("✗ Veuillez indiquer le statut du stock.");
-            comboStockForm.requestFocus();
-            return false;
-        }
-
-        // ── Test d'unicité ────────────────────────────────────────
-        // Un produit est considéré doublon si même nom (insensible à la casse),
-        // même prix ET même catégorie.
+        try { prix = Double.parseDouble(prixStr.replace(",", ".")); }
+        catch (NumberFormatException e) { lblFormError.setText("✗ Prix invalide — entrez un nombre (ex: 29.99)."); fieldPrix.requestFocus(); return false; }
+        if (prix < 0) { lblFormError.setText("✗ Le prix ne peut pas être négatif."); fieldPrix.requestFocus(); return false; }
+        if (prix > 99999.99) { lblFormError.setText("✗ Le prix semble trop élevé (max 99 999.99 DT)."); fieldPrix.requestFocus(); return false; }
+        if (comboCategorieForm.getValue() == null) { lblFormError.setText("✗ Veuillez sélectionner une catégorie."); comboCategorieForm.requestFocus(); return false; }
+        if (comboStockForm.getValue() == null) { lblFormError.setText("✗ Veuillez indiquer le statut du stock."); comboStockForm.requestFocus(); return false; }
         int excludeId = (selectedProduit != null) ? selectedProduit.getId() : -1;
         int catId = comboCategorieForm.getValue().getId();
         if (produitService.existsByNomPrixCategorie(nom, prix, catId, excludeId)) {
             lblFormError.setText("✗ Doublon détecté : un produit avec ce nom, ce prix et cette catégorie existe déjà.");
             return false;
         }
-
         return true;
     }
 
@@ -835,9 +738,9 @@ public class ShopController implements Initializable {
         tf.setPromptText(prompt);
         tf.setMaxWidth(Double.MAX_VALUE);
         tf.setStyle("-fx-background-color: rgba(255,255,255,0.05); -fx-text-fill: white;" +
-                    "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
-                    "-fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;" +
-                    "-fx-padding: 9 12 9 12; -fx-font-size: 13px;");
+                "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
+                "-fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;" +
+                "-fx-padding: 9 12 9 12; -fx-font-size: 13px;");
         return tf;
     }
 
@@ -848,70 +751,66 @@ public class ShopController implements Initializable {
         ta.setWrapText(true);
         ta.setMaxWidth(Double.MAX_VALUE);
         ta.setStyle("-fx-background-color: rgba(255,255,255,0.05); -fx-text-fill: white;" +
-                    "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
-                    "-fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;" +
-                    "-fx-padding: 9 12 9 12; -fx-font-size: 13px; -fx-control-inner-background: #0d0b1e;");
+                "-fx-prompt-text-fill: #4b5563; -fx-border-color: rgba(139,92,246,0.3);" +
+                "-fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px;" +
+                "-fx-padding: 9 12 9 12; -fx-font-size: 13px; -fx-control-inner-background: #0d0b1e;");
         return ta;
     }
 
     private <T> void styleCombo(ComboBox<T> cb) {
         cb.setMaxWidth(Double.MAX_VALUE);
         cb.setStyle("-fx-background-color: rgba(255,255,255,0.05); -fx-text-fill: white;" +
-                    "-fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 1px;" +
-                    "-fx-border-radius: 8px; -fx-background-radius: 8px;" +
-                    "-fx-padding: 4 10 4 10; -fx-font-size: 13px;");
+                "-fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 1px;" +
+                "-fx-border-radius: 8px; -fx-background-radius: 8px;" +
+                "-fx-padding: 4 10 4 10; -fx-font-size: 13px;");
     }
 
     private Button dialogPrimaryBtn(String text) {
         Button btn = new Button(text);
         btn.setStyle("-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);" +
-                     "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
-                     "-fx-background-radius: 10px; -fx-padding: 11 32 11 32;" +
-                     "-fx-cursor: hand; -fx-border-color: transparent;" +
-                     "-fx-effect: dropshadow(gaussian,rgba(168,85,247,0.5),12,0.3,0,2);");
+                "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 10px; -fx-padding: 11 32 11 32;" +
+                "-fx-cursor: hand; -fx-border-color: transparent;" +
+                "-fx-effect: dropshadow(gaussian,rgba(168,85,247,0.5),12,0.3,0,2);");
         return btn;
     }
 
     private Button dialogSecondaryBtn(String text) {
         Button btn = new Button(text);
         btn.setStyle("-fx-background-color: rgba(255,255,255,0.05); -fx-text-fill: #9ca3af;" +
-                     "-fx-font-size: 13px; -fx-font-weight: bold;" +
-                     "-fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 1px;" +
-                     "-fx-border-radius: 10px; -fx-background-radius: 10px;" +
-                     "-fx-padding: 11 28 11 28; -fx-cursor: hand;");
+                "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-border-color: rgba(255,255,255,0.1); -fx-border-width: 1px;" +
+                "-fx-border-radius: 10px; -fx-background-radius: 10px;" +
+                "-fx-padding: 11 28 11 28; -fx-cursor: hand;");
         return btn;
     }
 
     private Button buildBtn(String text, String color, String bg) {
         Button btn = new Button(text);
         btn.setStyle("-fx-background-color:" + bg + "; -fx-text-fill:" + color + ";" +
-                     "-fx-font-size:12px; -fx-font-weight:bold; -fx-background-radius:7px;" +
-                     "-fx-border-color:" + color + "55; -fx-border-width:1px;" +
-                     "-fx-border-radius:7px; -fx-padding:6 14 6 14; -fx-cursor:hand;");
+                "-fx-font-size:12px; -fx-font-weight:bold; -fx-background-radius:7px;" +
+                "-fx-border-color:" + color + "55; -fx-border-width:1px;" +
+                "-fx-border-radius:7px; -fx-padding:6 14 6 14; -fx-cursor:hand;");
         return btn;
     }
 
     private Button buildIconBtn(String icon, String color, String bg) {
         Button btn = new Button(icon);
         btn.setStyle("-fx-background-color:" + bg + "; -fx-text-fill:" + color + ";" +
-                     "-fx-font-size:14px; -fx-background-radius:7px;" +
-                     "-fx-border-color:" + color + "55; -fx-border-width:1px;" +
-                     "-fx-border-radius:7px; -fx-padding:5 10 5 10; -fx-cursor:hand;");
+                "-fx-font-size:14px; -fx-background-radius:7px;" +
+                "-fx-border-color:" + color + "55; -fx-border-width:1px;" +
+                "-fx-border-radius:7px; -fx-padding:5 10 5 10; -fx-cursor:hand;");
         return btn;
     }
-    // ── Helper : convertit un chemin ou URL en URL valide pour Image ──────
-    // Gère les cas : URL http, chemin absolu Windows/Linux, path déjà préfixé file:///
+
     private static String toImageUrl(String src) {
         if (src == null || src.isBlank()) return null;
         src = src.trim().replace("\\", "/");
         if (src.startsWith("http://") || src.startsWith("https://")) return src;
-        if (src.startsWith("file:///")) return src;          // déjà correct
-        if (src.startsWith("file://"))  return src;          // idem
-        // chemin absolu Windows (C:/...) ou Linux (/home/...)
-        if (src.length() > 1 && src.charAt(1) == ':') return "file:///" + src;  // Windows
-        if (src.startsWith("/")) return "file://" + src;     // Linux/Mac
-        return "file:///" + src;                              // relatif → essai
+        if (src.startsWith("file:///")) return src;
+        if (src.startsWith("file://"))  return src;
+        if (src.length() > 1 && src.charAt(1) == ':') return "file:///" + src;
+        if (src.startsWith("/")) return "file://" + src;
+        return "file:///" + src;
     }
-
-
 }

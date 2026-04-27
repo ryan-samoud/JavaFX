@@ -5,6 +5,7 @@ C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\HomeCo
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\MainController.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\PaiementController.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\PanierController.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\PrixPredicteurController.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\ShopController.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\ShopPublicController.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\controller\TournamentsController.java
@@ -32,6 +33,7 @@ C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\Categorie
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\CommandeService.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\PanierService.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\PanierSession.java
+C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\PrixPredicteurService.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\ProduitService.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\TournamentService.java
 C:\Users\Rayen\Desktop\projet\projet\src\main\java\com\esports\service\UserService.java

@@ -33,6 +33,19 @@
                     <Label text="Gérez vos produits et catégories"
                            style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
                 </VBox>
+
+                <!-- ✦ BOUTON PRÉDICTEUR IA — ajouté ici dans la topbar admin -->
+                <Button fx:id="btnPredirePrix"
+                        text="🤖 Prédire Prix IA"
+                        onAction="#onPredirePrix"
+                        style="-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);
+                               -fx-text-fill: white;
+                               -fx-font-size: 13px;
+                               -fx-font-weight: bold;
+                               -fx-padding: 10 20 10 20;
+                               -fx-background-radius: 10;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.5), 12, 0, 0, 2);"/>
             </HBox>
 
             <!-- ═══════════════════════════════════════════════════ -->
@@ -129,8 +142,5 @@
 
         </VBox>
     </ScrollPane>
-
-    <!-- ══ DIALOG OVERLAY PRODUIT (invisible, injecté dans le StackPane parent par le controller) ══ -->
-    <!-- Les overlays sont créés programmatiquement dans le controller -->
 
 </VBox>
