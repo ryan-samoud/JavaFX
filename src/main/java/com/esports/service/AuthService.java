@@ -43,6 +43,16 @@ public class AuthService {
         return AuthResult.success(user);
     }
 
+    public AuthResult loginByEmail(String email) {
+        Optional<User> opt = userService.findByEmailAny(email);
+        if (opt.isEmpty()) return AuthResult.failure("Utilisateur introuvable");
+        User user = opt.get();
+        if (user.isBanned())    return AuthResult.banned(user.getBanReason());
+        if (user.isSuspended()) return AuthResult.suspended(user.getBanReason(), user.getSuspendedUntil());
+        currentUser = user;
+        return AuthResult.success(user);
+    }
+
     public static User getCurrentUser() { return currentUser; }
     public static boolean isLoggedIn()  { return currentUser != null; }
     public static void logout()         { currentUser = null; }

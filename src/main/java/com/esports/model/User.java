@@ -16,6 +16,7 @@ public class User {
     private String photo;
     private String banReason;
     private LocalDateTime suspendedUntil;
+    private String faceData;
 
     // Full constructor (with ban fields)
     public User(int id, String nom, String prenom, String email,
@@ -80,6 +81,9 @@ public class User {
     public void setActive(boolean active)              { this.isActive = active; }
     public void setBanReason(String banReason)         { this.banReason = banReason; }
     public void setSuspendedUntil(LocalDateTime t)     { this.suspendedUntil = t; }
+
+    public String getFaceData()                  { return faceData; }
+    public void setFaceData(String faceData)     { this.faceData = faceData; }
 
     public boolean isAdmin() {
         return "admin".equalsIgnoreCase(role);

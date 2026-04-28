@@ -2,6 +2,10 @@ package com.esports.controller;
 
 import com.esports.service.AuthService;
 import com.esports.utils.CaptchaDialog;
+import com.esports.utils.TypingBiometricService;
+import com.esports.utils.TypingProfiler;
+import com.esports.utils.FaceIdCaptureDialog;
+import com.esports.utils.FaceIdService;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -20,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -33,13 +38,15 @@ public class LoginController implements Initializable {
     @FXML private Label         lblSuccess;
     @FXML private Button        btnLogin;
 
-    private final AuthService authService = new AuthService();
+    private final AuthService    authService    = new AuthService();
+    private final TypingProfiler typingProfiler = new TypingProfiler();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         lblError.setText("");
         lblSuccess.setText("");
         fieldPassword.setOnAction(e -> onLogin());
+        typingProfiler.attach(fieldPassword);
     }
 
     @FXML
@@ -71,6 +78,8 @@ public class LoginController implements Initializable {
             }
         };
 
+        final java.util.List<Double> typingIntervals = typingProfiler.getIntervals();
+
         task.setOnSucceeded(e -> {
             btnLogin.setDisable(false);
             btnLogin.setText("SE CONNECTER");
@@ -78,6 +87,23 @@ public class LoginController implements Initializable {
 
             switch (result.getStatus()) {
                 case SUCCESS -> {
+                    int uid = AuthService.getCurrentUser().getId();
+                    if (TypingBiometricService.isEnabled(uid)) {
+                        TypingBiometricService.Result bio =
+                                TypingBiometricService.compare(uid, typingIntervals);
+                        if (bio == TypingBiometricService.Result.MISMATCH) {
+                            AuthService.logout();
+                            fieldPassword.clear();
+                            typingProfiler.reset();
+                            lblError.setText("✗ Rythme de frappe non reconnu. Accès refusé.");
+                            return;
+                        }
+                        if (bio == TypingBiometricService.Result.NO_PROFILE) {
+                            TypingBiometricService.saveProfile(uid, typingIntervals);
+                        } else if (bio == TypingBiometricService.Result.MATCH) {
+                            TypingBiometricService.updateProfile(uid, typingIntervals);
+                        }
+                    }
                     lblSuccess.setText("✔ Connexion réussie ! Redirection...");
                     PauseTransition pause = new PauseTransition(Duration.seconds(1));
                     pause.setOnFinished(ev -> goHome());
@@ -308,6 +334,36 @@ public class LoginController implements Initializable {
     // ─────────────────────────────────────────────────────
     // NAVIGATION
     // ─────────────────────────────────────────────────────
+
+    @FXML
+    private void onFaceIdLogin() {
+        lblError.setText("");
+        lblSuccess.setText("");
+        Stage owner = (Stage) btnLogin.getScene().getWindow();
+        FaceIdCaptureDialog dialog = new FaceIdCaptureDialog(owner);
+        BufferedImage face = dialog.show();
+        if (face == null) {
+            lblError.setText("⚠ Aucun visage détecté. Réessayez.");
+            return;
+        }
+        String email = FaceIdService.findEmailByFace(face);
+        if (email == null) {
+            lblError.setText("✗ Visage non reconnu. Vérifiez que le Face ID est activé.");
+            return;
+        }
+        AuthService.AuthResult result = authService.loginByEmail(email);
+        switch (result.getStatus()) {
+            case SUCCESS -> {
+                lblSuccess.setText("✔ Connexion Face ID réussie !");
+                PauseTransition p = new PauseTransition(Duration.seconds(1));
+                p.setOnFinished(e -> goHome());
+                p.play();
+            }
+            case BANNED    -> showBannedDialog(result.getBanReason());
+            case SUSPENDED -> showSuspendedDialog(result.getBanReason(), result.getSuspendedUntil());
+            default        -> lblError.setText("✗ " + result.getMessage());
+        }
+    }
 
     @FXML
     private void onBack() { goHome(); }

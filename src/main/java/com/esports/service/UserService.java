@@ -35,6 +35,12 @@ public class UserService implements IUserService {
             catch (SQLException ignored) {}
             try { stmt.execute("ALTER TABLE user ADD COLUMN reset_token_expiry DATETIME NULL"); }
             catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE user ADD COLUMN face_data MEDIUMTEXT NULL"); }
+            catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE user ADD COLUMN typing_profile TEXT NULL"); }
+            catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE user ADD COLUMN typing_biometric_enabled TINYINT(1) DEFAULT 0 NULL"); }
+            catch (SQLException ignored) {}
         } catch (Exception e) {
             System.err.println("[UserService] ensureColumns: " + e.getMessage());
         }
@@ -331,7 +337,10 @@ public class UserService implements IUserService {
         try { sus = rs.getTimestamp("suspended_until"); } catch (SQLException ignored) {}
         try { banReason = rs.getString("ban_reason"); }   catch (SQLException ignored) {}
 
-        return new User(
+        String faceData = null;
+        try { faceData = rs.getString("face_data"); } catch (SQLException ignored) {}
+
+        User user = new User(
                 rs.getInt("id"),
                 rs.getString("nom"),
                 rs.getString("prenom"),
@@ -345,5 +354,7 @@ public class UserService implements IUserService {
                 banReason,
                 sus != null ? sus.toLocalDateTime() : null
         );
+        user.setFaceData(faceData);
+        return user;
     }
 }
