@@ -2,6 +2,9 @@ package com.esports.controller;
 
 import com.esports.model.User;
 import com.esports.service.UserService;
+import com.esports.utils.CaptchaDialog;
+import com.esports.utils.TypingBiometricService;
+import com.esports.utils.TypingProfiler;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,7 +48,8 @@ public class RegisterController implements Initializable {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[\\w.+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$");
 
-    private final UserService userService = new UserService();
+    private final UserService   userService = new UserService();
+    private final TypingProfiler typingProfiler = new TypingProfiler();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -53,6 +57,7 @@ public class RegisterController implements Initializable {
         rbSpectateur.setToggleGroup(roleGroup);
         rbJoueur.setSelected(true);
         clearAllErrors();
+        typingProfiler.attach(fieldPassword);
     }
 
     // ── INSCRIPTION ─────────────────────────────────────────────────
@@ -139,19 +144,24 @@ public class RegisterController implements Initializable {
 
         if (!valid) return;
 
-        // ── Envoi async ─────────────────────────────────────────────
+        // ── CAPTCHA ─────────────────────────────────────────────────────────
+        if (!CaptchaDialog.show(btnRegister.getScene().getWindow())) {
+            lblError.setText("⚠ Vérification de sécurité requise pour créer un compte.");
+            return;
+        }
+
+        //mail comp ── Envoi async ─────────────────────────────────────────────
         btnRegister.setDisable(true);
         btnRegister.setText("Inscription...");
 
         final int finalAge = age;
+        // capture intervals before task starts (user has already typed)
+        final java.util.List<Double> typingIntervals = typingProfiler.getIntervals();
 
         Task<String> task = new Task<>() {
             @Override
             protected String call() {
-                // Vérifier si l'email existe déjà
-                if (userService.findByEmail(email).isPresent()) {
-                    return "EMAIL_EXISTE";
-                }
+                if (userService.findByEmail(email).isPresent()) return "EMAIL_EXISTE";
                 User newUser = new User(nom, prenom, email, finalAge, role, password);
                 boolean ok = userService.save(newUser);
                 return ok ? "OK" : "ERREUR";
@@ -164,6 +174,9 @@ public class RegisterController implements Initializable {
 
             switch (task.getValue()) {
                 case "OK" -> {
+                    // save typing profile for this new user
+                    userService.findByEmail(email).ifPresent(u ->
+                        TypingBiometricService.saveProfile(u.getId(), typingIntervals));
                     clearForm();
                     Alert success = new Alert(Alert.AlertType.INFORMATION);
                     success.setTitle("Compte créé");

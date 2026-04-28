@@ -62,10 +62,27 @@
                         styleClass="btn-neon"
                         maxWidth="Infinity"/>
 
+                <Button text="👤  Connexion avec Face ID"
+                        onAction="#onFaceIdLogin"
+                        maxWidth="Infinity"
+                        style="-fx-background-color: rgba(124,58,237,0.15);
+                               -fx-text-fill: #a855f7;
+                               -fx-border-color: rgba(168,85,247,0.4);
+                               -fx-border-width: 1.5px; -fx-border-radius: 8px;
+                               -fx-background-radius: 8px; -fx-font-size: 13px;
+                               -fx-font-weight: bold; -fx-padding: 10 28 10 28;
+                               -fx-cursor: hand;"/>
+
                 <Button text="Pas encore de compte ? S'inscrire"
                         onAction="#onGoRegister"
                         styleClass="btn-hero-ghost"
                         maxWidth="Infinity"/>
+
+                <Button text="Mot de passe oublié ?"
+                        onAction="#onForgotPassword"
+                        styleClass="btn-hero-ghost"
+                        maxWidth="Infinity"
+                        style="-fx-text-fill: #a855f7; -fx-font-size: 12px;"/>
 
             </VBox>
         </VBox>

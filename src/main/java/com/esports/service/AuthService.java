@@ -1,6 +1,7 @@
 package com.esports.service;
 
 import com.esports.model.User;
+import com.esports.utils.PasswordUtil;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class AuthService {
 
         User user = anyOpt.get();
 
-        if (!user.getPassword().equals(password))
+        if (!PasswordUtil.verify(password, user.getPassword()))
             return AuthResult.failure("Mot de passe incorrect");
 
         // Banned
@@ -39,6 +40,16 @@ public class AuthService {
 
         currentUser = user;
         System.out.println("✔ LOGIN SUCCESS: " + user.getEmail());
+        return AuthResult.success(user);
+    }
+
+    public AuthResult loginByEmail(String email) {
+        Optional<User> opt = userService.findByEmailAny(email);
+        if (opt.isEmpty()) return AuthResult.failure("Utilisateur introuvable");
+        User user = opt.get();
+        if (user.isBanned())    return AuthResult.banned(user.getBanReason());
+        if (user.isSuspended()) return AuthResult.suspended(user.getBanReason(), user.getSuspendedUntil());
+        currentUser = user;
         return AuthResult.success(user);
     }
 

@@ -62,6 +62,13 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- SwingFXUtils — BufferedImage ↔ JavaFX Image -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
         <!-- Pour jouer des médias (vidéo/audio) — décommentez si nécessaire -->
         <!--
         <dependency>
@@ -93,6 +100,13 @@
             <version>${jbcrypt.version}</version>
         </dependency>
 
+        <!-- ── Email (JavaMail / SMTP) ──────────────────────────── -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
         <!-- ── Tests — JUnit 5 ──────────────────────────────────── -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -105,6 +119,13 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- ── Webcam Capture — Face ID ────────────────────────── -->
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture</artifactId>
+            <version>0.3.12</version>
         </dependency>
 
         <!-- ── Tests — Mockito ──────────────────────────────────── -->
@@ -160,6 +181,8 @@
                             <mainClass>com.esports/com.esports.MainApp</mainClass>
                             <options>
                                 <option>-Dprism.order=sw</option>
+                                <option>--patch-module</option>
+                                <option>opencv=${settings.localRepository}/org/bytedeco/opencv/4.7.0-1.5.9/opencv-4.7.0-1.5.9-windows-x86_64.jar</option>
                                 <option>-Xms128m</option>
                                 <option>-Xmx512m</option>
                                 <option>-XX:ReservedCodeCacheSize=128m</option>
