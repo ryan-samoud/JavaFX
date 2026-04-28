@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            style="-fx-background: #0d0b1e; -fx-background-color: #0d0b1e; -fx-border-color: transparent;"
+            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.GameDetailsController">
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+    </stylesheets>
+
+    <VBox spacing="18" style="-fx-padding: 24; -fx-background-color: #0d0b1e;">
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Button text="← Retour aux jeux" onAction="#onBackToGames"
+                    style="-fx-background-color: rgba(168,85,247,0.2); -fx-text-fill: #e9d5ff; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 14; -fx-cursor: hand;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="📄 Exporter PDF" onAction="#onExportPdf"
+                    style="-fx-background-color: rgba(59,130,246,0.2); -fx-text-fill: #93c5fd; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 8 14; -fx-cursor: hand;"/>
+            <Label text="Fiche jeu" style="-fx-text-fill: #c4b5fd; -fx-font-size: 14; -fx-font-weight: bold;"/>
+        </HBox>
+
+        <HBox spacing="20">
+            <StackPane prefWidth="360" prefHeight="220" style="-fx-background-color: #1a1635; -fx-background-radius: 14;">
+                <ImageView fx:id="imageGame" fitWidth="360" fitHeight="220" preserveRatio="false"/>
+                <Label text="🎮" style="-fx-font-size: 48;"/>
+            </StackPane>
+
+            <VBox spacing="8" style="-fx-background-color: #14112b; -fx-background-radius: 14; -fx-padding: 16; -fx-border-color: rgba(139,92,246,0.35); -fx-border-radius: 14;" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblTitle" text="Nom du jeu" style="-fx-text-fill: white; -fx-font-size: 26; -fx-font-weight: bold;"/>
+                <HBox spacing="10">
+                    <Label text="Categorie:" style="-fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="lblCategory" style="-fx-text-fill: #e9d5ff; -fx-font-weight: bold;"/>
+                    <Label text="Mode:" style="-fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="lblMode" style="-fx-text-fill: #86efac; -fx-font-weight: bold;"/>
+                    <Label text="Age:" style="-fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="lblAge" style="-fx-text-fill: #93c5fd; -fx-font-weight: bold;"/>
+                </HBox>
+                <HBox spacing="16">
+                    <Label text="Joueurs max:" style="-fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="lblPlayers" style="-fx-text-fill: #fef08a; -fx-font-weight: bold;"/>
+                    <Label text="Note:" style="-fx-text-fill: #9ca3af;"/>
+                    <Label fx:id="lblRating" style="-fx-text-fill: #fbbf24; -fx-font-weight: bold;"/>
+                </HBox>
+                <Label text="Description" style="-fx-text-fill: #e5e7eb; -fx-font-weight: bold;"/>
+                <Label fx:id="lblDescription" wrapText="true" style="-fx-text-fill: #d1d5db; -fx-font-size: 13;"/>
+            </VBox>
+        </HBox>
+
+        <!-- QR Code Section -->
+        <HBox spacing="16" alignment="CENTER"
+              style="-fx-background-color: #14112b; -fx-background-radius: 14; -fx-padding: 20; -fx-border-color: rgba(168,85,247,0.35); -fx-border-radius: 14;">
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="📱 QR Code du Jeu" style="-fx-text-fill: #e9d5ff; -fx-font-size: 16; -fx-font-weight: bold;"/>
+                <ImageView fx:id="imageQrCode" fitWidth="200" fitHeight="200" preserveRatio="true"/>
+                <Label fx:id="lblQrHint" text="Scannez pour voir les infos du jeu"
+                       style="-fx-text-fill: #9ca3af; -fx-font-size: 12; -fx-font-style: italic;"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="10" style="-fx-background-color: #14112b; -fx-background-radius: 14; -fx-padding: 16; -fx-border-color: rgba(124,58,237,0.32); -fx-border-radius: 14;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="AI Similar Games (Gemini)" style="-fx-text-fill: #ddd6fe; -fx-font-size: 16; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnRefreshSimilar" text="Refresh"
+                        style="-fx-background-color: rgba(124,58,237,0.22); -fx-text-fill: #e9d5ff; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 6 10;"/>
+            </HBox>
+            <Label fx:id="lblSimilarState" text="Loading similar games..." style="-fx-text-fill: #9ca3af;"/>
+            <VBox fx:id="boxSimilarGames" spacing="8"/>
+        </VBox>
+
+        <VBox spacing="10" style="-fx-background-color: #14112b; -fx-background-radius: 14; -fx-padding: 16; -fx-border-color: rgba(236,72,153,0.30); -fx-border-radius: 14;">
+            <Label text="Live streams &amp; videos" style="-fx-text-fill: #f5d0fe; -fx-font-size: 16; -fx-font-weight: bold;"/>
+            <Label fx:id="lblStreamsState" text="Loading..." style="-fx-text-fill: #9ca3af;"/>
+            <HBox spacing="16">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Twitch Live" style="-fx-text-fill: #ddd6fe; -fx-font-weight: bold;"/>
+                    <Button fx:id="btnSeeLiveTwitch" text="See Live on Twitch"
+                            style="-fx-background-color: rgba(168,85,247,0.25); -fx-text-fill: #ede9fe; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 6 10;"/>
+                    <VBox fx:id="boxTwitchCards" spacing="8"/>
+                </VBox>
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="YouTube Videos" style="-fx-text-fill: #fecaca; -fx-font-weight: bold;"/>
+                    <VBox fx:id="boxYoutubeCards" spacing="8"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </VBox>
+</ScrollPane>

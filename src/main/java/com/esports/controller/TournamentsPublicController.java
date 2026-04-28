@@ -1,6 +1,7 @@
 package com.esports.controller;
 
-import com.esports.dao.TournamentDAO;
+import com.esports.interfaces.ITournamentService;
+import com.esports.service.TournamentService;
 import com.esports.model.Tournament;
 
 import javafx.fxml.FXML;
@@ -46,7 +47,7 @@ public class TournamentsPublicController implements Initializable {
     @FXML private Label lblEmpty;
 
     // ── Data ───────────────────────────────────────────────────────
-    private final TournamentDAO dao = new TournamentDAO();
+    private final ITournamentService dao = new TournamentService();
     private List<Tournament>    allTournaments;
 
     private static final DateTimeFormatter DATE_FMT =

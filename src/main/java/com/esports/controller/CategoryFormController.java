@@ -27,7 +27,6 @@ public class CategoryFormController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         fieldNom.textProperty().addListener((o, a, b) -> {
             errNom.setVisible(false);
-            errNom.setManaged(false);
             fieldNom.setStyle("");
         });
     }
@@ -45,18 +44,7 @@ public class CategoryFormController implements Initializable {
     private void onSubmit() {
         String nom = fieldNom.getText().trim();
         if (nom.isEmpty()) {
-            errNom.setText("Le nom est obligatoire");
             errNom.setVisible(true);
-            errNom.setManaged(true);
-            fieldNom.setStyle("-fx-border-color: #f87171; -fx-border-width: 1.5;");
-            return;
-        }
-
-        int currentId = (catToEdit == null) ? -1 : catToEdit.getId();
-        if (catService.existsByName(nom, currentId)) {
-            errNom.setText("Cette catégorie existe déjà");
-            errNom.setVisible(true);
-            errNom.setManaged(true);
             fieldNom.setStyle("-fx-border-color: #f87171; -fx-border-width: 1.5;");
             return;
         }

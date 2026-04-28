@@ -16,6 +16,7 @@ public class JeuService implements IJeuService {
 
     private static final Object SCHEMA_LOCK = new Object();
     private static boolean jeuSchemaEnsured = false;
+    private final JeuMailService jeuMailService = new JeuMailService();
 
     /**
      * Aligns local DB with the Java model: extra columns + mode enum including {@code coop}.
@@ -63,6 +64,7 @@ public class JeuService implements IJeuService {
         try {
             Connection conn = DatabaseConnection.getInstance();
             ensureJeuSchema(conn);
+            boolean created = false;
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, j.getNom());
                 stmt.setInt(2, j.getTrancheAge());
@@ -72,8 +74,14 @@ public class JeuService implements IJeuService {
                 stmt.setString(6, j.getImage());
                 stmt.setInt(7, j.getNbJoueurs());
                 stmt.setDouble(8, j.getNote());
-                return stmt.executeUpdate() == 1;
+                int affectedRows = stmt.executeUpdate();
+                created = affectedRows == 1;
+                if (created && j instanceof Jeu) {
+                    // Trigger only after successful insert (post-persist equivalent).
+                    jeuMailService.sendJeuCreatedEmail(j);
+                }
             }
+            return created;
         } catch (SQLException e) {
             System.err.println("[JeuService] add: " + e.getMessage());
             return false;
@@ -172,24 +180,33 @@ public class JeuService implements IJeuService {
     }
 
     @Override
-    public boolean existsByName(String nom, int excludeId) {
-        String sql = "SELECT COUNT(*) FROM jeu WHERE LOWER(nom) = LOWER(?) AND id != ?";
+    public List<Jeu> findFavoritesByUser(int userId) {
+        List<Jeu> list = new ArrayList<>();
+        // In this project, "Favorites" are stored as reactions of type 'heart'
+        String sql = "SELECT j.*, c.nom_categorie, c.genre FROM jeu j "
+                + "JOIN jeu_reaction r ON j.id = r.jeu_id "
+                + "LEFT JOIN categorie_jeu c ON j.categorie_id = c.id "
+                + "WHERE r.user_id = ? AND r.type = 'heart'";
         try {
             Connection conn = DatabaseConnection.getInstance();
             ensureJeuSchema(conn);
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, nom);
-                stmt.setInt(2, excludeId);
+                stmt.setInt(1, userId);
                 try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt(1) > 0;
+                    ResultSetMetaData meta = rs.getMetaData();
+                    Set<String> labels = new HashSet<>();
+                    for (int i = 1; i <= meta.getColumnCount(); i++) {
+                        labels.add(meta.getColumnLabel(i).toLowerCase(Locale.ROOT));
+                    }
+                    while (rs.next()) {
+                        list.add(mapFull(rs, labels));
                     }
                 }
             }
         } catch (SQLException e) {
-            System.err.println("[JeuService] existsByName: " + e.getMessage());
+            System.err.println("[JeuService] findFavoritesByUser: " + e.getMessage());
         }
-        return false;
+        return list;
     }
 
     private Jeu mapFull(ResultSet rs, Set<String> labels) throws SQLException {

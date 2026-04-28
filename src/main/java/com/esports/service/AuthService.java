@@ -1,6 +1,5 @@
 package com.esports.service;
 
-import com.esports.dao.UserDAO;
 import com.esports.model.User;
 
 import java.util.Optional;
@@ -8,7 +7,7 @@ import java.util.Optional;
 public class AuthService {
 
     private static User currentUser;
-    private final UserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
 
     public AuthResult login(String email, String password) {
 
@@ -18,7 +17,7 @@ public class AuthService {
         if (password == null || password.isBlank())
             return AuthResult.failure("Mot de passe vide");
 
-        Optional<User> userOpt = userDAO.findByEmail(email);
+        Optional<User> userOpt = userService.findByEmail(email);
 
         if (userOpt.isEmpty())
             return AuthResult.failure("Email incorrect");

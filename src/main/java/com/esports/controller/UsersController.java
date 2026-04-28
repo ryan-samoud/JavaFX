@@ -1,6 +1,7 @@
 package com.esports.controller;
 
-import com.esports.dao.UserDAO;
+import com.esports.interfaces.IUserService;
+import com.esports.service.UserService;
 import com.esports.model.User;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -38,7 +39,7 @@ public class UsersController implements Initializable {
     @FXML private TableColumn<User, String> colCreatedAt;
     @FXML private TableColumn<User, Void> colActions;
 
-    private final UserDAO userDAO = new UserDAO();
+    private final IUserService userService = new UserService();
     private ObservableList<User> masterList = FXCollections.observableArrayList();
     private FilteredList<User> filteredList;
 
@@ -139,7 +140,7 @@ public class UsersController implements Initializable {
 
     private void loadUsers() {
         try {
-            List<User> users = userDAO.findAll();
+            List<User> users = userService.findAll();
             masterList.setAll(users);
             lblUserCount.setText(users.size() + " utilisateurs");
         } catch (Exception e) {
@@ -187,7 +188,7 @@ public class UsersController implements Initializable {
         if (res.isPresent() && res.get() == ButtonType.OK) {
 
             // ⚠ il faut que DAO supporte ça
-            boolean ok = userDAO.deactivate(user.getId());
+            boolean ok = userService.deactivate(user.getId());
 
             if (ok) {
                 masterList.remove(user);

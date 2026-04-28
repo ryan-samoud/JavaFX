@@ -1,7 +1,7 @@
 package com.esports.controller;
-
-import com.esports.dao.UserDAO;
 import com.esports.service.AuthService;
+import com.esports.interfaces.IUserService;
+import com.esports.service.UserService;
 import com.esports.model.User;
 
 import javafx.fxml.FXML;
@@ -31,7 +31,7 @@ public class DashboardController implements Initializable {
     // ===== RECENT USERS =====
     @FXML private VBox recentUsersContainer;
 
-    private final UserDAO userDAO = new UserDAO();
+    private final IUserService userService = new UserService();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -46,7 +46,7 @@ public class DashboardController implements Initializable {
     // ================= KPIs =================
     private void loadKpis() {
         try {
-            int count = userDAO.countActive();
+            int count = userService.countActive();
             if (lblTotalUsers != null) lblTotalUsers.setText(String.valueOf(count));
         } catch (Exception e) {
             System.err.println("KPIs error: " + e.getMessage());
@@ -56,7 +56,7 @@ public class DashboardController implements Initializable {
     // ============ RECENT USERS =============
     private void loadRecentUsers() {
         try {
-            List<User> users = userDAO.findRecent(5);
+            List<User> users = userService.findRecent(5);
             if (recentUsersContainer == null) return;
             recentUsersContainer.getChildren().clear();
             for (User u : users) {

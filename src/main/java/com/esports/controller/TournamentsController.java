@@ -1,6 +1,7 @@
 package com.esports.controller;
 
-import com.esports.dao.TournamentDAO;
+import com.esports.interfaces.ITournamentService;
+import com.esports.service.TournamentService;
 import com.esports.model.Tournament;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -39,7 +40,7 @@ public class TournamentsController implements Initializable {
     @FXML private TableColumn<Tournament, String>    colStartDate;
     @FXML private TableColumn<Tournament, Void>      colActions;
 
-    private final TournamentDAO tournamentDAO = new TournamentDAO();
+    private final ITournamentService tournamentService = new TournamentService();
     private ObservableList<Tournament> masterList   = FXCollections.observableArrayList();
     private FilteredList<Tournament>   filteredList;
 
@@ -122,7 +123,7 @@ public class TournamentsController implements Initializable {
 
     private void loadTournaments() {
         try {
-            List<Tournament> list = tournamentDAO.findAll();
+            List<Tournament> list = tournamentService.findAll();
             masterList.setAll(list);
             lblTournamentCount.setText(list.size() + " tournoi(s)");
         } catch (Exception e) {
@@ -161,7 +162,7 @@ public class TournamentsController implements Initializable {
         confirm.setContentText("Cette action est irréversible.");
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            if (tournamentDAO.delete(t.getId())) {
+            if (tournamentService.delete(t.getId())) {
                 masterList.remove(t);
                 lblTournamentCount.setText(masterList.size() + " tournoi(s)");
             }

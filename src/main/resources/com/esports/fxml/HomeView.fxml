@@ -38,6 +38,7 @@
 
             <Button text="Accueil" styleClass="nav-link"/>
             <Button text="Jeux" onAction="#onViewGames" styleClass="nav-link"/>
+            <Button text="Favoris" onAction="#onViewFavorites" styleClass="nav-link"/>
             <Button text="Tournois" onAction="#onViewTournaments" styleClass="nav-link"/>
             <Button text="Boutique" onAction="#onShop" styleClass="nav-link"/>
             <Button text="Événements" styleClass="nav-link"/>

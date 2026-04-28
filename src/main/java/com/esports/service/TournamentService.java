@@ -1,16 +1,16 @@
-package com.esports.dao;
+package com.esports.service;
 
+import com.esports.interfaces.ITournamentService;
 import com.esports.model.Tournament;
 import com.esports.utils.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * DAO — TournamentDAO.java
- * Requêtes SQL sur la table `tournaments`.
+ * SERVICE — TournamentService.java
+ * Couche Modèle (MVC) : logique métier + accès aux données pour les tournois.
  *
  * Table SQL :
  *   CREATE TABLE tournaments (
@@ -24,7 +24,7 @@ import java.util.Optional;
  *     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
  *   );
  */
-public class TournamentDAO {
+public class TournamentService implements ITournamentService {
 
     public List<Tournament> findAll() {
         List<Tournament> list = new ArrayList<>();
@@ -37,7 +37,7 @@ public class TournamentDAO {
             while (rs.next()) list.add(map(rs));
 
         } catch (SQLException e) {
-            System.err.println("[TournamentDAO] findAll : " + e.getMessage());
+            System.err.println("[TournamentService] findAll : " + e.getMessage());
         }
         return list;
     }
@@ -49,7 +49,7 @@ public class TournamentDAO {
              ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            System.err.println("[TournamentDAO] countAll : " + e.getMessage());
+            System.err.println("[TournamentService] countAll : " + e.getMessage());
         }
         return 0;
     }
@@ -72,7 +72,7 @@ public class TournamentDAO {
                 return true;
             }
         } catch (SQLException e) {
-            System.err.println("[TournamentDAO] save : " + e.getMessage());
+            System.err.println("[TournamentService] save : " + e.getMessage());
         }
         return false;
     }
@@ -90,7 +90,7 @@ public class TournamentDAO {
             stmt.setInt(7, t.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("[TournamentDAO] update : " + e.getMessage());
+            System.err.println("[TournamentService] update : " + e.getMessage());
         }
         return false;
     }
@@ -102,11 +102,14 @@ public class TournamentDAO {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("[TournamentDAO] delete : " + e.getMessage());
+            System.err.println("[TournamentService] delete : " + e.getMessage());
         }
         return false;
     }
 
+    // ─────────────────────────────
+    // MAPPING DB → JAVA
+    // ─────────────────────────────
     private Tournament map(ResultSet rs) throws SQLException {
         Date sd = rs.getDate("start_date");
         return new Tournament(

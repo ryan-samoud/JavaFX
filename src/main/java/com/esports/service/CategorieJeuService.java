@@ -102,24 +102,4 @@ public class CategorieJeuService implements ICategorieJeuService {
         }
         return null;
     }
-
-    @Override
-    public boolean existsByName(String nom, int excludeId) {
-        String sql = "SELECT COUNT(*) FROM categorie_jeu WHERE LOWER(nom_categorie) = LOWER(?) AND id != ?";
-        try {
-            Connection conn = DatabaseConnection.getInstance();
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, nom);
-                stmt.setInt(2, excludeId);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt(1) > 0;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("[CategorieJeuService] existsByName: " + e.getMessage());
-        }
-        return false;
-    }
 }

@@ -189,6 +189,28 @@ public class HomeController implements Initializable {
     }
 
     @FXML
+    private void onViewFavorites() {
+        if (!AuthService.isLoggedIn()) {
+            new Alert(Alert.AlertType.INFORMATION, "Connectez-vous pour voir vos favoris.", ButtonType.OK).showAndWait();
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esports/fxml/GamesPublicView.fxml"));
+            Parent root = loader.load();
+            
+            GamesPublicController controller = loader.getController();
+            controller.onShowFavorites(); 
+
+            Stage stage = (Stage) btnDeconnexion.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Mes Favoris");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("✗ Erreur navigation favoris : " + e.getMessage());
+        }
+    }
+
+    @FXML
     private void onShop() {
         navigateTo("/com/esports/fxml/ShopView.fxml", "Shop");
     }

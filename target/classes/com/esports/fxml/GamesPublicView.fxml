@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import java.net.URL?>
@@ -25,6 +26,7 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Accueil" onAction="#onBackHome" styleClass="nav-link"/>
             <Button text="Jeux" style="-fx-background-color: rgba(168,85,247,0.12); -fx-text-fill: #c084fc; -fx-font-size: 14; -fx-font-weight: bold; -fx-border-color: transparent transparent #a855f7 transparent; -fx-border-width: 0 0 2 0; -fx-padding: 7 14 5 14;"/>
+            <Button text="Mes Favoris" onAction="#onShowFavorites" styleClass="nav-link"/>
             <Button text="Tournois" styleClass="nav-link"/>
             <Button text="Boutique" styleClass="nav-link"/>
             <Button text="Connexion" onAction="#onBackHome" styleClass="btn-outline-sm"/>
@@ -41,13 +43,84 @@
             <HBox alignment="CENTER" spacing="15" style="-fx-padding: 20 0 0 0;">
                 <TextField fx:id="fieldSearch" promptText="🔍 Rechercher un jeu..." prefWidth="400" 
                            style="-fx-background-color: rgba(26,18,58,0.9); -fx-text-fill: white; -fx-prompt-text-fill: #6b7280; -fx-border-color: rgba(139,92,246,0.4); -fx-border-width: 1.5; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 12 20;"/>
+                <Button fx:id="btnVoiceSearch" text="🎤 Voice Search" onAction="#onVoiceSearch"
+                        style="-fx-background-color: rgba(139,92,246,0.25); -fx-text-fill: #f5d0fe; -fx-font-weight: bold; -fx-border-color: rgba(236,72,153,0.5); -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 10 16; -fx-cursor: hand;"/>
             </HBox>
+        </VBox>
+
+        <!-- GAME OF THE DAY -->
+        <VBox spacing="12" alignment="CENTER" style="-fx-padding: 0 60 24 60;">
+            <HBox alignment="CENTER_LEFT" maxWidth="1100" spacing="8">
+                <Label text="🏆" style="-fx-font-size: 18;"/>
+                <Label text="GAME OF THE DAY"
+                       style="-fx-text-fill: #fef3c7; -fx-font-size: 15; -fx-font-weight: bold; -fx-letter-spacing: 1px;"/>
+            </HBox>
+
+            <StackPane fx:id="paneGameOfDayCard" maxWidth="1100"
+                       style="-fx-background-color: linear-gradient(to right, rgba(124,58,237,0.30), rgba(236,72,153,0.26)); -fx-background-radius: 16; -fx-border-color: rgba(251,191,36,0.35); -fx-border-radius: 16; -fx-padding: 16;">
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <StackPane prefWidth="240" prefHeight="140" style="-fx-background-color: rgba(15,12,36,0.75); -fx-background-radius: 12;">
+                        <ImageView fx:id="imgGameOfDay" fitWidth="240" fitHeight="140" preserveRatio="false"/>
+                        <Label fx:id="lblGameOfDayPlaceholder" text="🎮" style="-fx-font-size: 36;"/>
+                    </StackPane>
+
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblGameOfDayTitle" text="No game selected"
+                               style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblGameOfDayMeta" text="Mode • Catégorie • 0+"
+                               style="-fx-text-fill: #ddd6fe; -fx-font-size: 13; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblGameOfDayDesc" wrapText="true" text="Best rated game appears here."
+                               style="-fx-text-fill: #e5e7eb; -fx-font-size: 12;"/>
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label fx:id="lblGameOfDayLikes" text="👍 0 likes"
+                                   style="-fx-text-fill: #86efac; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                            <Label fx:id="lblGameOfDayFavs" text="❤️ 0 favs"
+                                   style="-fx-text-fill: #fda4af; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
+
+                    <Button fx:id="btnGameOfDayPlay" text="Play Featured Game"
+                            style="-fx-background-color: linear-gradient(to right, #f59e0b, #f43f5e); -fx-text-fill: white; -fx-font-size: 12; -fx-font-weight: bold; -fx-background-radius: 10; -fx-padding: 10 18; -fx-cursor: hand;"/>
+                </HBox>
+            </StackPane>
         </VBox>
 
         <!-- CATEGORIES SECTION -->
         <VBox spacing="15" alignment="CENTER" style="-fx-padding: 0 60 30 60;">
             <Label text="PARCOURIR PAR CATÉGORIE" style="-fx-text-fill: #9ca3af; -fx-font-size: 12; -fx-font-weight: bold; -fx-letter-spacing: 2px;"/>
             <FlowPane fx:id="paneCategories" alignment="CENTER" hgap="15" vgap="15"/>
+        </VBox>
+
+        <!-- AI CHAT RECOMMENDATION -->
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 0 60 20 60;">
+            <Label text="NEXUS AI - CHATBOT RECOMMANDATION"
+                   style="-fx-text-fill: #c4b5fd; -fx-font-size: 14; -fx-font-weight: bold; -fx-letter-spacing: 1px;"/>
+            <VBox spacing="10" style="-fx-background-color: linear-gradient(to bottom right, rgba(20,17,43,0.95), rgba(26,18,58,0.95)); -fx-background-radius: 14; -fx-border-color: rgba(139,92,246,0.50); -fx-border-radius: 14; -fx-padding: 14;" maxWidth="1100">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="🤖" style="-fx-font-size: 18;"/>
+                    <Label text="Assistant recommandations jeux (Gemini)"
+                           style="-fx-text-fill: #e9d5ff; -fx-font-weight: bold; -fx-font-size: 13;"/>
+                </HBox>
+                <TextArea fx:id="areaChat" editable="false" wrapText="true" prefHeight="190"
+                          style="-fx-control-inner-background: #0f0d22; -fx-text-fill: #e5e7eb; -fx-highlight-fill: #a855f7; -fx-highlight-text-fill: white; -fx-font-size: 13; -fx-background-radius: 10; -fx-border-color: rgba(168,85,247,0.25); -fx-border-radius: 10;"/>
+                <HBox spacing="10">
+                    <TextField fx:id="fieldChatPrompt" HBox.hgrow="ALWAYS" promptText="Ex: Je veux un jeu coop fun pour 3-4 joueurs"
+                               style="-fx-background-color: rgba(26,18,58,0.9); -fx-text-fill: white; -fx-prompt-text-fill: #6b7280; -fx-border-color: rgba(139,92,246,0.4); -fx-border-width: 1.2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 10 14;"/>
+                    <Button fx:id="btnSendPrompt" text="Demander" onAction="#onAskRecommendation"
+                            style="-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899); -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-background-radius: 10;"/>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- AI RECOMMENDATION CARDS -->
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 0 60 20 60;">
+            <HBox alignment="CENTER_LEFT" maxWidth="1100" spacing="8">
+                <Label text="✨" style="-fx-font-size: 16;"/>
+                <Label fx:id="lblAiCardsTitle" text="Recommandations IA"
+                       style="-fx-text-fill: #f5d0fe; -fx-font-size: 15; -fx-font-weight: bold;"/>
+            </HBox>
+            <FlowPane fx:id="paneAiRecommendations" alignment="CENTER_LEFT" hgap="14" vgap="14" prefWrapLength="1100"
+                      style="-fx-background-color: rgba(20,17,43,0.45); -fx-background-radius: 14; -fx-padding: 12; -fx-border-color: rgba(168,85,247,0.25); -fx-border-radius: 14;"/>
         </VBox>
 
         <!-- GAMES GRID -->

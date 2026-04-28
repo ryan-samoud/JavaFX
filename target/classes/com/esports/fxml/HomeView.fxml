@@ -37,7 +37,8 @@
             <Region HBox.hgrow="ALWAYS"/>
 
             <Button text="Accueil" styleClass="nav-link"/>
-            <Button text="Jeux" styleClass="nav-link"/>
+            <Button text="Jeux" onAction="#onViewGames" styleClass="nav-link"/>
+            <Button text="Favoris" onAction="#onViewFavorites" styleClass="nav-link"/>
             <Button text="Tournois" onAction="#onViewTournaments" styleClass="nav-link"/>
             <Button text="Boutique" onAction="#onShop" styleClass="nav-link"/>
             <Button text="Événements" styleClass="nav-link"/>
@@ -46,9 +47,30 @@
             <Label text="🏆" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
             <Label text="🛒" style="-fx-font-size: 18px; -fx-cursor: hand;"/>
 
-            <Button text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
+            <Label fx:id="lblConnectedUser" text="" 
+                   style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"
+                   visible="false" managed="false"/>
 
-            <Button text="S'inscrire"
+            <!-- Bouton Déconnexion — visible seulement si connecté -->
+            <Button fx:id="btnDeconnexion"
+                    text="Déconnexion"
+                    onAction="#onLogout"
+                    visible="false" managed="false"
+                    style="-fx-background-color: rgba(248,113,113,0.15);
+                           -fx-text-fill: #f87171;
+                           -fx-border-color: rgba(248,113,113,0.5);
+                           -fx-border-width: 1.5px;
+                           -fx-border-radius: 8px;
+                           -fx-background-radius: 8px;
+                           -fx-font-size: 13px;
+                           -fx-font-weight: bold;
+                           -fx-padding: 7 20 7 20;
+                           -fx-cursor: hand;"/>
+
+            <!-- Connexion + S'inscrire — cachés si connecté -->
+            <Button fx:id="btnConnexion" text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
+
+            <Button fx:id="btnInscrire" text="S'inscrire"
                     style="-fx-background-color: transparent;
                            -fx-text-fill: white;
                            -fx-border-color: rgba(255,255,255,0.5);
@@ -86,7 +108,7 @@
 
             <HBox spacing="15" alignment="CENTER">
                 <Button text="Explorer les Tournois" onAction="#onViewTournaments" styleClass="btn-hero-primary"/>
-                <Button text="Voir les Jeux" styleClass="btn-hero-ghost"/>
+                <Button text="Voir les Jeux" onAction="#onViewGames" styleClass="btn-hero-ghost"/>
             </HBox>
 
         </VBox>
@@ -144,7 +166,7 @@
                            style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;
                                   -fx-wrap-text: true; -fx-text-alignment: CENTER;
                                   -fx-alignment: CENTER;" wrapText="true"/>
-                    <Button text="Accéder →" styleClass="btn-hero-primary"/>
+                    <Button text="Accéder →" onAction="#onViewGames" styleClass="btn-hero-primary"/>
                 </VBox>
 
                 <!-- Tournois -->

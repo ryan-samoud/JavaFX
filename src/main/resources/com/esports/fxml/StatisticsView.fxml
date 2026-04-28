@@ -65,6 +65,20 @@
                 </HBox>
                 <Label fx:id="lblKpiModes" text="—" styleClass="kpi-value-green" wrapText="true"/>
             </VBox>
+            <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card" spacing="8">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="👤" style="-fx-font-size: 18px;"/>
+                    <Label text="UTILISATEURS ACTIFS" styleClass="kpi-title"/>
+                </HBox>
+                <Label fx:id="lblKpiUsers" text="0" styleClass="kpi-value-pink"/>
+            </VBox>
+            <VBox HBox.hgrow="ALWAYS" styleClass="kpi-card" spacing="8">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="❤️" style="-fx-font-size: 18px;"/>
+                    <Label text="RÉACTIONS" styleClass="kpi-title"/>
+                </HBox>
+                <Label fx:id="lblKpiReactions" text="0" styleClass="kpi-value"/>
+            </VBox>
         </HBox>
 
         <!-- Pie -->
@@ -93,6 +107,26 @@
                 <Label text="Note moyenne par catégorie (courbe)"
                        style="-fx-text-fill: #e2d9f3; -fx-font-size: 14px; -fx-font-weight: bold;"/>
                 <Canvas fx:id="canvasLine" width="400" height="280"/>
+            </VBox>
+        </HBox>
+
+        <!-- Users + Reactions -->
+        <HBox spacing="18" alignment="TOP_CENTER">
+            <VBox spacing="10" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #0f0d22; -fx-background-radius: 14;
+                         -fx-border-color: rgba(139,92,246,0.2); -fx-border-width: 1.5; -fx-border-radius: 14;
+                         -fx-padding: 16 16 18 16;">
+                <Label text="Utilisateurs par rôle (barres)"
+                       style="-fx-text-fill: #e2d9f3; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Canvas fx:id="canvasUsers" width="400" height="260"/>
+            </VBox>
+            <VBox spacing="10" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #0f0d22; -fx-background-radius: 14;
+                         -fx-border-color: rgba(139,92,246,0.2); -fx-border-width: 1.5; -fx-border-radius: 14;
+                         -fx-padding: 16 16 18 16;">
+                <Label text="Réactions par type (camembert)"
+                       style="-fx-text-fill: #e2d9f3; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <Canvas fx:id="canvasReactions" width="400" height="260"/>
             </VBox>
         </HBox>
     </VBox>
