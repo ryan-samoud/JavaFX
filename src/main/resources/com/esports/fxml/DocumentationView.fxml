@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<ScrollPane fitToWidth="true" fitToHeight="false"
+            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+            minWidth="1280" minHeight="800"
+            xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.DocumentationController"
+            styleClass="home-scroll">
+
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+        <URL value="@../css/register.css"/>
+    </stylesheets>
+
+    <VBox styleClass="home-root" spacing="0" minWidth="1280">
+
+        <!-- NAVBAR -->
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white;
+                       -fx-font-size: 15px; -fx-font-weight: bold;
+                       -fx-background-radius: 6px; -fx-padding: 4 9 4 9;"/>
+                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18px;
+                       -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnBack" text="← Retour à la connexion" onAction="#onBack" styleClass="btn-outline-sm"/>
+        </HBox>
+
+        <VBox spacing="40" style="-fx-background-color: linear-gradient(to bottom,#100c2a,#0d0b1e); -fx-padding: 48 80 72 80;">
+
+            <!-- PAGE TITLE -->
+            <VBox spacing="10" alignment="CENTER">
+                <Label text="📋  DOCUMENTATION MÉTIERS AVANCÉS"
+                       style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+                <Label text="Code source commenté étape par étape — Forgot Password · AI Rhythm · Gamertag · CAPTCHA"
+                       style="-fx-text-fill: #a855f7; -fx-font-size: 13px;"/>
+                <Label text="⚠  TEMPORAIRE — À SUPPRIMER AVANT LIVRAISON"
+                       style="-fx-text-fill: #fb923c; -fx-font-size: 11px; -fx-font-weight: bold;
+                              -fx-background-color: rgba(249,115,22,0.1); -fx-border-color: rgba(249,115,22,0.4);
+                              -fx-border-width: 1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 3 12 3 12;"/>
+            </VBox>
+
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!--  1. FORGOT PASSWORD                                         -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <VBox spacing="0" style="-fx-background-color: rgba(20,14,50,0.95); -fx-border-color: rgba(168,85,247,0.4);
+                                     -fx-border-width: 1.5; -fx-border-radius: 14; -fx-background-radius: 14;">
+                <!-- card header -->
+                <HBox spacing="14" alignment="CENTER_LEFT"
+                      style="-fx-background-color: linear-gradient(to right,rgba(124,58,237,0.55),rgba(124,58,237,0.05));
+                             -fx-padding: 18 28 18 28; -fx-background-radius: 14 14 0 0;">
+                    <Label text="📧" style="-fx-font-size: 24px;"/>
+                    <VBox spacing="3">
+                        <Label text="1.  FORGOT PASSWORD — Réinitialisation par Email"
+                               style="-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                        <Label text="Fichiers :  ForgotPasswordController.java  ·  EmailService.java  ·  UserService.java"
+                               style="-fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-font-family: 'Courier New';"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="28" style="-fx-padding: 28 32 32 32;">
+
+                    <!-- FLUX GLOBAL -->
+                    <VBox spacing="8">
+                        <Label text="FLUX GLOBAL" style="-fx-text-fill: #7c3aed; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <HBox spacing="0" alignment="CENTER_LEFT">
+                            <Label text="Login " style="-fx-text-fill: #d1d5db; -fx-font-size: 13px;"/>
+                            <Label text="→ " style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <Label text="ForgotPasswordView (Étape 1 : email) " style="-fx-text-fill: #d1d5db; -fx-font-size: 13px;"/>
+                            <Label text="→ " style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <Label text="Email SMTP envoyé " style="-fx-text-fill: #d1d5db; -fx-font-size: 13px;"/>
+                            <Label text="→ " style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <Label text="Étape 2 : code " style="-fx-text-fill: #d1d5db; -fx-font-size: 13px;"/>
+                            <Label text="→ " style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                            <Label text="ResetPasswordView" style="-fx-text-fill: #d1d5db; -fx-font-size: 13px;"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- ETAPE 1 -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 1 — Saisie email + envoi du code  (onSendCode)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="L'utilisateur entre son email. Le contrôleur valide le format avec une regex, génère un code 6 chiffres via SecureRandom, le sauvegarde en BDD avec une expiry à +15 min, puis appelle EmailService. Si l'email n'existe pas, on retourne quand même un message neutre pour éviter l'énumération d'emails (attaque OSINT)."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <!-- code block -->
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// ForgotPasswordController.java — onSendCode()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="String email = fieldEmail.getText().trim();" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (!email.matches(&quot;^[\\w.+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$&quot;)) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    lblStep1Error.setText(&quot;⚠ Format d'e-mail invalide.&quot;);  return;" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// Tâche asynchrone pour ne pas bloquer le thread JavaFX" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="Task&lt;String&gt; task = new Task&lt;&gt;() {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    protected String call() throws Exception {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="        Optional&lt;User&gt; opt = userService.findByEmailAny(email);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        if (opt.isEmpty()) return &quot;NOT_FOUND&quot;; // anti-énumération" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="        // Génération code sécurisé 6 chiffres" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        String code = String.format(&quot;%06d&quot;, random.nextInt(1_000_000));" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        LocalDateTime expiry = LocalDateTime.now().plusMinutes(15);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="        userService.saveResetToken(email, code, expiry); // → BDD" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        EmailService.sendPasswordResetCode(email, user.getNom(), code);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        return &quot;OK&quot;;" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    }" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="};" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 2 -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 2 — Vérification du code  (onVerifyCode)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="L'utilisateur saisit le code à 6 chiffres reçu par email. Le service cherche en BDD via le token et vérifie l'expiry en Java (pas en SQL, pour éviter les problèmes de timezone MySQL). Si valide, l'userId est passé en static à ResetPasswordController puis navigation."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// ForgotPasswordController.java — onVerifyCode()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="if (!code.matches(&quot;\\d{6}&quot;)) {  // doit être exactement 6 chiffres" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    lblStep2Error.setText(&quot;⚠ Le code doit contenir 6 chiffres.&quot;); return;" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// UserService.findByResetToken() vérifie expiry en Java" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="Optional&lt;User&gt; opt = userService.findByResetToken(code);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="if (opt.isEmpty()) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    lblStep2Error.setText(&quot;✗ Code invalide ou expiré.&quot;);" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="} else {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    ResetPasswordController.pendingResetUserId = user.getId();" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    navigateTo(&quot;/com/esports/fxml/ResetPasswordView.fxml&quot;, ...);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 3 -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 3 — Envoi email HTML via Gmail SMTP  (EmailService)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="EmailService utilise JavaMail avec Gmail SMTP (port 587, TLS). Le code est affiché en police monospace 40px sur fond violet dans un template HTML. L'App Password Google (16 chars) est hardcodé dans les properties."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// EmailService.java — sendPasswordResetCode()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="Properties props = new Properties();" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com&quot;);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;); // TLS obligatoire" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="Session session = Session.getInstance(props, new Authenticator() {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    protected PasswordAuthentication getPasswordAuthentication() {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        return new PasswordAuthentication(SENDER_EMAIL, SENDER_PASS);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    }" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="});" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="MimeMessage msg = new MimeMessage(session);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="msg.setContent(buildHtml(userName, code), &quot;text/html; charset=UTF-8&quot;);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="Transport.send(msg); // envoi réel" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- BDD -->
+                    <VBox spacing="6">
+                        <Label text="BASE DE DONNÉES" style="-fx-text-fill: #7c3aed; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 12 18 12 18;">
+                            <Label text="// UserService.java — saveResetToken()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="UPDATE user SET reset_token=?, reset_token_expiry=? WHERE email=?" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// findByResetToken() — expiry vérifiée en Java, pas en SQL" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="SELECT * FROM user WHERE reset_token=?" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (expiry.toLocalDateTime().isBefore(LocalDateTime.now())) return empty;" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// Colonnes ajoutées automatiquement au démarrage (UserService.ensureColumns)" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="user.reset_token         VARCHAR(10)  NULL" style="-fx-text-fill: #a78bfa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="user.reset_token_expiry  DATETIME     NULL  -- now() + 15 min" style="-fx-text-fill: #a78bfa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!--  2. AI RHYTHM SYSTEM                                         -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <VBox spacing="0" style="-fx-background-color: rgba(20,14,50,0.95); -fx-border-color: rgba(168,85,247,0.4);
+                                     -fx-border-width: 1.5; -fx-border-radius: 14; -fx-background-radius: 14;">
+                <HBox spacing="14" alignment="CENTER_LEFT"
+                      style="-fx-background-color: linear-gradient(to right,rgba(124,58,237,0.55),rgba(124,58,237,0.05));
+                             -fx-padding: 18 28 18 28; -fx-background-radius: 14 14 0 0;">
+                    <Label text="⌨" style="-fx-font-size: 24px;"/>
+                    <VBox spacing="3">
+                        <Label text="2.  AI RHYTHM SYSTEM — Biométrie Clavier"
+                               style="-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                        <Label text="Fichiers :  TypingProfiler.java  ·  TypingBiometricService.java  ·  LoginController.java"
+                               style="-fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-font-family: 'Courier New';"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="28" style="-fx-padding: 28 32 32 32;">
+
+                    <!-- FLUX -->
+                    <VBox spacing="8">
+                        <Label text="FLUX GLOBAL" style="-fx-text-fill: #7c3aed; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="L'utilisateur active la protection depuis son profil (opt-in). À chaque connexion, TypingProfiler enregistre les timestamps des touches. Après login réussi, TypingBiometricService compare les intervalles au profil stocké en BDD. Trop d'écart (MAE ≥ 0.35) → accès refusé."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                    </VBox>
+
+                    <!-- ETAPE 1 : CAPTURE -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 1 — Capture des intervalles de frappe  (TypingProfiler)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="TypingProfiler s'attache au PasswordField dans initialize(). Il écoute chaque touche tapée (KEY_TYPED) et enregistre le timestamp System.currentTimeMillis(). getIntervals() calcule les écarts entre touches et les normalise par la moyenne — ainsi un utilisateur rapide et un lent ont le même vecteur, seul le rythme compte."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// TypingProfiler.java" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="public void attach(PasswordField field) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    field.addEventFilter(KeyEvent.KEY_TYPED, e -&gt; {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        if (ch == null || ch.isEmpty() || ch.charAt(0) &lt; 32) return;" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        timestamps.add(System.currentTimeMillis()); // horodatage" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    });" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="public List&lt;Double&gt; getIntervals() {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    // Calcul des écarts bruts entre chaque touche" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    double gap = timestamps.get(i) - timestamps.get(i-1);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    if (gap &lt; 2000) raw.add(gap); // ignore les pauses &gt; 2s" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="    // Normalisation : divise par la moyenne → rythme indépendant de la vitesse" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    double mean = raw.stream().mapToDouble(d -&gt; d).average().orElse(1);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    for (double v : raw) norm.add(v / mean); // vecteur normalisé" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    return norm;" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 2 : COMPARAISON -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 2 — Comparaison MAE + apprentissage adaptatif  (TypingBiometricService)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="compare() calcule le MAE (Mean Absolute Error) entre le profil stocké et les intervalles capturés. Si MAE &lt; 0.35 → MATCH. updateProfile() met à jour le profil avec un rolling average pondéré : 80% ancien profil + 20% nouvelle capture pour rester stable tout en s'adaptant."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// TypingBiometricService.java" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// COMPARAISON — alignedMAE entre profil stocké et capture" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="private static double alignedMAE(List&lt;Double&gt; a, List&lt;Double&gt; b) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    int len = Math.min(a.size(), b.size());" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    double sum = 0;" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    for (int i = 0; i &lt; len; i++) sum += Math.abs(a.get(i) - b.get(i));" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    return sum / len; // résultat : proche de 0 = même rythme" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// compare() retourne l'enum : NO_PROFILE / TOO_SHORT / MATCH / MISMATCH" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="double mae = alignedMAE(stored, captured);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="return mae &lt; 0.35 ? Result.MATCH : Result.MISMATCH;" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// APPRENTISSAGE ADAPTATIF — rolling average 80/20" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="merged.add(stored.get(i) * 0.80 + captured.get(i) * 0.20);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="// → profil très stable, s'adapte légèrement à chaque connexion" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 3 : INTEGRATION LOGIN -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 3 — Intégration dans le flux de connexion  (LoginController)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="La vérification n'a lieu QUE si l'utilisateur a activé la protection (isEnabled). Sur MISMATCH, logout immédiat. Sur NO_PROFILE, on sauvegarde le premier profil. Sur MATCH, on met à jour avec rolling average."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// LoginController.java — après connexion réussie" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="int uid = AuthService.getCurrentUser().getId();" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (TypingBiometricService.isEnabled(uid)) { // opt-in seulement" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="    Result bio = TypingBiometricService.compare(uid, typingIntervals);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="    if (bio == MISMATCH) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        AuthService.logout();         // accès refusé" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        lblError.setText(&quot;✗ Rythme de frappe non reconnu.&quot;);" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        return;" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    }" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    if (bio == NO_PROFILE)  saveProfile(uid, typingIntervals);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    if (bio == MATCH)       updateProfile(uid, typingIntervals);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- BDD -->
+                    <VBox spacing="6">
+                        <Label text="BASE DE DONNÉES" style="-fx-text-fill: #7c3aed; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 12 18 12 18;">
+                            <Label text="user.typing_profile           TEXT     NULL  -- ex: '0.95,1.20,0.88,1.05;5'" style="-fx-text-fill: #a78bfa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="                                               --     intervalles;nb_samples" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="user.typing_biometric_enabled TINYINT  DEFAULT 0  -- 0=désactivé, 1=actif" style="-fx-text-fill: #a78bfa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </VBox>
+
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!--  3. GAMERTAG CREATOR                                        -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <VBox spacing="0" style="-fx-background-color: rgba(20,14,50,0.95); -fx-border-color: rgba(168,85,247,0.4);
+                                     -fx-border-width: 1.5; -fx-border-radius: 14; -fx-background-radius: 14;">
+                <HBox spacing="14" alignment="CENTER_LEFT"
+                      style="-fx-background-color: linear-gradient(to right,rgba(124,58,237,0.55),rgba(124,58,237,0.05));
+                             -fx-padding: 18 28 18 28; -fx-background-radius: 14 14 0 0;">
+                    <Label text="🎮" style="-fx-font-size: 24px;"/>
+                    <VBox spacing="3">
+                        <Label text="3.  GAMERTAG CREATOR — Générateur de Pseudos IA"
+                               style="-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                        <Label text="Fichiers :  GamertagAiService.java  ·  GamertagGeneratorDialog.java  ·  ProfileController.java"
+                               style="-fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-font-family: 'Courier New';"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="28" style="-fx-padding: 28 32 32 32;">
+
+                    <!-- ETAPE 1 : BANQUES DE MOTS -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 1 — Banques de mots par jeu  (GAME_WORDS)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="GamertagAiService contient une Map statique de 15+ jeux, chacun avec 16–24 mots liés à l'univers du jeu. resolveWordBank() cherche d'abord un match exact sur le nom nettoyé, puis un match partiel. Si aucun jeu n'est trouvé, DEFAULT_WORDS est utilisé."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// GamertagAiService.java — GAME_WORDS (extrait)" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="GAME_WORDS.put(&quot;valorant&quot;, new String[]{" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    &quot;Phantom&quot;,&quot;Vandal&quot;,&quot;Jett&quot;,&quot;Reyna&quot;,&quot;Spike&quot;,&quot;Ace&quot;,&quot;Clutch&quot;,..." style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="});" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// STYLE_PREFIX — 6 styles avec préfixes différents" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="STYLE_PREFIX.put(&quot;agressif&quot;,   {&quot;xX&quot;,&quot;Dark&quot;,&quot;Rage&quot;,&quot;Savage&quot;,&quot;Blood&quot;,...});" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="STYLE_PREFIX.put(&quot;mysterieux&quot;, {&quot;Void&quot;,&quot;Shadow&quot;,&quot;Phantom&quot;,&quot;Ghost&quot;,...});" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="STYLE_PREFIX.put(&quot;legendaire&quot;, {&quot;Pro&quot;,&quot;Elite&quot;,&quot;God&quot;,&quot;King&quot;,&quot;Omega&quot;,...});" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// resolveWordBank() — matching jeu" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="String key = game.toLowerCase().replaceAll(&quot;[^a-z0-9]&quot;, &quot;&quot;);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (GAME_WORDS.containsKey(key)) return GAME_WORDS.get(key); // exact" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="// sinon : partial match (ex: 'league of legends' trouve 'lol')" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 2 : GENERATION -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 2 — Génération des 6 tags  (generate + buildTag)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="generate() boucle jusqu'à avoir 6 tags uniques (max 80 tentatives). buildTag() choisit aléatoirement parmi 4 stratégies d'assemblage et a 30% de chance d'intégrer le mot-clé utilisateur. Le résultat est clampé à 3–16 caractères alphanumériques."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// GamertagAiService.java — buildTag()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="String word   = pick(rng, wordBank);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="String prefix = pick(rng, prefixes);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="String suffix = pick(rng, suffixes);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// 30% de chance d'utiliser le mot-clé de l'utilisateur" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (keyword != null &amp;&amp; rng.nextInt(10) &lt; 3)" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    word = capitalise(keyword.replaceAll(&quot;[^a-zA-Z0-9]&quot;, &quot;&quot;));" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// 4 stratégies d'assemblage choisies aléatoirement" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="switch (rng.nextInt(4)) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    case 0 -&gt; tag = prefix + word + suffix;  // DarkPhantomGG" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    case 1 -&gt; tag = word + suffix;           // PhantomGG" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    case 2 -&gt; tag = prefix + word;           // DarkPhantom" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    default -&gt; tag = keyword + word;         // LiwaPhantom" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="tag = tag.replaceAll(&quot;[^a-zA-Z0-9_]&quot;, &quot;&quot;);  // nettoie" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (tag.length() &gt; 16) tag = tag.substring(0, 16); // clamp" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 3 : UI -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 3 — Interface utilisateur  (GamertagGeneratorDialog)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="La dialog est entièrement construite en Java (pas de FXML). Elle affiche un champ jeu, une ComboBox style (6 options), un champ mot-clé optionnel, un bouton Générer, et les 6 résultats sous forme de chips cliquables. Un clic sur un chip copie le tag dans le presse-papier automatiquement."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// GamertagGeneratorDialog.java — onGenerate() et chips" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// Appel du service pour générer 6 tags" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="List&lt;String&gt; tags = GamertagAiService.generate(game, style, keyword);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// Chaque tag devient un bouton chip cliquable" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="for (String tag : tags) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    Button chip = new Button(tag);" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    chip.setOnAction(e -&gt; {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        Clipboard.getSystemClipboard().setContent(content);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        chip.setText(tag + &quot; ✓ Copié !&quot;); // feedback visuel" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    });" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <Label text="BASE DE DONNÉES  →  Aucune. Service entièrement sans état."
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                </VBox>
+            </VBox>
+
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!--  4. CAPTCHA                                                 -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <VBox spacing="0" style="-fx-background-color: rgba(20,14,50,0.95); -fx-border-color: rgba(168,85,247,0.4);
+                                     -fx-border-width: 1.5; -fx-border-radius: 14; -fx-background-radius: 14;">
+                <HBox spacing="14" alignment="CENTER_LEFT"
+                      style="-fx-background-color: linear-gradient(to right,rgba(124,58,237,0.55),rgba(124,58,237,0.05));
+                             -fx-padding: 18 28 18 28; -fx-background-radius: 14 14 0 0;">
+                    <Label text="🔒" style="-fx-font-size: 24px;"/>
+                    <VBox spacing="3">
+                        <Label text="4.  CAPTCHA — Puzzle Coulissant Style Genshin"
+                               style="-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;"/>
+                        <Label text="Fichiers :  CaptchaDialog.java  (entier en Java, sans FXML)  ·  LoginController.java"
+                               style="-fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-font-family: 'Courier New';"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="28" style="-fx-padding: 28 32 32 32;">
+
+                    <!-- FLUX -->
+                    <VBox spacing="8">
+                        <Label text="FLUX GLOBAL" style="-fx-text-fill: #7c3aed; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="Appelé dans LoginController.onLogin() AVANT l'authentification. La dialog est modale et non-décorée. Elle génère un puzzle, affiche l'image, laisse l'utilisateur glisser la pièce, vérifie la position ±10px. Faux → spring-back animation. Après 5 échecs, doit rafraîchir. Vrai → fermeture après 750ms et retour true au contrôleur."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                    </VBox>
+
+                    <!-- ETAPE 1 : GÉNÉRATION DU PUZZLE -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 1 — Génération du puzzle  (generatePuzzle)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="generatePuzzle() choisit une position cible X aléatoire entre 80 et 240px. Elle charge une image depuis les ressources (/com/esports/captcha/1-20.jpg), puis extrait un WritableImage de 60×60px à la position cible — c'est la pièce qui sera glissée."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// CaptchaDialog.java — generatePuzzle()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="int minX = PIECE_W + 20;           // = 80px min" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="int maxX = IMG_W - PIECE_W - 20;   // = 240px max" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="targetX = minX + random.nextInt(maxX - minX); // position secrète" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="sourceImage = loadImage();   // charge image ou génère fond procédural" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="PixelReader pr = sourceImage.getPixelReader();" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// Extrait la pièce 60×60 à la position cible" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="pieceImage = new WritableImage(pr, targetX, PIECE_Y, PIECE_W, PIECE_H);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 2 : DESSIN CANVAS -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 2 — Rendu du canvas  (drawPuzzle)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="drawPuzzle() redessine tout le canvas à chaque déplacement du handle. Elle superpose : image de fond complète, un trou sombre à la position cible, la pièce glissante avec un clip arrondi (rrClip). En cas de succès, un glow ring vert s'affiche autour du trou."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// CaptchaDialog.java — drawPuzzle(boolean success)" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// 1. Image de fond complète" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="gc.drawImage(sourceImage, 0, 0, IMG_W, IMG_H);" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// 2. Trou sombre à la position cible" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="gc.setFill(Color.web(&quot;rgba(0,0,0,0.62)&quot;));" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="gc.fillRoundRect(targetX, PIECE_Y, PIECE_W, PIECE_H, 10, 10);" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// 3. Pièce glissante avec clip arrondi (rrClip = arcTo)" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="gc.save();" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="rrClip(gc, dragX, PIECE_Y, PIECE_W, PIECE_H, 10); // clip arrondi" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="gc.drawImage(pieceImage, dragX, PIECE_Y, PIECE_W, PIECE_H);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="gc.restore();" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// 4. Glow ring vert si succès" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (success) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    gc.setStroke(Color.web(&quot;rgba(74,222,128,0.35)&quot;));" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    gc.strokeRoundRect(targetX-3, PIECE_Y-3, PIECE_W+6, PIECE_H+6, 13,13);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 3 : VÉRIFICATION -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 3 — Vérification et animations  (verify)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="verify() compare dragX à targetX avec une tolérance de ±10px. En cas de succès, result=true, animation verte et fermeture après 750ms. En cas d'échec, une Timeline anime le retour du handle vers la gauche (spring-back) en 350ms avec EASE_OUT."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// CaptchaDialog.java — verify()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="double diff = Math.abs(dragX - targetX); // écart pièce / cible" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="if (diff &lt;= TOLERANCE) { // TOLERANCE = ±10px → SUCCÈS" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    result = true;  locked = true;" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    lblStatus.setText(&quot;✔ Vérification réussie !&quot;);" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    drawPuzzle(true); // glow vert" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    new PauseTransition(750ms).setOnFinished(e -&gt; stage.close());" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="} else {                  // ÉCHEC — spring-back animation" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    attempts++;" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    // Timeline 350ms ramène le handle à gauche (EASE_OUT)" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    new Timeline(new KeyFrame(Duration.millis(350)," style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        new KeyValue(handlePane.layoutXProperty(), 2.0, EASE_OUT)" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    )).play();" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- ETAPE 4 : IMAGE FALLBACK -->
+                    <VBox spacing="10">
+                        <Label text="ÉTAPE 4 — Chargement image + fallback procédural  (loadImage)"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                        <Label wrapText="true"
+                               text="loadImage() mélange aléatoirement une liste de 60 candidats (1–20 × .jpg/.jpeg/.png) et essaie chaque chemin dans les ressources. Si aucune image n'est trouvée, generateProceduralImage() produit un fond purple/teal avec bruit sinusoïdal — aucune dépendance externe."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 14 18 14 18;">
+                            <Label text="// CaptchaDialog.java — generateProceduralImage() (fallback)" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="for (int y = 0; y &lt; IMG_H; y++) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    for (int x = 0; x &lt; IMG_W; x++) {" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        double v1 = Math.sin((x+seed)*0.09) * Math.cos((y+seed)*0.13) * 0.15;" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        double r  = clamp(0.05 + 0.30*nx + v1 + ...); // canal rouge" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        double b  = clamp(0.13 + 0.32*(1-ny) + v1 + ...); // bleu" style="-fx-text-fill: #60a5fa; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="        pw.setColor(x, y, Color.color(r, g, b));" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    }" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Integration -->
+                    <VBox spacing="6">
+                        <Label text="INTÉGRATION DANS LOGIN" style="-fx-text-fill: #7c3aed; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                        <VBox spacing="2" style="-fx-background-color: #0d0b1e; -fx-border-color: rgba(168,85,247,0.3);
+                                                  -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;
+                                                  -fx-padding: 12 18 12 18;">
+                            <Label text="// LoginController.java — onLogin()" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text=" " style="-fx-font-size: 4px;"/>
+                            <Label text="// CAPTCHA obligatoire AVANT l'appel au service d'auth" style="-fx-text-fill: #6b7280; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="if (!CaptchaDialog.show(btnLogin.getScene().getWindow())) {" style="-fx-text-fill: #fb923c; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    lblError.setText(&quot;⚠ Vérification de sécurité requise.&quot;);" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="    return;  // bloque la connexion si CAPTCHA échoué" style="-fx-text-fill: #f87171; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="}" style="-fx-text-fill: #e2e8f0; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                            <Label text="// Si ici → CAPTCHA validé, on continue vers authService.login()" style="-fx-text-fill: #4ade80; -fx-font-family: 'Courier New'; -fx-font-size: 12px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <Label text="BASE DE DONNÉES  →  Aucune. Tout en mémoire, sans état persistant."
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                </VBox>
+            </VBox>
+
+            <!-- FOOTER -->
+            <Label alignment="CENTER" text="NexUS Esports — Documentation interne  ·  2026  ·  À supprimer avant livraison"
+                   style="-fx-text-fill: #374151; -fx-font-size: 12px;"/>
+
+        </VBox>
+    </VBox>
+</ScrollPane>

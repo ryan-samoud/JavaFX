@@ -237,7 +237,7 @@ public class CaptchaDialog {
     }
 
     // ─────────────────────────────────────────────────────────────
-    // PUZZLE GENERATION
+    // 1/PUZZLE GENERATION
     // ─────────────────────────────────────────────────────────────
 
     private void generatePuzzle() {
