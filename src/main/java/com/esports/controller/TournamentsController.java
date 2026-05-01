@@ -1,7 +1,12 @@
 package com.esports.controller;
 
+import com.esports.interfaces.IMatchService;
 import com.esports.interfaces.ITournamentService;
+import com.esports.model.Match;
+import com.esports.model.ParticipantRanking;
 import com.esports.model.Tournament;
+import com.esports.service.ArduinoService;
+import com.esports.service.MatchService;
 import com.esports.service.TournamentService;
 import com.esports.utils.AlertUtils;
 
@@ -51,6 +56,7 @@ public class TournamentsController implements Initializable {
     @FXML private FlowPane cardsContainer;
 
     private final ITournamentService tournamentService = new TournamentService();
+    private final IMatchService matchService = new MatchService();
     private List<Tournament> allTournaments;
 
     @Override
@@ -141,7 +147,10 @@ public class TournamentsController implements Initializable {
         btnDelete.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff4757; -fx-border-color: #ff4757; -fx-border-radius: 5; -fx-cursor: hand; -fx-font-size: 11px;");
         btnEdit.setOnAction(e -> onEditTournament(t));
         btnDelete.setOnAction(e -> onDeleteTournament(t));
-        actions.getChildren().addAll(btnEdit, btnDelete);
+        Button btnRanking = new Button("Voir Classement");
+        btnRanking.setStyle("-fx-background-color: transparent; -fx-text-fill: #fbbf24; -fx-border-color: #fbbf24; -fx-border-radius: 5; -fx-cursor: hand; -fx-font-size: 11px;");
+        btnRanking.setOnAction(e -> showTournamentRanking(t));
+        actions.getChildren().addAll(btnEdit, btnDelete, btnRanking);
 
         card.getChildren().addAll(iv, info, spacer, actions);
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #1a1a35; -fx-border-color: " + color + "; -fx-border-width: 2; -fx-border-radius: 12; -fx-background-radius: 12;"));
@@ -214,6 +223,101 @@ public class TournamentsController implements Initializable {
         tournamentService.findAll().stream().collect(Collectors.groupingBy(Tournament::getStatut, Collectors.counting()))
                 .forEach((k, v) -> pc.getData().add(new PieChart.Data(k + " (" + v + ")", v)));
         s.setScene(new Scene(new VBox(pc), 600, 500)); s.show();
+    }
+
+    private void showTournamentRanking(Tournament t) {
+        Stage stage = new Stage(); stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Classement — " + t.getNom());
+
+        VBox root = new VBox(20);
+        root.setPadding(new Insets(30));
+        root.setStyle("-fx-background-color: #0a0a0f; -fx-border-color: #a855f7; -fx-border-width: 2;");
+
+        Label title = new Label("🏆 CLASSEMENT : " + t.getNom().toUpperCase());
+        title.setStyle("-fx-text-fill: white; -fx-font-family: 'Courier New'; -fx-font-size: 18px; -fx-font-weight: bold;");
+
+        VBox table = new VBox(5);
+
+        HBox header = new HBox(10);
+        header.setPadding(new Insets(10));
+        header.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 5;");
+
+        String[] headers = {"#", "JOUEUR", "MJ", "V", "N", "D", "DIFF", "PTS", "LCD"};
+        int[] widths = {30, 150, 40, 40, 40, 40, 50, 50, 50};
+        for (int i = 0; i < headers.length; i++) {
+            Label l = new Label(headers[i]);
+            l.setPrefWidth(widths[i]);
+            l.setStyle("-fx-text-fill: #888899; -fx-font-weight: bold; -fx-font-size: 11px;");
+            header.getChildren().add(l);
+        }
+        table.getChildren().add(header);
+
+        List<ParticipantRanking> rankings = matchService.getLeaderboard(t.getId());
+
+        if (!rankings.isEmpty()) {
+            new Thread(() -> {
+                int rnk = 1;
+                for (ParticipantRanking r : rankings) {
+                    String msg = "R:" + rnk + "- " + r.getPlayerName() + " " + r.getPoints() + "pts";
+                    ArduinoService.getInstance().sendData(msg);
+                    rnk++;
+                    try { Thread.sleep(3000); } catch (InterruptedException ex) { break; }
+                }
+            }).start();
+        }
+
+        int rank = 1;
+        for (ParticipantRanking r : rankings) {
+            HBox row = new HBox(10);
+            row.setPadding(new Insets(10));
+            row.setAlignment(Pos.CENTER_LEFT);
+            row.setStyle("-fx-border-color: transparent transparent #1a1a2e transparent; -fx-border-width: 0 0 1 0;");
+
+            Label lRank = new Label(String.valueOf(rank++)); lRank.setPrefWidth(30);
+            Label lName = new Label(r.getPlayerName()); lName.setPrefWidth(150);
+            Label lMJ = new Label(String.valueOf(r.getMatchesPlayed())); lMJ.setPrefWidth(40);
+            Label lV = new Label(String.valueOf(r.getWins())); lV.setPrefWidth(40);
+            Label lN = new Label(String.valueOf(r.getDraws())); lN.setPrefWidth(40);
+            Label lD = new Label(String.valueOf(r.getLosses())); lD.setPrefWidth(40);
+            Label lDiff = new Label((r.getGoalDifference() > 0 ? "+" : "") + r.getGoalDifference()); lDiff.setPrefWidth(50);
+            Label lPts = new Label(String.valueOf(r.getPoints())); lPts.setPrefWidth(50);
+
+            lRank.setStyle("-fx-text-fill: #fbbf24; -fx-font-weight: bold;");
+            lName.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+            lPts.setStyle("-fx-text-fill: #00ff9d; -fx-font-weight: bold; -fx-font-size: 13px;");
+            String subStyle = "-fx-text-fill: #9ca3af; -fx-font-size: 12px;";
+            for (Label l : List.of(lMJ, lV, lN, lD, lDiff)) l.setStyle(subStyle);
+
+            Button btnLCDRow = new Button("📟");
+            btnLCDRow.setStyle("-fx-background-color: transparent; -fx-text-fill: #ec4899; -fx-cursor: hand; -fx-font-size: 14px;");
+            btnLCDRow.setOnAction(e -> {
+                String msg = "R:" + r.getPlayerName() + " " + r.getPoints() + "pts";
+                ArduinoService.getInstance().sendData(msg);
+            });
+
+            row.getChildren().addAll(lRank, lName, lMJ, lV, lN, lD, lDiff, lPts, btnLCDRow);
+            table.getChildren().add(row);
+        }
+
+        if (rankings.isEmpty()) {
+            Label empty = new Label("Aucun match terminé pour ce tournoi.");
+            empty.setStyle("-fx-text-fill: #444455; -fx-font-style: italic; -fx-padding: 20;");
+            table.getChildren().add(empty);
+        }
+
+        ScrollPane sp = new ScrollPane(table);
+        sp.setFitToWidth(true); sp.setPrefHeight(450);
+        sp.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+        Button btnClose = new Button("FERMER");
+        btnClose.setStyle("-fx-background-color: #1a1a2e; -fx-text-fill: white; -fx-padding: 10 25; -fx-cursor: hand; -fx-background-radius: 5;");
+        btnClose.setOnAction(e -> stage.close());
+
+        root.getChildren().addAll(title, sp, btnClose);
+        root.setAlignment(Pos.CENTER);
+
+        stage.setScene(new Scene(root, 580, 600));
+        stage.show();
     }
 
     @FXML private void onAddTournament() { openTournamentForm(null); }

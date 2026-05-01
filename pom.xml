@@ -147,6 +147,13 @@
             <version>20240303</version>
         </dependency>
 
+        <!-- ── jSerialComm — communication série Arduino ────────── -->
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+
         <!-- ── MapJFX ───────────────────────────────────────────── -->
         <dependency>
             <groupId>com.sothawo</groupId>
