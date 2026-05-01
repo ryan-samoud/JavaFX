@@ -49,10 +49,6 @@ public class EvenementService implements IEvenementService {
         return 0;
     }
 
-    /**
-     * Check if an event name already exists (for unique validation).
-     * excludeId = 0 for new events, or the current event's id for edits.
-     */
     public boolean existsByNom(String nom, int excludeId) {
         String sql = excludeId == 0
                 ? "SELECT COUNT(*) FROM evenement WHERE LOWER(nom) = LOWER(?)"
@@ -114,10 +110,10 @@ public class EvenementService implements IEvenementService {
     public boolean delete(int id) {
         String deleteSponsors = "DELETE FROM sponsor WHERE evenement_id = ?";
         String deleteEvent    = "DELETE FROM evenement WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getInstance()) {
-            PreparedStatement ps1 = conn.prepareStatement(deleteSponsors);
+        try (Connection conn = DatabaseConnection.getInstance();
+             PreparedStatement ps1 = conn.prepareStatement(deleteSponsors);
+             PreparedStatement ps2 = conn.prepareStatement(deleteEvent)) {
             ps1.setInt(1, id); ps1.executeUpdate();
-            PreparedStatement ps2 = conn.prepareStatement(deleteEvent);
             ps2.setInt(1, id);
             return ps2.executeUpdate() > 0;
         } catch (SQLException e) {

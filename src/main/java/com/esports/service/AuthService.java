@@ -19,7 +19,6 @@ public class AuthService {
         if (password == null || password.isBlank())
             return AuthResult.failure("Mot de passe vide");
 
-        // Check any user (including banned/suspended) first
         Optional<User> anyOpt = userService.findByEmailAny(email);
 
         if (anyOpt.isEmpty())
@@ -30,11 +29,9 @@ public class AuthService {
         if (!PasswordUtil.verify(password, user.getPassword()))
             return AuthResult.failure("Mot de passe incorrect");
 
-        // Banned
         if (user.isBanned())
             return AuthResult.banned(user.getBanReason());
 
-        // Suspended
         if (user.isSuspended())
             return AuthResult.suspended(user.getBanReason(), user.getSuspendedUntil());
 
@@ -57,9 +54,6 @@ public class AuthService {
     public static boolean isLoggedIn()  { return currentUser != null; }
     public static void logout()         { currentUser = null; }
 
-    // ─────────────────────────────────────────────────────
-    // RESULT
-    // ─────────────────────────────────────────────────────
     public static class AuthResult {
 
         public enum Status { SUCCESS, FAILURE, BANNED, SUSPENDED }
