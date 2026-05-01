@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/17"
+            fx:controller="com.esports.controller.PaiementController"
+            style="-fx-background-color: #0d0b1e;">
+    <stylesheets>
+        <URL value="@../css/home.css"/>
+    </stylesheets>
+
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white;
+                       -fx-font-size: 15px; -fx-font-weight: bold;
+                       -fx-background-radius: 6px; -fx-padding: 4 9 4 9;"/>
+                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18px;
+                       -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="← Retour au panier" onAction="#onBackPanier" styleClass="nav-link"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                    style="-fx-background: #0d0b1e; -fx-background-color: #0d0b1e; -fx-border-color: transparent;">
+            <HBox spacing="32" style="-fx-background-color: #0d0b1e; -fx-padding: 40 80 60 80;"
+                  alignment="TOP_CENTER">
+
+                <!-- FORMULAIRE GAUCHE -->
+                <VBox spacing="24" prefWidth="500">
+
+                    <!-- Titre -->
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="💳" style="-fx-font-size: 28px;"/>
+                        <Label text="Paiement sécurisé"
+                               style="-fx-text-fill: white; -fx-font-size: 24px;
+                                      -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+                    </HBox>
+
+                    <!-- Section carte -->
+                    <VBox spacing="16" style="-fx-background-color: rgba(20,17,43,0.9);
+                                              -fx-border-color: rgba(139,92,246,0.22);
+                                              -fx-border-width: 1.5px; -fx-border-radius: 14px;
+                                              -fx-background-radius: 14px; -fx-padding: 24;">
+                        <Label text="Informations de carte"
+                               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <VBox spacing="6">
+                            <Label text="Numéro de carte" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                            <TextField fx:id="fieldCarte" promptText="1234 5678 9012 3456"
+                                       styleClass="input-field"/>
+                        </VBox>
+
+                        <HBox spacing="16">
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="Date d'expiration" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                                <TextField fx:id="fieldExpiration" promptText="MM/AA" styleClass="input-field"/>
+                            </VBox>
+                            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                                <Label text="CVV" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                                <TextField fx:id="fieldCvv" promptText="123" styleClass="input-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="6">
+                            <Label text="Nom sur la carte" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                            <TextField fx:id="fieldNomCarte" promptText="JOHN DOE" styleClass="input-field"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Section livraison -->
+                    <VBox spacing="16" style="-fx-background-color: rgba(20,17,43,0.9);
+                                              -fx-border-color: rgba(139,92,246,0.22);
+                                              -fx-border-width: 1.5px; -fx-border-radius: 14px;
+                                              -fx-background-radius: 14px; -fx-padding: 24;">
+                        <Label text="Informations de livraison"
+                               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <VBox spacing="6">
+                            <Label text="Adresse de livraison" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                            <TextField fx:id="fieldAdresse" promptText="123 Rue Example, Tunis"
+                                       styleClass="input-field"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Téléphone" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                            <TextField fx:id="fieldTelephone" promptText="+216 XX XXX XXX"
+                                       styleClass="input-field"/>
+                        </VBox>
+
+                        <VBox spacing="6">
+                            <Label text="Notes (optionnel)" style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;"/>
+                            <TextArea fx:id="fieldNotes" promptText="Instructions de livraison..."
+                                      prefRowCount="3" styleClass="input-field"
+                                      style="-fx-background-color: rgba(26,18,58,0.9);
+                                             -fx-text-fill: white; -fx-font-size: 13px;
+                                             -fx-border-color: rgba(139,92,246,0.35);
+                                             -fx-border-width: 1.5px; -fx-border-radius: 8px;
+                                             -fx-background-radius: 8px;"/>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Message erreur -->
+                    <Label fx:id="lblErreur" text="" visible="false" managed="false"
+                           style="-fx-text-fill: #f87171; -fx-font-size: 13px;
+                                  -fx-background-color: rgba(248,113,113,0.1);
+                                  -fx-border-color: rgba(248,113,113,0.4); -fx-border-width: 1px;
+                                  -fx-border-radius: 8px; -fx-background-radius: 8px;
+                                  -fx-padding: 10 16 10 16;"
+                           wrapText="true"/>
+
+                    <!-- Bouton payer -->
+                    <Button fx:id="btnPayer" text="🔒  Payer maintenant"
+                            onAction="#onPayer" maxWidth="Infinity"
+                            style="-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);
+                                   -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;
+                                   -fx-background-radius: 12px; -fx-padding: 16 0 16 0;
+                                   -fx-cursor: hand; -fx-border-color: transparent;"/>
+                </VBox>
+
+                <!-- RÉSUMÉ DROITE -->
+                <VBox spacing="16" minWidth="300" maxWidth="300"
+                      style="-fx-background-color: rgba(20,17,43,0.9);
+                             -fx-border-color: rgba(139,92,246,0.22);
+                             -fx-border-width: 1.5px; -fx-border-radius: 14px;
+                             -fx-background-radius: 14px; -fx-padding: 24;">
+
+                    <Label text="Résumé de commande"
+                           style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                    <VBox fx:id="vboxArticles" spacing="10"/>
+
+                    <Label style="-fx-border-color: rgba(139,92,246,0.2);
+                                  -fx-border-width: 1px 0 0 0; -fx-min-height: 1px;"/>
+
+                    <HBox>
+                        <Label text="Total" style="-fx-text-fill: #9ca3af; -fx-font-size: 14px;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblTotal" text="0 DT"
+                               style="-fx-text-fill: #a855f7; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    </HBox>
+
+                    <HBox spacing="8" alignment="CENTER">
+                        <Label text="🔒" style="-fx-font-size: 12px;"/>
+                        <Label text="Paiement 100% sécurisé"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 11px;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
