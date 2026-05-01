@@ -2,80 +2,135 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 <?import java.net.URL?>
 
-<ScrollPane fitToWidth="true" fitToHeight="true"
-            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-            minWidth="1280" minHeight="800"
-            xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/17"
-            fx:controller="com.esports.controller.HomeController"
-            styleClass="home-scroll">
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx/17"
+      fx:controller="com.esports.controller.ShopController"
+      styleClass="content-area"
+      fx:id="rootVBox">
 
     <stylesheets>
-        <URL value="@../css/home.css"/>
+        <URL value="@../css/dashboard.css"/>
     </stylesheets>
 
-    <VBox styleClass="home-root" spacing="0" minWidth="1280" minHeight="800">
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;">
 
-        <!-- NAVBAR -->
-        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label text="N" style="-fx-background-color: #a855f7; -fx-text-fill: white;
-                       -fx-font-size: 15px; -fx-font-weight: bold;
-                       -fx-background-radius: 6px; -fx-padding: 4 9 4 9;"/>
-                <Label text="NexUS" style="-fx-text-fill: white; -fx-font-size: 18px;
-                       -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+        <VBox spacing="28" style="-fx-background-color: #0a0818; -fx-padding: 30 36 40 36;">
+
+            <!-- TOPBAR -->
+            <HBox alignment="CENTER_LEFT" spacing="16"
+                  style="-fx-padding: 0 0 20 0;
+                         -fx-border-color: transparent transparent rgba(139,92,246,0.15) transparent;
+                         -fx-border-width: 0 0 1 0;">
+                <Label text="🛒" style="-fx-font-size: 26px;"/>
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label text="Administration de la Boutique"
+                           style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                    <Label text="Gérez vos produits et catégories"
+                           style="-fx-text-fill: #6b7280; -fx-font-size: 13px;"/>
+                </VBox>
             </HBox>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button fx:id="btnConnexion" text="Connexion" onAction="#onLogin" styleClass="btn-outline-sm"/>
-            <Button fx:id="btnInscrire" text="S'inscrire" onAction="#onRegister"
-                    style="-fx-background-color: transparent; -fx-text-fill: white;
-                           -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 1.5px;
-                           -fx-border-radius: 8px; -fx-background-radius: 8px;
-                           -fx-font-size: 13px; -fx-font-weight: bold;
-                           -fx-padding: 7 20 7 20; -fx-cursor: hand;"/>
-            <HBox fx:id="hboxUserNav" visible="false" managed="false"
-                  alignment="CENTER_LEFT" spacing="8">
-                <Button fx:id="lblAvatar" text="" onAction="#onProfile"
-                        style="-fx-background-color: linear-gradient(to bottom right,#7c3aed,#ec4899);
-                               -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;
-                               -fx-background-radius: 50%; -fx-min-width: 36px; -fx-min-height: 36px;
-                               -fx-max-width: 36px; -fx-max-height: 36px; -fx-cursor: hand;"/>
-                <Label fx:id="lblConnectedUser" text=""
-                       style="-fx-text-fill: #4ade80; -fx-font-size: 13px; -fx-font-weight: bold;"/>
-            </HBox>
-            <Button fx:id="btnDeconnexion" text="Déconnexion" onAction="#onLogout"
-                    visible="false" managed="false"
-                    style="-fx-background-color: rgba(248,113,113,0.15); -fx-text-fill: #f87171;
-                           -fx-border-color: rgba(248,113,113,0.5); -fx-border-width: 1.5px;
-                           -fx-border-radius: 8px; -fx-background-radius: 8px;
-                           -fx-font-size: 13px; -fx-font-weight: bold;
-                           -fx-padding: 7 20 7 20; -fx-cursor: hand;"/>
-            <Button fx:id="btnAdmin" text="⚙" visible="false" managed="false"
-                    onAction="#onAdminBackoffice" styleClass="btn-neon-sm"/>
-        </HBox>
 
-        <!-- SHOP CONTENT -->
-        <VBox alignment="CENTER" spacing="20" VBox.vgrow="ALWAYS"
-              style="-fx-background-color: linear-gradient(to bottom, #100c2a, #0d0b1e);
-                     -fx-padding: 60 40 60 40;">
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- SECTION 1 — CATÉGORIES                             -->
+            <!-- ═══════════════════════════════════════════════════ -->
+            <VBox spacing="0"
+                  style="-fx-background-color: rgba(20,17,43,0.9);
+                         -fx-border-color: rgba(139,92,246,0.22);
+                         -fx-border-width: 1.5px; -fx-border-radius: 14px;
+                         -fx-background-radius: 14px;">
 
-            <Label text="🛍️" style="-fx-font-size: 64px;"/>
+                <HBox alignment="CENTER_LEFT" spacing="14"
+                      style="-fx-padding: 18 24 18 24;
+                             -fx-border-color: transparent transparent rgba(139,92,246,0.12) transparent;
+                             -fx-border-width: 0 0 1 0;">
+                    <Label text="🏷" style="-fx-font-size: 20px;"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Gestion des Catégories"
+                               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblCatCount" text="0 catégorie(s)"
+                               style="-fx-text-fill: #6b7280; -fx-font-size: 12px;"/>
+                    </VBox>
+                    <TextField fx:id="fieldSearchCat" promptText="🔍  Rechercher une catégorie…"
+                               prefWidth="230" styleClass="input-field"/>
+                    <Button text="＋  Ajouter Catégorie"
+                            onAction="#onAddCategorie"
+                            styleClass="btn-primary"/>
+                </HBox>
 
-            <Label text="BOUTIQUE"
-                   style="-fx-text-fill: white; -fx-font-size: 32px;
-                          -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
+                <TableView fx:id="tableCategories" prefHeight="210" styleClass="esports-table"
+                           style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                    <columns>
+                        <TableColumn fx:id="colCatId"      text="ID"              prefWidth="50"/>
+                        <TableColumn fx:id="colCatNom"     text="NOM"             prefWidth="160"/>
+                        <TableColumn fx:id="colCatDesc"    text="DESCRIPTION"     prefWidth="260"/>
+                        <TableColumn fx:id="colCatDate"    text="DATE CRÉATION"   prefWidth="145"/>
+                        <TableColumn fx:id="colCatStatut"  text="STATUT"          prefWidth="100"/>
+                        <TableColumn fx:id="colCatActions" text="ACTIONS"         prefWidth="160"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Aucune catégorie trouvée." styleClass="empty-label"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
 
-            <Label text="Bientôt disponible — équipez-vous avec le meilleur matériel gaming"
-                   style="-fx-text-fill: #9ca3af; -fx-font-size: 16px;"
-                   wrapText="true"/>
+            <!-- ═══════════════════════════════════════════════════ -->
+            <!-- SECTION 2 — PRODUITS                               -->
+            <!-- ═══════════════════════════════════════════════════ -->
+            <VBox spacing="0"
+                  style="-fx-background-color: rgba(20,17,43,0.9);
+                         -fx-border-color: rgba(139,92,246,0.22);
+                         -fx-border-width: 1.5px; -fx-border-radius: 14px;
+                         -fx-background-radius: 14px;">
 
-            <Button text="← Retour à l'accueil"
-                    onAction="#onHome"
-                    styleClass="btn-hero-primary"
-                    style="-fx-padding: 12 30 12 30;"/>
+                <HBox alignment="CENTER_LEFT" spacing="14"
+                      style="-fx-padding: 18 24 18 24;
+                             -fx-border-color: transparent transparent rgba(139,92,246,0.12) transparent;
+                             -fx-border-width: 0 0 1 0;">
+                    <Label text="🛍️" style="-fx-font-size: 20px;"/>
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Bibliothèque des Produits"
+                               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblProduitCount" text="0 produit(s)"
+                               style="-fx-text-fill: #6b7280; -fx-font-size: 12px;"/>
+                    </VBox>
+                    <TextField fx:id="fieldSearch" promptText="🔍  Rechercher un produit…"
+                               prefWidth="210" styleClass="input-field"/>
+                    <ComboBox fx:id="comboCategorie" prefWidth="170" styleClass="combo-filter"
+                              promptText="Toutes les catégories"/>
+                    <ComboBox fx:id="comboStock" prefWidth="130" styleClass="combo-filter"/>
+                    <Button text="＋  Nouveau Produit"
+                            onAction="#onAddProduit"
+                            styleClass="btn-primary"/>
+                </HBox>
+
+                <TableView fx:id="tableProduits" prefHeight="360" styleClass="esports-table"
+                           style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                    <columns>
+                        <TableColumn fx:id="colId"          text="ID"              prefWidth="45"/>
+                        <TableColumn fx:id="colIdCat"       text="ID CATÉGORIE"    prefWidth="110"/>
+                        <TableColumn fx:id="colNom"         text="NOM"             prefWidth="150"/>
+                        <TableColumn fx:id="colCategorie"   text="CATÉGORIE"       prefWidth="120"/>
+                        <TableColumn fx:id="colPrix"        text="PRIX"            prefWidth="90"/>
+                        <TableColumn fx:id="colStock"       text="STOCK"           prefWidth="100"/>
+                        <TableColumn fx:id="colImage"       text="IMAGE"           prefWidth="90"/>
+                        <TableColumn fx:id="colModel3d"     text="MODÈLE 3D"       prefWidth="100"/>
+                        <TableColumn fx:id="colActions"     text="ACTIONS"         prefWidth="170"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Aucun produit trouvé." styleClass="empty-label"/>
+                    </placeholder>
+                </TableView>
+            </VBox>
 
         </VBox>
-    </VBox>
-</ScrollPane>
+    </ScrollPane>
+
+    <!-- ══ DIALOG OVERLAY PRODUIT (invisible, injecté dans le StackPane parent par le controller) ══ -->
+    <!-- Les overlays sont créés programmatiquement dans le controller -->
+
+</VBox>

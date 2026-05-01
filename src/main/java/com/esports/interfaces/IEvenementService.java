@@ -12,4 +12,5 @@ public interface IEvenementService {
     boolean delete(int id);
     void incrementParticipants(int id);
     void decrementParticipants(int id);
+    boolean existsByNom(String nom, int excludeId);
 }

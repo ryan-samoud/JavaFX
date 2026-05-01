@@ -6,9 +6,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!--  Identité du projet                                       -->
-    <!-- ══════════════════════════════════════════════════════════ -->
     <groupId>com.esports</groupId>
     <artifactId>nexus-esports</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -17,15 +14,11 @@
     <name>NEXUS ESPORTS</name>
     <description>Plateforme de gestion de tournois esports — JavaFX 17 + MySQL</description>
 
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!--  Propriétés globales                                      -->
-    <!-- ══════════════════════════════════════════════════════════ -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <!-- Versions centralisées -->
         <javafx.version>21.0.2</javafx.version>
         <mysql.version>8.3.0</mysql.version>
         <jbcrypt.version>0.4</jbcrypt.version>
@@ -39,9 +32,6 @@
         </repository>
     </repositories>
 
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!--  Dépendances                                              -->
-    <!-- ══════════════════════════════════════════════════════════ -->
     <dependencies>
 
         <!-- ── JavaFX ───────────────────────────────────────────── -->
@@ -54,6 +44,12 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
@@ -75,27 +71,12 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- ── Webcam ───────────────────────────────────────────── -->
         <dependency>
             <groupId>com.github.sarxos</groupId>
             <artifactId>webcam-capture</artifactId>
             <version>0.3.12</version>
         </dependency>
-
-        <!-- Pour les graphiques (charts) si besoin -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
-        <!-- Pour jouer des médias (vidéo/audio) — décommentez si nécessaire -->
-        <!--
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        -->
 
         <!-- ── Base de données MySQL ────────────────────────────── -->
         <dependency>
@@ -104,22 +85,21 @@
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- ── BCrypt — hachage de mots de passe (recommandé) ───── -->
-        <!--
-             Pour activer BCrypt dans AuthService.java :
-             1. Décommentez cette dépendance
-             2. Remplacez hashPassword() par :
-                  BCrypt.hashpw(password, BCrypt.gensalt(12))
-             3. Remplacez checkPassword() par :
-                  BCrypt.checkpw(rawPassword, storedHash)
-        -->
+        <!-- ── BCrypt ───────────────────────────────────────────── -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt.version}</version>
         </dependency>
 
-        <!-- ── iText7 — Génération PDF certificats ─────────────────── -->
+        <!-- ── Email (JavaMail / SMTP) ──────────────────────────── -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
+        <!-- ── iText7 — Génération PDF ──────────────────────────── -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>kernel</artifactId>
@@ -136,7 +116,7 @@
             <version>7.2.5</version>
         </dependency>
 
-        <!-- ── SLF4J — requis par iText7 ──────────────────────────── -->
+        <!-- ── SLF4J — requis par iText7 ───────────────────────── -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -148,7 +128,7 @@
             <version>2.0.12</version>
         </dependency>
 
-        <!-- ── ZXing — QR Code Generation ────────────────────────── -->
+        <!-- ── ZXing — QR Code Generation ──────────────────────── -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
@@ -158,6 +138,20 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
             <version>3.5.3</version>
+        </dependency>
+
+        <!-- ── JSON ─────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
+
+        <!-- ── MapJFX ───────────────────────────────────────────── -->
+        <dependency>
+            <groupId>com.sothawo</groupId>
+            <artifactId>mapjfx</artifactId>
+            <version>3.1.0</version>
         </dependency>
 
         <!-- ── Tests — JUnit 5 ──────────────────────────────────── -->
@@ -188,21 +182,8 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20240303</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sothawo</groupId>
-            <artifactId>mapjfx</artifactId>
-            <version>3.1.0</version>
-        </dependency>
     </dependencies>
 
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!--  Build                                                    -->
-    <!-- ══════════════════════════════════════════════════════════ -->
     <build>
         <plugins>
 
@@ -224,7 +205,6 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <!-- Module/MainClass format required for modular projects -->
                     <mainClass>com.esports/com.esports.MainApp</mainClass>
                     <options>
                         <option>-Dprism.order=sw</option>
@@ -240,6 +220,7 @@
                                 <option>-Xms128m</option>
                                 <option>-Xmx512m</option>
                                 <option>-XX:ReservedCodeCacheSize=128m</option>
+                                <option>-XX:HeapBaseMinAddress=0x100000000</option>
                             </options>
                         </configuration>
                     </execution>

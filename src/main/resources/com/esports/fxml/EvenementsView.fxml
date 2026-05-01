@@ -54,6 +54,18 @@
                        -fx-text-fill: #0a0a0f; -fx-font-family: 'Courier New';
                        -fx-font-weight: bold; -fx-font-size: 13px;
                        -fx-background-radius: 6; -fx-padding: 10 22 10 22; -fx-cursor: hand;"/>
+
+        <!-- Notification bell for flagged comments -->
+        <StackPane onMouseClicked="#onShowFlagged" style="-fx-cursor: hand; -fx-padding: 4 8 4 8;">
+            <Label text="🔔" style="-fx-font-size: 22px;"/>
+            <Label fx:id="lblFlagCount" text=""
+                   style="-fx-background-color: #ef4444; -fx-text-fill: white;
+                          -fx-font-size: 9px; -fx-font-weight: bold;
+                          -fx-background-radius: 10px; -fx-padding: 1 4 1 4;
+                          -fx-font-family: 'Courier New';"
+                   StackPane.alignment="TOP_RIGHT"
+                   translateX="6" translateY="-4"/>
+        </StackPane>
     </HBox>
 
     <!-- Tableau -->

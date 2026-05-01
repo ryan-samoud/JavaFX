@@ -1,5 +1,6 @@
 package com.esports.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -58,10 +59,12 @@ public class Tournament {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 
-    // Kept for backward compat (old model used title/prizePool)
+    // Kept for backward compat
     public String getTitle() { return nom; }
     public double getPrizePool() { return prize; }
     public int getMaxTeams() { return nbParticipantsMax; }
+    public String getStatus() { return statut; }
+    public LocalDate getStartDate() { return dateDebut != null ? dateDebut.toLocalDate() : null; }
 
     @Override
     public String toString() {

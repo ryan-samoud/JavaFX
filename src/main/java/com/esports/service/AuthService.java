@@ -1,6 +1,7 @@
 package com.esports.service;
 
 import com.esports.model.User;
+import com.esports.utils.PasswordUtil;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,7 +19,6 @@ public class AuthService {
         if (password == null || password.isBlank())
             return AuthResult.failure("Mot de passe vide");
 
-        // Check any user (including banned/suspended) first
         Optional<User> anyOpt = userService.findByEmailAny(email);
 
         if (anyOpt.isEmpty())
@@ -26,14 +26,12 @@ public class AuthService {
 
         User user = anyOpt.get();
 
-        if (!user.getPassword().equals(password))
+        if (!PasswordUtil.verify(password, user.getPassword()))
             return AuthResult.failure("Mot de passe incorrect");
 
-        // Banned
         if (user.isBanned())
             return AuthResult.banned(user.getBanReason());
 
-        // Suspended
         if (user.isSuspended())
             return AuthResult.suspended(user.getBanReason(), user.getSuspendedUntil());
 
@@ -42,13 +40,20 @@ public class AuthService {
         return AuthResult.success(user);
     }
 
+    public AuthResult loginByEmail(String email) {
+        Optional<User> opt = userService.findByEmailAny(email);
+        if (opt.isEmpty()) return AuthResult.failure("Utilisateur introuvable");
+        User user = opt.get();
+        if (user.isBanned())    return AuthResult.banned(user.getBanReason());
+        if (user.isSuspended()) return AuthResult.suspended(user.getBanReason(), user.getSuspendedUntil());
+        currentUser = user;
+        return AuthResult.success(user);
+    }
+
     public static User getCurrentUser() { return currentUser; }
     public static boolean isLoggedIn()  { return currentUser != null; }
     public static void logout()         { currentUser = null; }
 
-    // ─────────────────────────────────────────────────────
-    // RESULT
-    // ─────────────────────────────────────────────────────
     public static class AuthResult {
 
         public enum Status { SUCCESS, FAILURE, BANNED, SUSPENDED }

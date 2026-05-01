@@ -13,6 +13,9 @@ module com.esports {
     requires java.net.http;
     requires org.json;
     requires jdk.jsobject;
+    requires jbcrypt;
+    requires java.mail;
+    requires webcam.capture;
 
     // iText7 PDF (automatic modules)
     requires kernel;

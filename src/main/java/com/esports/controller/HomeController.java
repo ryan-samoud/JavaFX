@@ -48,25 +48,21 @@ public class HomeController implements Initializable {
         }
     }
 
-    // ================= CONNEXION → page dédiée =================
     @FXML
     private void onLogin() {
         navigateTo("/com/esports/fxml/LoginView.fxml", "Connexion");
     }
 
-    // ================= PROFILE =================
     @FXML
     private void onProfile() {
         navigateTo("/com/esports/fxml/ProfileView.fxml", "Mon Profil");
     }
 
-    // ================= ADMIN =================
     @FXML
     private void onAdminBackoffice() {
         navigateTo("/com/esports/fxml/MainView.fxml", "Admin Dashboard");
     }
 
-    // ================= NAVIGATION =================
     @FXML
     private void onRegister() {
         navigateTo("/com/esports/fxml/RegisterView.fxml", "Inscription");
@@ -83,27 +79,24 @@ public class HomeController implements Initializable {
     }
 
     @FXML
-    private void onViewEvents() { navigateTo("/com/esports/fxml/EvenementsPublicView.fxml", "Événements");}
+    private void onViewEvents() { navigateTo("/com/esports/fxml/EvenementsPublicView.fxml", "Événements"); }
 
     @FXML
     private void onShop() {
-        navigateTo("/com/esports/fxml/ShopView.fxml", "Shop");
+        navigateTo("/com/esports/fxml/ShopPublicView.fxml", "Shop");
     }
 
-    // ================= LOGOUT =================
     @FXML
     private void onLogout() {
         AuthService.logout();
         showLoggedOutNavbar();
     }
 
-    // ================= HOME =================
     @FXML
     private void onHome() {
         navigateTo("/com/esports/fxml/HomeView.fxml", "NEXUS ESPORTS");
     }
 
-    // ================= PLACEHOLDERS =================
     @FXML private void onForgotPassword()      {}
     @FXML private void onFollowTournament()    {}
     @FXML private void onRegisterTournament()  {}
@@ -120,12 +113,10 @@ public class HomeController implements Initializable {
     @FXML private void onAddToCart3()          {}
     @FXML private void onAddToCart4()          {}
 
-    // ================= NAVIGATION CORE =================
     private void navigateTo(String fxmlPath, String title) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
-            // Utiliser le premier noeud disponible dans la scène
             javafx.scene.Node anchor = (hboxUserNav != null && hboxUserNav.getScene() != null)
                     ? hboxUserNav : btnConnexion;
             Stage stage = (Stage) anchor.getScene().getWindow();
@@ -138,13 +129,11 @@ public class HomeController implements Initializable {
         }
     }
 
-    // ================= NAVBAR STATE =================
     private void showLoggedInNavbar(String name, boolean isAdmin) {
         if (hboxUserNav != null)    { hboxUserNav.setVisible(true);    hboxUserNav.setManaged(true); }
         if (lblConnectedUser != null) lblConnectedUser.setText("✔ " + name);
         if (lblAvatar != null && AuthService.getCurrentUser() != null) {
-            User u = AuthService.getCurrentUser();
-            setAvatar(u);
+            setAvatar(AuthService.getCurrentUser());
         }
         if (btnDeconnexion != null) { btnDeconnexion.setVisible(true);  btnDeconnexion.setManaged(true); }
         if (btnConnexion   != null) { btnConnexion.setVisible(false);   btnConnexion.setManaged(false); }
@@ -181,7 +170,6 @@ public class HomeController implements Initializable {
                 }
             } catch (Exception ignored) {}
         }
-        // Fallback: initials
         lblAvatar.setGraphic(null);
         lblAvatar.setText(getInitials(u.getNom(), u.getPrenom()));
         lblAvatar.setStyle(
