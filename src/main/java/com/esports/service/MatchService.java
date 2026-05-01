@@ -2,11 +2,11 @@ package com.esports.service;
 
 import com.esports.interfaces.IMatchService;
 import com.esports.model.Match;
+import com.esports.model.ParticipantRanking;
 import com.esports.utils.DatabaseConnection;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MatchService implements IMatchService {
 
@@ -100,6 +100,37 @@ public class MatchService implements IMatchService {
             }
         } catch (SQLException e) { System.err.println("[MatchService] findById : " + e.getMessage()); }
         return null;
+    }
+
+    @Override
+    public List<ParticipantRanking> getLeaderboard(int tid) {
+        List<Match> matches = findByTournamentId(tid);
+        Map<String, ParticipantRanking> stats = new HashMap<>();
+
+        for (Match m : matches) {
+            if (!"TERMINE".equals(m.getStatut())) continue;
+
+            ParticipantRanking p1 = stats.computeIfAbsent(m.getNomJoueur1(), ParticipantRanking::new);
+            ParticipantRanking p2 = stats.computeIfAbsent(m.getNomJoueur2(), ParticipantRanking::new);
+
+            p1.addMatchPlayed(); p2.addMatchPlayed();
+            p1.addGoalsFor(m.getScoreJoueur1()); p1.addGoalsAgainst(m.getScoreJoueur2());
+            p2.addGoalsFor(m.getScoreJoueur2()); p2.addGoalsAgainst(m.getScoreJoueur1());
+
+            if (m.getScoreJoueur1() > m.getScoreJoueur2()) {
+                p1.addWin(); p2.addLoss();
+            } else if (m.getScoreJoueur1() < m.getScoreJoueur2()) {
+                p1.addLoss(); p2.addWin();
+            } else {
+                p1.addDraw(); p2.addDraw();
+            }
+        }
+
+        List<ParticipantRanking> result = new ArrayList<>(stats.values());
+        result.sort(Comparator.comparing(ParticipantRanking::getPoints)
+                .thenComparing(ParticipantRanking::getGoalDifference)
+                .reversed());
+        return result;
     }
 
     private Match map(ResultSet rs) throws SQLException {
