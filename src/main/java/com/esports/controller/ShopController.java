@@ -123,9 +123,12 @@ public class ShopController implements Initializable {
     @FXML
     private void onPredirePrix() {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("com/esports/fxml/PrixPredicteurView.fxml")
-            );
+            URL fxmlUrl = getClass().getResource("/com/esports/fxml/PrixPredicteurView.fxml");
+            if (fxmlUrl == null) {
+                System.out.println("[ERROR] PrixPredicteurView.fxml introuvable !");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
             Stage stage = (Stage) btnPredirePrix.getScene().getWindow();
             stage.setScene(new Scene(root));

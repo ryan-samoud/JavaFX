@@ -50,12 +50,12 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Pour les graphiques (charts) si besoin -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
@@ -69,15 +69,6 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Pour jouer des médias (vidéo/audio) — décommentez si nécessaire -->
-        <!--
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-        -->
-
         <!-- ── Base de données MySQL ────────────────────────────── -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -85,15 +76,7 @@
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- ── BCrypt — hachage de mots de passe (recommandé) ───── -->
-        <!--
-             Pour activer BCrypt dans AuthService.java :
-             1. Décommentez cette dépendance
-             2. Remplacez hashPassword() par :
-                  BCrypt.hashpw(password, BCrypt.gensalt(12))
-             3. Remplacez checkPassword() par :
-                  BCrypt.checkpw(rawPassword, storedHash)
-        -->
+        <!-- ── BCrypt — hachage de mots de passe ───────────────── -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
@@ -168,22 +151,20 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <!-- Module/MainClass format required for modular projects -->
-                    <mainClass>com.esports/com.esports.MainApp</mainClass>
                     <mainClass>com.esports.MainApp</mainClass>
                     <options>
                         <option>-Dprism.order=sw</option>
+                        <option>-Xms128m</option>
+                        <option>-Xmx512m</option>
+                        <option>-XX:ReservedCodeCacheSize=128m</option>
+                        <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                        <option>--add-modules=java.net.http</option>
                     </options>
                 </configuration>
                 <executions>
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.esports/com.esports.MainApp</mainClass>
-                            <options>
-                                <option>-Dprism.order=sw</option>
-                                <option>--patch-module</option>
-                                <option>opencv=${settings.localRepository}/org/bytedeco/opencv/4.7.0-1.5.9/opencv-4.7.0-1.5.9-windows-x86_64.jar</option>
                             <mainClass>com.esports.MainApp</mainClass>
                             <options>
                                 <option>-Dprism.order=sw</option>
@@ -191,6 +172,7 @@
                                 <option>-Xmx512m</option>
                                 <option>-XX:ReservedCodeCacheSize=128m</option>
                                 <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                                <option>--add-modules=java.net.http</option>
                             </options>
                         </configuration>
                     </execution>
@@ -208,8 +190,7 @@
                         <goals><goal>shade</goal></goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation=
-                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.esports.MainApp</mainClass>
                                 </transformer>
                             </transformers>
