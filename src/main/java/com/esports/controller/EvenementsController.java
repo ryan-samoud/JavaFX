@@ -596,7 +596,6 @@ public class EvenementsController implements Initializable {
                 "-fx-control-inner-background: #1a1035;";
     }
 
-    // FIX: description label — same style as all other labels
     private Label formLabel(String text) {
         Label l = new Label(text);
         l.setStyle("-fx-text-fill: #c4b5fd; -fx-font-size: 11px; -fx-font-weight: bold;" +
@@ -714,7 +713,6 @@ public class EvenementsController implements Initializable {
                 Label dateLabel = new Label(c.getCreatedAt() != null ? c.getCreatedAt().format(fmt) : "");
                 dateLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 10px; -fx-font-family: 'Courier New';");
 
-                // Approve button
                 Button btnApprove = new Button("✓ Approuver");
                 btnApprove.setStyle("-fx-background-color: rgba(74,222,128,0.15); -fx-text-fill: #4ade80;" +
                         "-fx-border-color: rgba(74,222,128,0.3); -fx-border-width: 1;" +
@@ -731,7 +729,6 @@ public class EvenementsController implements Initializable {
                     }
                 });
 
-                // Delete button
                 Button btnDel = new Button("🗑 Supprimer");
                 btnDel.setStyle("-fx-background-color: rgba(239,68,68,0.15); -fx-text-fill: #f87171;" +
                         "-fx-border-color: rgba(239,68,68,0.3); -fx-border-width: 1;" +

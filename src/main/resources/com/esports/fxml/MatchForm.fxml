@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.esports.controller.MatchFormController"
+      style="-fx-background-color: #0d0b21; -fx-padding: 30; -fx-border-color: #3b2b5a; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10;"
+      prefWidth="450">
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Rectangle width="4" height="24" arcWidth="2" arcHeight="2" style="-fx-fill: #ffaa00;"/>
+        <Label fx:id="lblTitle" text="AJOUTER / MODIFIER MATCH"
+               style="-fx-text-fill: white; -fx-font-family: 'Courier New'; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <VBox spacing="15">
+        <VBox spacing="5">
+            <Label text="Tournoi :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+            <ComboBox fx:id="comboTournoi" maxWidth="Infinity" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Round (min 5 chars) :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+            <TextField fx:id="fieldRound" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+            <Label fx:id="errRound" text="Minimum 5 caractères" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Date (&gt;= aujourd'hui) / Heure :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+            <HBox spacing="10">
+                <DatePicker fx:id="datePicker" prefWidth="150" style="-fx-background-color: #1a1635;"/>
+                <TextField fx:id="fieldTime" promptText="HH:mm" prefWidth="80" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+            </HBox>
+            <Label fx:id="errDate" text="La date doit être future ou égale à aujourd'hui" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Statut :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+            <ComboBox fx:id="comboStatut" maxWidth="Infinity" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+        </VBox>
+        <HBox spacing="15">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Joueur 1 (min 5 chars) :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+                <HBox spacing="5">
+                    <TextField fx:id="fieldJoueur1" HBox.hgrow="ALWAYS" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+                    <TextField fx:id="fieldScore1" prefWidth="50" promptText="0" style="-fx-background-color: #1a1635; -fx-text-fill: #00b8ff; -fx-border-color: #3b2b5a;"/>
+                </HBox>
+                <Label fx:id="errJoueur1" text="Min 5 caractères" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Joueur 2 (min 5 chars) :" style="-fx-text-fill: #7c6fa8; -fx-font-family: 'Courier New';"/>
+                <HBox spacing="5">
+                    <TextField fx:id="fieldJoueur2" HBox.hgrow="ALWAYS" style="-fx-background-color: #1a1635; -fx-text-fill: white; -fx-border-color: #3b2b5a;"/>
+                    <TextField fx:id="fieldScore2" prefWidth="50" promptText="0" style="-fx-background-color: #1a1635; -fx-text-fill: #00ff9d; -fx-border-color: #3b2b5a;"/>
+                </HBox>
+                <Label fx:id="errJoueur2" text="Min 5 caractères" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+            </VBox>
+        </HBox>
+        <Label fx:id="errScores" text="Les scores doivent être des chiffres" visible="false" style="-fx-text-fill: #ff4757; -fx-font-size: 10px;"/>
+    </VBox>
+
+    <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 20 0 0 0;">
+        <Button text="Annuler" onAction="#onCancel"
+                style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8; -fx-cursor: hand;"/>
+        <Button fx:id="btnSave" text="Enregistrer" onAction="#onSave"
+                style="-fx-background-color: linear-gradient(to right, #ffaa00, #ff5500); -fx-text-fill: #0a0a0f; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 10 30 10 30; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox spacing="0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.esports.controller.UserInscriptionsController"
+      style="-fx-background-color: #0d0b1e; -fx-min-width: 900; -fx-min-height: 600;">
+
+    <!-- Sub Header -->
+    <HBox style="-fx-background-color: linear-gradient(to right, #1a1635, #0d0b1e); -fx-padding: 30 50; -fx-border-color: transparent transparent #3b2b5a transparent; -fx-border-width: 0 0 1 0;">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="MES INSCRIPTIONS" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold; -fx-letter-spacing: 2px;"/>
+            <Label text="Gérez vos participations aux tournois NexUS" style="-fx-text-fill: #7c6fa8; -fx-font-size: 14px;"/>
+        </VBox>
+        <Button text="← Retour aux tournois" onAction="#onBack" 
+                style="-fx-background-color: transparent; -fx-text-fill: #a855f7; -fx-cursor: hand; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+        <VBox fx:id="inscriptionsList" spacing="15" style="-fx-padding: 40 50;">
+            <!-- Rows injected by controller -->
+        </VBox>
+    </ScrollPane>
+
+</VBox>
