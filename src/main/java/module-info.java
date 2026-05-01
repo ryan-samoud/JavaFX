@@ -27,7 +27,7 @@ module com.esports {
     requires com.google.zxing.javase;
     requires com.sothawo.mapjfx;
     requires org.slf4j;
-    requires jSerialComm;
+    requires com.fazecast.jSerialComm;
 
     opens com.esports to javafx.fxml;
     opens com.esports.controller to javafx.fxml, javafx.web;
