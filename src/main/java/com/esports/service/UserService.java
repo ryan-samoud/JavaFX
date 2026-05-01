@@ -11,19 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * SERVICE — UserService.java
- * Couche Modèle (MVC) : logique métier + accès aux données pour les utilisateurs.
- */
 public class UserService implements IUserService {
 
     public UserService() {
         ensureColumns();
     }
 
-    // ─────────────────────────────
-    // SCHEMA MIGRATION
-    // ─────────────────────────────
     private void ensureColumns() {
         try (Connection conn = DatabaseConnection.getInstance();
              Statement stmt = conn.createStatement()) {
@@ -46,9 +39,6 @@ public class UserService implements IUserService {
         }
     }
 
-    // ─────────────────────────────
-    // FIND BY EMAIL (active only)
-    // ─────────────────────────────
     public Optional<User> findByEmail(String email) {
         String sql = "SELECT * FROM user WHERE email = ? AND is_active = 1";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -62,9 +52,6 @@ public class UserService implements IUserService {
         return Optional.empty();
     }
 
-    // ─────────────────────────────
-    // FIND BY EMAIL (any status)
-    // ─────────────────────────────
     public Optional<User> findByEmailAny(String email) {
         String sql = "SELECT * FROM user WHERE email = ?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -78,9 +65,6 @@ public class UserService implements IUserService {
         return Optional.empty();
     }
 
-    // ─────────────────────────────
-    // FIND ALL ACTIVE USERS
-    // ─────────────────────────────
     public List<User> findAll() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM user WHERE is_active = 1";
@@ -94,9 +78,6 @@ public class UserService implements IUserService {
         return list;
     }
 
-    // ─────────────────────────────
-    // FIND ALL USERS (incl. banned/suspended)
-    // ─────────────────────────────
     public List<User> findAllUsers() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM user ORDER BY date_creation DESC";
@@ -110,9 +91,6 @@ public class UserService implements IUserService {
         return list;
     }
 
-    // ─────────────────────────────
-    // FIND RECENT USERS
-    // ─────────────────────────────
     public List<User> findRecent(int limit) {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM user WHERE is_active = 1 ORDER BY date_creation DESC LIMIT ?";
@@ -127,9 +105,6 @@ public class UserService implements IUserService {
         return list;
     }
 
-    // ─────────────────────────────
-    // COUNT ACTIVE USERS
-    // ─────────────────────────────
     public int countActive() {
         String sql = "SELECT COUNT(*) FROM user WHERE is_active = 1";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -142,9 +117,6 @@ public class UserService implements IUserService {
         return 0;
     }
 
-    // ─────────────────────────────
-    // SAVE NEW USER
-    // ─────────────────────────────
     public boolean save(User user) {
         String sql = "INSERT INTO user (nom, prenom, email, age, role, password, is_active, date_creation) " +
                      "VALUES (?, ?, ?, ?, ?, ?, 1, NOW())";
@@ -155,11 +127,10 @@ public class UserService implements IUserService {
             stmt.setString(3, user.getEmail());
             stmt.setInt(4,    user.getAge());
             stmt.setString(5, user.getRole());
-            // Hash password if not already hashed
             String pwd = PasswordUtil.isHashed(user.getPassword())
                     ? user.getPassword()
                     : PasswordUtil.hash(user.getPassword());
-            stmt.setString(6, pwd); //injection
+            stmt.setString(6, pwd);
             return stmt.executeUpdate() > 0;
         } catch (Exception e) {
             System.err.println("[UserService] save: " + e.getMessage());
@@ -167,9 +138,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // UPDATE USER
-    // ─────────────────────────────
     public boolean update(User user) {
         String sql = "UPDATE user SET nom=?, prenom=?, email=?, age=?, password=?, photo=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -191,9 +159,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // DEACTIVATE USER (soft delete)
-    // ─────────────────────────────
     public boolean deactivate(int id) {
         String sql = "UPDATE user SET is_active = 0 WHERE id = ?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -206,9 +171,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // BAN USER (permanent)
-    // ─────────────────────────────
     public boolean ban(int id, String reason) {
         String sql = "UPDATE user SET is_active=0, ban_reason=?, suspended_until=NULL WHERE id=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -222,9 +184,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // UNBAN USER
-    // ─────────────────────────────
     public boolean unban(int id) {
         String sql = "UPDATE user SET is_active=1, ban_reason=NULL, suspended_until=NULL WHERE id=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -237,9 +196,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // SUSPEND USER (temporary)
-    // ─────────────────────────────
     public boolean suspend(int id, LocalDateTime until, String reason) {
         String sql = "UPDATE user SET is_active=0, suspended_until=?, ban_reason=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -254,9 +210,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // PASSWORD RESET — save token
-    // ─────────────────────────────
     public boolean saveResetToken(String email, String token, LocalDateTime expiry) {
         String sql = "UPDATE user SET reset_token=?, reset_token_expiry=? WHERE email=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -271,10 +224,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // PASSWORD RESET — find by token (not expired)
-    // Expiry is checked in Java to avoid MySQL NOW() timezone issues.
-    // ─────────────────────────────
     public Optional<User> findByResetToken(String token) {
         String sql = "SELECT * FROM user WHERE reset_token=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -296,9 +245,6 @@ public class UserService implements IUserService {
         return Optional.empty();
     }
 
-    // ─────────────────────────────
-    // PASSWORD RESET — clear token after use
-    // ─────────────────────────────
     public boolean clearResetToken(int userId) {
         String sql = "UPDATE user SET reset_token=NULL, reset_token_expiry=NULL WHERE id=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -311,9 +257,6 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // PASSWORD RESET — update password only
-    // ─────────────────────────────
     public boolean updatePassword(int userId, String hashedPassword) {
         String sql = "UPDATE user SET password=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getInstance();
@@ -327,18 +270,14 @@ public class UserService implements IUserService {
         return false;
     }
 
-    // ─────────────────────────────
-    // MAPPING DB → JAVA
-    // ─────────────────────────────
     private User map(ResultSet rs) throws SQLException {
         Timestamp ts  = rs.getTimestamp("date_creation");
         Timestamp sus = null;
         String banReason = null;
-        try { sus = rs.getTimestamp("suspended_until"); } catch (SQLException ignored) {}
-        try { banReason = rs.getString("ban_reason"); }   catch (SQLException ignored) {}
-
-        String faceData = null;
-        try { faceData = rs.getString("face_data"); } catch (SQLException ignored) {}
+        String faceData  = null;
+        try { sus      = rs.getTimestamp("suspended_until"); } catch (SQLException ignored) {}
+        try { banReason = rs.getString("ban_reason"); }        catch (SQLException ignored) {}
+        try { faceData  = rs.getString("face_data"); }         catch (SQLException ignored) {}
 
         User user = new User(
                 rs.getInt("id"),

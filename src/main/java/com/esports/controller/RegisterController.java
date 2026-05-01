@@ -16,7 +16,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
@@ -48,7 +47,7 @@ public class RegisterController implements Initializable {
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[\\w.+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$");
 
-    private final UserService   userService = new UserService();
+    private final UserService    userService    = new UserService();
     private final TypingProfiler typingProfiler = new TypingProfiler();
 
     @Override
@@ -150,7 +149,6 @@ public class RegisterController implements Initializable {
             return;
         }
 
-        //mail comp ── Envoi async ─────────────────────────────────────────────
         btnRegister.setDisable(true);
         btnRegister.setText("Inscription...");
 

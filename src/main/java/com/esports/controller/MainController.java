@@ -30,6 +30,7 @@ public class MainController implements Initializable {
     @FXML private Button btnDashboard;
     @FXML private Button btnUsers;
     @FXML private Button btnTournaments;
+    @FXML private Button btnMatches;
     @FXML private Button btnTeams;
     @FXML private Button btnShop;
     @FXML private Button btnEvents;
@@ -72,6 +73,11 @@ public class MainController implements Initializable {
     @FXML
     private void onTournaments() {
         navigate("/com/esports/fxml/TournamentsView.fxml", btnTournaments);
+    }
+
+    @FXML
+    private void onMatches() {
+        navigate("/com/esports/fxml/MatchesView.fxml", btnMatches);
     }
 
     @FXML

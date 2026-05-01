@@ -69,6 +69,7 @@ public class User {
     public String getPhoto()                 { return photo; }
     public String getBanReason()             { return banReason; }
     public LocalDateTime getSuspendedUntil() { return suspendedUntil; }
+    public String getFaceData()              { return faceData; }
 
     // SETTERS
     public void setNom(String nom)                     { this.nom = nom; }
@@ -81,9 +82,7 @@ public class User {
     public void setActive(boolean active)              { this.isActive = active; }
     public void setBanReason(String banReason)         { this.banReason = banReason; }
     public void setSuspendedUntil(LocalDateTime t)     { this.suspendedUntil = t; }
-
-    public String getFaceData()                  { return faceData; }
-    public void setFaceData(String faceData)     { this.faceData = faceData; }
+    public void setFaceData(String faceData)           { this.faceData = faceData; }
 
     public boolean isAdmin() {
         return "admin".equalsIgnoreCase(role);
