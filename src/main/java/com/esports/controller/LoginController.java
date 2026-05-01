@@ -366,6 +366,11 @@ public class LoginController implements Initializable {
     }
 
     @FXML
+    private void onOpenDoc() {
+        navigateTo("/com/esports/fxml/DocumentationView.fxml", "Documentation");
+    }
+
+    @FXML
     private void onBack() { goHome(); }
 
     @FXML

@@ -6,6 +6,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!--  Identité du projet                                       -->
+    <!-- ══════════════════════════════════════════════════════════ -->
     <groupId>com.esports</groupId>
     <artifactId>nexus-esports</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -14,24 +17,26 @@
     <name>NEXUS ESPORTS</name>
     <description>Plateforme de gestion de tournois esports — JavaFX 17 + MySQL</description>
 
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!--  Propriétés globales                                      -->
+    <!-- ══════════════════════════════════════════════════════════ -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <javafx.version>21.0.2</javafx.version>
+        <!-- Versions centralisées -->
+        <javafx.version>17.0.10</javafx.version>
         <mysql.version>8.3.0</mysql.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <junit.version>5.10.2</junit.version>
+        <itext.version>8.0.4</itext.version>
+        <zxing.version>3.5.3</zxing.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>gluonhq</id>
-            <url>https://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
-        </repository>
-    </repositories>
-
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!--  Dépendances                                              -->
+    <!-- ══════════════════════════════════════════════════════════ -->
     <dependencies>
 
         <!-- ── JavaFX ───────────────────────────────────────────── -->
@@ -40,42 +45,30 @@
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
-        <!-- ── Webcam ───────────────────────────────────────────── -->
         <dependency>
-            <groupId>com.github.sarxos</groupId>
-            <artifactId>webcam-capture</artifactId>
-            <version>0.3.12</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javafx.version}</version>
         </dependency>
 
         <!-- ── Base de données MySQL ────────────────────────────── -->
@@ -85,7 +78,7 @@
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- ── BCrypt ───────────────────────────────────────────── -->
+        <!-- ── BCrypt — hachage de mots de passe ───────────────── -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
@@ -97,47 +90,6 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
-        </dependency>
-
-        <!-- ── iText7 — Génération PDF ──────────────────────────── -->
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>kernel</artifactId>
-            <version>7.2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>io</artifactId>
-            <version>7.2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>layout</artifactId>
-            <version>7.2.5</version>
-        </dependency>
-
-        <!-- ── SLF4J — requis par iText7 ───────────────────────── -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.12</version>
-        </dependency>
-
-        <!-- ── ZXing — QR Code Generation ──────────────────────── -->
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>3.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>javase</artifactId>
-            <version>3.5.3</version>
         </dependency>
 
         <!-- ── JSON ─────────────────────────────────────────────── -->
@@ -154,11 +106,59 @@
             <version>2.10.4</version>
         </dependency>
 
+        <!-- ── iText7 PDF ───────────────────────────────────────── -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
+
+        <!-- ── ZXing — QR Codes ─────────────────────────────────── -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+
         <!-- ── MapJFX ───────────────────────────────────────────── -->
         <dependency>
             <groupId>com.sothawo</groupId>
             <artifactId>mapjfx</artifactId>
             <version>3.1.0</version>
+        </dependency>
+
+        <!-- ── SLF4J ────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+
+        <!-- ── Webcam Capture — Face ID ────────────────────────── -->
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture</artifactId>
+            <version>0.3.12</version>
         </dependency>
 
         <!-- ── Tests — JUnit 5 ──────────────────────────────────── -->
@@ -191,6 +191,9 @@
 
     </dependencies>
 
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!--  Build                                                    -->
+    <!-- ══════════════════════════════════════════════════════════ -->
     <build>
         <plugins>
 
@@ -212,23 +215,28 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>com.esports/com.esports.MainApp</mainClass>
                     <mainClass>com.esports.MainApp</mainClass>
                     <options>
                         <option>-Dprism.order=sw</option>
+                        <option>-Xms128m</option>
+                        <option>-Xmx512m</option>
+                        <option>-XX:ReservedCodeCacheSize=128m</option>
+                        <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                        <option>--add-modules=java.net.http</option>
                     </options>
                 </configuration>
                 <executions>
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.esports/com.esports.MainApp</mainClass>
+                            <mainClass>com.esports.MainApp</mainClass>
                             <options>
                                 <option>-Dprism.order=sw</option>
                                 <option>-Xms128m</option>
                                 <option>-Xmx512m</option>
                                 <option>-XX:ReservedCodeCacheSize=128m</option>
                                 <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                                <option>--add-modules=java.net.http</option>
                             </options>
                         </configuration>
                     </execution>
@@ -246,8 +254,7 @@
                         <goals><goal>shade</goal></goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation=
-                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.esports.MainApp</mainClass>
                                 </transformer>
                             </transformers>

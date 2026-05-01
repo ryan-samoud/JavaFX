@@ -3,10 +3,9 @@ package com.esports.service;
 import com.esports.model.Produit;
 
 import java.io.File;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,10 +14,9 @@ public class VisionService {
 
     // ---------------------------------------------------------------
     // Imagga API — gratuit 1000 req/mois sans CB
-    // Créer un compte sur https://imagga.com pour obtenir ces valeurs
     // ---------------------------------------------------------------
-    private static final String IMAGGA_KEY    = "acc_855653444bac5bf";            // <-- remplacer
-    private static final String IMAGGA_SECRET = "54ffc11e17cf7d92fe47a2d0835509f9"; // <-- remplacer
+    private static final String IMAGGA_KEY    = "acc_855653444bac5bf";
+    private static final String IMAGGA_SECRET = "54ffc11e17cf7d92fe47a2d0835509f9";
     private static final String IMAGGA_URL    = "https://api.imagga.com/v2/tags";
 
     // Score minimum Imagga (0 à 100)
@@ -69,7 +67,7 @@ public class VisionService {
     }
 
     // -------------------------------------------------------------------------
-    // Appel Imagga API
+    // Appel Imagga API via HttpURLConnection (compatible sans module-info)
     // -------------------------------------------------------------------------
 
     public List<String> analyserImage(File imageFile) {
@@ -84,32 +82,40 @@ public class VisionService {
             String credentials = Base64.getEncoder()
                     .encodeToString((IMAGGA_KEY + ":" + IMAGGA_SECRET).getBytes());
 
-            // Corps multipart avec l'image encodée en base64
+            // Corps multipart
             String boundary = "----ImaggaBoundary" + System.currentTimeMillis();
-            String body = "--" + boundary + "\r\n"
+            String bodyStr = "--" + boundary + "\r\n"
                     + "Content-Disposition: form-data; name=\"image_base64\"\r\n\r\n"
                     + base64Image + "\r\n"
                     + "--" + boundary + "--\r\n";
+            byte[] bodyBytes = bodyStr.getBytes();
 
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(IMAGGA_URL))
-                    .header("Authorization", "Basic " + credentials)
-                    .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build();
+            // Connexion HTTP
+            URL url = new URL(IMAGGA_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "Basic " + credentials);
+            conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+            conn.setRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
 
-            HttpResponse<String> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofString());
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(bodyBytes);
+            }
 
-            System.out.println("[VISION] Status: " + response.statusCode());
+            int statusCode = conn.getResponseCode();
+            System.out.println("[VISION] Status: " + statusCode);
 
-            if (response.statusCode() == 200) {
-                labels = parseLabelsImagga(response.body());
+            if (statusCode == 200) {
+                String responseBody = new String(conn.getInputStream().readAllBytes());
+                labels = parseLabelsImagga(responseBody);
                 System.out.println("[VISION] Labels retenus (confidence >= " + SCORE_MIN + "): " + labels);
             } else {
-                System.out.println("[VISION] ERREUR API Imagga: " + response.body());
+                String errorBody = new String(conn.getErrorStream().readAllBytes());
+                System.out.println("[VISION] ERREUR API Imagga: " + errorBody);
             }
+
+            conn.disconnect();
 
         } catch (Exception e) {
             System.out.println("[VISION] ERREUR: " + e.getMessage());
@@ -120,25 +126,21 @@ public class VisionService {
 
     // -------------------------------------------------------------------------
     // Parsing réponse Imagga
-    // Format : {"result":{"tags":[{"confidence":99.5,"tag":{"en":"keyboard","fr":"..."}},...]}}
     // -------------------------------------------------------------------------
 
     private List<String> parseLabelsImagga(String json) {
         List<String> labels = new ArrayList<>();
         try {
-            // Découper sur chaque "en": pour récupérer les labels anglais
             String[] parts = json.split("\"en\":");
             for (int i = 1; i < parts.length; i++) {
                 String part = parts[i].trim();
                 if (!part.startsWith("\"")) continue;
 
-                // Extraire le label
                 int end = part.indexOf("\"", 1);
                 if (end < 1) continue;
                 String label = part.substring(1, end).toLowerCase().trim();
                 if (label.isBlank() || label.length() < 3) continue;
 
-                // La confidence est dans le bloc AVANT "en": (Imagga : confidence -> tag -> en)
                 String before = parts[i - 1];
                 double confidence = extraireConfidence(before);
 
@@ -161,10 +163,6 @@ public class VisionService {
         return labels;
     }
 
-    /**
-     * Cherche "confidence": X.XX dans la fin du fragment précédant le label.
-     * Imagga place confidence avant le champ "en" dans chaque objet tag.
-     */
     private double extraireConfidence(String fragment) {
         try {
             int idx = fragment.lastIndexOf("\"confidence\":");
