@@ -2,6 +2,7 @@ package com.esports.controller;
 
 import com.esports.interfaces.IMatchService;
 import com.esports.model.Match;
+import com.esports.service.ArduinoService;
 import com.esports.service.MatchService;
 import com.esports.utils.AlertUtils;
 
@@ -101,7 +102,13 @@ public class MatchesController implements Initializable {
         de.setStyle("-fx-background-color: transparent; -fx-text-fill: #ff4757; -fx-border-color: #ff4757; -fx-border-radius: 5; -fx-cursor: hand;");
         ed.setOnAction(e -> onEditMatch(m));
         de.setOnAction(e -> onDeleteMatch(m));
-        actions.getChildren().addAll(ed, de);
+        Button btnLCD = new Button("Voir LCD");
+        btnLCD.setStyle("-fx-background-color: transparent; -fx-text-fill: #ec4899; -fx-border-color: #ec4899; -fx-border-radius: 5; -fx-cursor: hand;");
+        btnLCD.setOnAction(e -> {
+            String msg = "M:" + m.getNomJoueur1() + " " + m.getScoreJoueur1() + "-" + m.getScoreJoueur2() + " " + m.getNomJoueur2();
+            ArduinoService.getInstance().sendData(msg);
+        });
+        actions.getChildren().addAll(ed, de, btnLCD);
         
         card.getChildren().addAll(header, scoreRow, actions);
         card.setOnMouseEntered(e -> card.setStyle("-fx-background-color: #161630; -fx-border-color: #ffaa00; -fx-border-width: 2; -fx-border-radius: 12;"));
