@@ -28,6 +28,7 @@ module com.esports {
     requires com.sothawo.mapjfx;
     requires org.slf4j;
     requires com.fazecast.jSerialComm;
+    requires org.apache.pdfbox;
 
     opens com.esports to javafx.fxml;
     opens com.esports.controller to javafx.fxml;
