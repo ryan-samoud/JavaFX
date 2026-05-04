@@ -48,7 +48,7 @@ public class EventDetailsController {
 
     // Bad words list — extend as needed
     private static final Set<String> BAD_WORDS = Set.of(
-            "idiot", "stupide", "nul", "merde", "putain", "connard", "imbecile",
+            "idiot", "stupide", "nul", "merde", "putain", "connard", "imbecile","xyz",
             "crétin", "salaud", "enculé", "con", "batard", "pd", "fdp",
             "shit", "fuck", "asshole", "bastard", "bitch", "crap", "damn"
     );

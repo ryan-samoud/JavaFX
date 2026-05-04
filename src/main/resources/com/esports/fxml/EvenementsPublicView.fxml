@@ -42,6 +42,12 @@
                            -fx-border-color: transparent transparent #a855f7 transparent;
                            -fx-border-width: 0 0 2 0; -fx-padding: 7 14 5 14; -fx-background-radius: 6px;"/>
             <Button text="Connexion" onAction="#onBackHome" styleClass="btn-outline-sm"/>
+            <Button fx:id="btnTranslate" text="🌐 FR" onAction="#onToggleTranslation"
+                    style="-fx-background-color: rgba(74,222,128,0.12); -fx-text-fill: #4ade80;
+                           -fx-border-color: rgba(74,222,128,0.35); -fx-border-width: 1px;
+                           -fx-border-radius: 6px; -fx-background-radius: 6px;
+                           -fx-font-size: 13px; -fx-font-weight: bold;
+                           -fx-padding: 7 14 7 14; -fx-cursor: hand;"/>
         </HBox>
 
         <!-- ══════════════════════════════════════════ -->
@@ -54,13 +60,13 @@
             <HBox alignment="CENTER" spacing="10">
                 <Rectangle width="4" height="36" arcWidth="2" arcHeight="2"
                            style="-fx-fill: linear-gradient(to bottom, #a855f7, #ec4899);"/>
-                <Label text="ÉVÉNEMENTS"
+                <Label fx:id="lblHeroTitle" text="ÉVÉNEMENTS"
                        style="-fx-text-fill: white; -fx-font-size: 38px; -fx-font-weight: bold;
                               -fx-font-family: 'Arial Black';
                               -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.6), 20, 0.3, 0, 0);"/>
             </HBox>
 
-            <Label text="Découvrez et participez aux événements eSports NexUS"
+            <Label fx:id="lblHeroSub" text="Découvrez et participez aux événements eSports NexUS"
                    style="-fx-text-fill: #c4b5fd; -fx-font-size: 15px; -fx-padding: 0 0 8 0;"/>
 
             <HBox alignment="CENTER" spacing="12">
@@ -98,19 +104,19 @@
             <VBox alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
                 <Label fx:id="lblTotalCount" text="—"
                        style="-fx-text-fill: #a855f7; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
-                <Label text="Total" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
+                <Label text="Total" fx:id="lblStatTotal" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
             </VBox>
             <Rectangle width="1" height="36" style="-fx-fill: rgba(139,92,246,0.2);"/>
             <VBox alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
                 <Label fx:id="lblUpcomingCount" text="—"
                        style="-fx-text-fill: #4ade80; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
-                <Label text="À venir" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
+                <Label text="À venir" fx:id="lblStatUpcoming" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
             </VBox>
             <Rectangle width="1" height="36" style="-fx-fill: rgba(139,92,246,0.2);"/>
             <VBox alignment="CENTER" spacing="4" HBox.hgrow="ALWAYS">
                 <Label fx:id="lblPassedCount" text="—"
                        style="-fx-text-fill: #6b7280; -fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Arial Black';"/>
-                <Label text="Passés" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
+                <Label text="Passés" fx:id="lblStatPassed" style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;"/>
             </VBox>
         </HBox>
 
@@ -131,7 +137,7 @@
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <Circle radius="5"
                                 style="-fx-fill: #a855f7; -fx-effect: dropshadow(gaussian,rgba(168,85,247,0.8),8,0.4,0,0);"/>
-                        <Label text="À VENIR"
+                        <Label fx:id="lblSectionUpcoming" text="À VENIR"
                                style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold; -fx-letter-spacing: 2px;"/>
                     </HBox>
                     <FlowPane fx:id="paneUpcoming" hgap="18" vgap="18" prefWrapLength="9999"/>
@@ -141,7 +147,7 @@
                 <VBox spacing="12">
                     <HBox alignment="CENTER_LEFT" spacing="8">
                         <Circle radius="5" style="-fx-fill: #4b5563;"/>
-                        <Label text="PASSÉS"
+                        <Label fx:id="lblSectionPassed" text="PASSÉS"
                                style="-fx-text-fill: #4b5563; -fx-font-size: 13px; -fx-font-weight: bold; -fx-letter-spacing: 2px;"/>
                     </HBox>
                     <FlowPane fx:id="panePassed" hgap="18" vgap="18" prefWrapLength="9999"/>
