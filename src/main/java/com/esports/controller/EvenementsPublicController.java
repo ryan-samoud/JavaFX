@@ -261,7 +261,6 @@ public class EvenementsPublicController implements Initializable {
         Region bot = new Region(); VBox.setVgrow(bot, Priority.ALWAYS);
         content.getChildren().addAll(topRow, nom, lieu, date, desc, bot);
 
-        // ── Buttons ─────────────────────────────────────────
         Button btnDetails = new Button("Voir les détails");
         btnDetails.setStyle(outlineBtn());
         btnDetails.setOnAction(ev -> openDetails(e));
@@ -272,15 +271,13 @@ public class EvenementsPublicController implements Initializable {
                 "-fx-border-radius: 8px; -fx-background-radius: 8px;" +
                 "-fx-font-size: 12px; -fx-padding: 8 0 8 0; -fx-cursor: hand;");
         btnPredict.setOnAction(ev -> showPrediction(e));
-        HBox.setHgrow(btnPredict, Priority.ALWAYS);
-        btnPredict.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(btnPredict, Priority.ALWAYS); btnPredict.setMaxWidth(Double.MAX_VALUE);
 
         if (e.isPast()) {
             HBox.setHgrow(btnDetails, Priority.ALWAYS); btnDetails.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(btnPredict, Priority.ALWAYS); btnPredict.setMaxWidth(Double.MAX_VALUE);
             content.getChildren().add(new HBox(8, btnDetails, btnPredict));
         } else {
-            // Two buttons side by side for upcoming events
             boolean isParticipating = participatedEvents.contains(e.getId());
             Button btnPart = isParticipating ? new Button("Annuler") : new Button("Participer →");
             if (isParticipating) {
@@ -298,7 +295,6 @@ public class EvenementsPublicController implements Initializable {
             HBox.setHgrow(btnDetails, Priority.ALWAYS); btnDetails.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(btnPart,    Priority.ALWAYS); btnPart.setMaxWidth(Double.MAX_VALUE);
             content.getChildren().add(new HBox(8, btnDetails, btnPart));
-            // Prediction on its own row below
             content.getChildren().add(new HBox(btnPredict));
         }
 
@@ -319,8 +315,6 @@ public class EvenementsPublicController implements Initializable {
         if (hovered) s += "-fx-effect:dropshadow(gaussian," + borderColor + ",18,0.3,0,4);";
         return s;
     }
-
-    // ── Prediction popup ──────────────────────────────────────────
 
     private void showPrediction(Evenement e) {
         Eventpredictionengine.Prediction p = Eventpredictionengine.predict(e);
@@ -343,7 +337,6 @@ public class EvenementsPublicController implements Initializable {
         sep.setStyle("-fx-background-color: linear-gradient(to right, #7c3aed, rgba(236,72,153,0.4), transparent);");
         VBox.setMargin(sep, new Insets(4, 0, 4, 0));
 
-        // Stars
         double rating = p.rating;
         int fullStars = (int) rating;
         boolean halfStar = (rating - fullStars) >= 0.5;
@@ -357,7 +350,6 @@ public class EvenementsPublicController implements Initializable {
 
 
 
-        // Progress bar
         String barColor = rating >= 4.0 ? "#4ade80" : rating >= 2.5 ? "#f59e0b" : "#f87171";
         Region barFill = new Region();
         barFill.setPrefHeight(8);

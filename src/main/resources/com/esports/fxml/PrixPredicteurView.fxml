@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.esports.controller.PrixPredicteurController"
+           stylesheets="@../css/nexus.css">
+
+    <!-- Background -->
+    <Pane fx:id="backgroundPane" style="-fx-background-color: #0d0b1e;" />
+
+    <!-- Main ScrollPane -->
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                style="-fx-background: transparent; -fx-background-color: transparent; -fx-focus-color: transparent;">
+        <VBox spacing="0" style="-fx-background-color: transparent;">
+
+            <!-- ===== HEADER ===== -->
+            <HBox alignment="CENTER_LEFT" spacing="16"
+                  style="-fx-background-color: rgba(13,11,30,0.95); -fx-border-color: rgba(139,92,246,0.3); -fx-border-width: 0 0 1 0; -fx-padding: 18 32 18 32;">
+
+                <Button fx:id="btnRetour" text="← Retour" onAction="#onRetour"
+                        style="-fx-background-color: rgba(124,58,237,0.2); -fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8 16 8 16; -fx-background-radius: 8; -fx-border-color: rgba(168,85,247,0.4); -fx-border-radius: 8; -fx-cursor: hand;" />
+
+                <Label text="🤖" style="-fx-font-size: 28px;" />
+                <VBox spacing="2">
+                    <Label text="Prédicteur de Prix IA"
+                           style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                    <Label text="Régression linéaire multiple • Entraîné en Java pur"
+                           style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;" />
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Label text="NexUS Esports"
+                       style="-fx-text-fill: #a855f7; -fx-font-size: 14px; -fx-font-weight: bold;" />
+            </HBox>
+
+            <!-- ===== CONTENT ===== -->
+            <HBox spacing="24" style="-fx-padding: 28 32 28 32;" alignment="TOP_LEFT">
+
+                <!-- LEFT PANEL: Category + Form -->
+                <VBox spacing="20" HBox.hgrow="ALWAYS" style="-fx-min-width: 460px;">
+
+                    <!-- Category Selection Card -->
+                    <VBox spacing="14"
+                          style="-fx-background-color: rgba(20,17,43,0.9); -fx-border-color: rgba(139,92,246,0.22); -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 22 24 22 24;">
+                        <Label text="Catégorie de produit"
+                               style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold;" />
+                        <ComboBox fx:id="cbCategorie" onAction="#onCategorieChanged"
+                                  promptText="— Sélectionner une catégorie —"
+                                  maxWidth="Infinity"
+                                  style="-fx-background-color: rgba(139,92,246,0.1); -fx-border-color: rgba(139,92,246,0.4); -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8 12 8 12;" />
+                    </VBox>
+
+                    <!-- Dynamic Form Card -->
+                    <VBox fx:id="formCard" spacing="0"
+                          style="-fx-background-color: rgba(20,17,43,0.9); -fx-border-color: rgba(139,92,246,0.22); -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 22 24 22 24;"
+                          visible="false" managed="false">
+                        <Label text="Configuration du produit"
+                               style="-fx-text-fill: #a855f7; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 0 0 14 0;" />
+
+                        <!-- Dynamic fields container -->
+                        <VBox fx:id="dynamicFieldsContainer" spacing="16" />
+
+                        <!-- Predict Button -->
+                        <Button fx:id="btnPredire" text="✨ Prédire le Prix" onAction="#onPredire"
+                                maxWidth="Infinity"
+                                style="-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899); -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 13 0 13 0; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(168,85,247,0.5), 12, 0, 0, 3);">
+                            <VBox.margin>
+                                <Insets top="20" />
+                            </VBox.margin>
+                        </Button>
+                    </VBox>
+                </VBox>
+
+                <!-- RIGHT PANEL: Results -->
+                <VBox spacing="20" style="-fx-min-width: 340px; -fx-max-width: 380px;">
+
+                    <!-- Price Result Card -->
+                    <VBox fx:id="resultCard" spacing="0" alignment="CENTER"
+                          style="-fx-background-color: rgba(20,17,43,0.9); -fx-border-color: rgba(139,92,246,0.22); -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 28 24 28 24;"
+                          visible="false" managed="false">
+
+                        <Label text="💰 Prix Estimé"
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 13px; -fx-font-weight: bold;" />
+                        <Label fx:id="lblPrixPredit" text="—"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 42px; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(74,222,128,0.4), 15, 0, 0, 0);">
+                            <VBox.margin>
+                                <Insets top="8" bottom="4" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="lblUnite" text="DT"
+                               style="-fx-text-fill: #4ade80; -fx-font-size: 16px;" />
+
+                        <!-- Fourchette -->
+                        <VBox spacing="6" alignment="CENTER">
+                            <VBox.margin>
+                                <Insets top="20" />
+                            </VBox.margin>
+                            <Label text="Fourchette ± 15%"
+                                   style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" />
+                            <HBox spacing="12" alignment="CENTER">
+                                <VBox alignment="CENTER" spacing="2"
+                                      style="-fx-background-color: rgba(124,58,237,0.15); -fx-border-color: rgba(124,58,237,0.3); -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 14 8 14;">
+                                    <Label text="MIN"
+                                           style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" />
+                                    <Label fx:id="lblPrixMin" text="—"
+                                           style="-fx-text-fill: #a855f7; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                                </VBox>
+                                <Label text="—" style="-fx-text-fill: #9ca3af;" />
+                                <VBox alignment="CENTER" spacing="2"
+                                      style="-fx-background-color: rgba(236,72,153,0.15); -fx-border-color: rgba(236,72,153,0.3); -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 14 8 14;">
+                                    <Label text="MAX"
+                                           style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" />
+                                    <Label fx:id="lblPrixMax" text="—"
+                                           style="-fx-text-fill: #ec4899; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Separator -->
+                        <Separator style="-fx-background-color: rgba(139,92,246,0.2);">
+                            <VBox.margin>
+                                <Insets top="20" bottom="16" />
+                            </VBox.margin>
+                        </Separator>
+
+                        <!-- Ajouter à la boutique -->
+                        <Button fx:id="btnAjouter" text="🛒 Ajouter à la Boutique" onAction="#onAjouterBoutique"
+                                maxWidth="Infinity"
+                                style="-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899); -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 11 0 11 0; -fx-background-radius: 10; -fx-cursor: hand;" />
+                    </VBox>
+
+                    <!-- Config Summary Card -->
+                    <VBox fx:id="summaryCard" spacing="10"
+                          style="-fx-background-color: rgba(20,17,43,0.9); -fx-border-color: rgba(139,92,246,0.22); -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 20 22 20 22;"
+                          visible="false" managed="false">
+                        <Label text="📋 Résumé de la configuration"
+                               style="-fx-text-fill: #a855f7; -fx-font-size: 12px; -fx-font-weight: bold;" />
+                        <VBox fx:id="summaryContainer" spacing="6" />
+                    </VBox>
+
+                    <!-- Info Card (default state) -->
+                    <VBox fx:id="infoCard" spacing="14" alignment="CENTER"
+                          style="-fx-background-color: rgba(20,17,43,0.9); -fx-border-color: rgba(139,92,246,0.22); -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 32 24 32 24;">
+                        <Label text="🧠"
+                               style="-fx-font-size: 40px;" />
+                        <Label text="Prédiction par IA"
+                               style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" alignment="CENTER" wrapText="true" />
+                        <Label text="Sélectionnez une catégorie puis configurez les paramètres du produit pour obtenir une estimation de prix basée sur l'apprentissage automatique."
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 12px;" wrapText="true" alignment="CENTER"
+                               textAlignment="CENTER" />
+
+                        <VBox spacing="8" style="-fx-padding: 12 0 0 0;">
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="✦" style="-fx-text-fill: #a855f7; -fx-font-size: 11px;" />
+                                <Label text="12 catégories supportées"
+                                       style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" />
+                            </HBox>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="✦" style="-fx-text-fill: #a855f7; -fx-font-size: 11px;" />
+                                <Label text="15 000 epochs de gradient descent"
+                                       style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" />
+                            </HBox>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label text="✦" style="-fx-text-fill: #a855f7; -fx-font-size: 11px;" />
+                                <Label text="Fourchette ± 15% incluse"
+                                       style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>

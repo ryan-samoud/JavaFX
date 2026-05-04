@@ -4,11 +4,6 @@ import com.esports.model.Tournament;
 
 import java.util.List;
 
-/**
- * INTERFACE — ITournamentService.java
- * Contrat de la couche service pour les tournois.
- * Permet de découpler les controllers de l'implémentation concrète.
- */
 public interface ITournamentService {
 
     List<Tournament> findAll();
@@ -20,4 +15,10 @@ public interface ITournamentService {
     boolean update(Tournament tournament);
 
     boolean delete(int id);
+
+    Tournament findById(int id);
+
+    boolean existsByName(String name);
+
+    boolean existsByNameExcludeId(String name, int id);
 }

@@ -5,7 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import java.net.URL?>
 
-<ScrollPane fitToWidth="true" fitToHeight="true"
+<ScrollPane fitToWidth="true" fitToHeight="false"
             hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
             minWidth="1280" minHeight="800"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -34,7 +34,7 @@
         </HBox>
 
         <!-- EDIT FORM -->
-        <VBox alignment="CENTER" spacing="24" VBox.vgrow="ALWAYS"
+        <VBox alignment="CENTER" spacing="24"
               style="-fx-background-color: linear-gradient(to bottom, #100c2a, #0d0b1e);
                      -fx-padding: 40 40 60 40;">
 

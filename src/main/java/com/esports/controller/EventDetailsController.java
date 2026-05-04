@@ -46,7 +46,6 @@ public class EventDetailsController {
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // Bad words list — extend as needed
     private static final Set<String> BAD_WORDS = Set.of(
             "idiot", "stupide", "nul", "merde", "putain", "connard", "imbecile","xyz",
             "crétin", "salaud", "enculé", "con", "batard", "pd", "fdp",
@@ -74,7 +73,6 @@ public class EventDetailsController {
         Platform.runLater(() -> loadMap(e.getLieu()));
         loadComments();
 
-        // Show/hide form based on login
         boolean loggedIn = AuthService.isLoggedIn();
         if (vboxCommentForm != null) {
             vboxCommentForm.setVisible(loggedIn);
@@ -154,7 +152,6 @@ public class EventDetailsController {
                 "-fx-border-color:" + borderColor + ";-fx-border-width:1;" +
                 "-fx-border-radius:10px;-fx-background-radius:10px;");
 
-        // Header
         HBox header = new HBox(10); header.setAlignment(Pos.CENTER_LEFT);
         String auteurText = c.getAuteurNom() != null && !c.getAuteurNom().isBlank()
                 ? c.getAuteurNom() : "Utilisateur";
@@ -168,7 +165,6 @@ public class EventDetailsController {
 
         header.getChildren().addAll(auteur, spacer, dateLabel);
 
-        // Flagged badge
         if (flagged) {
             Label flagBadge = new Label("🚩 En cours de révision");
             flagBadge.setStyle("-fx-text-fill:#ef4444;-fx-background-color:rgba(239,68,68,0.12);" +
@@ -178,18 +174,15 @@ public class EventDetailsController {
             header.getChildren().add(flagBadge);
         }
 
-        // Content label
         Label contenu = new Label(c.getContenu());
         contenu.setStyle("-fx-text-fill:#d1d5db;-fx-font-size:13px;");
         contenu.setWrapText(true);
 
-        // Edit/Delete for own comments or admin
         if (isOwn || isAdmin) {
             Button btnEdit   = smallBtn("✏", "#60a5fa");
             Button btnDelete = smallBtn("🗑", "#f87171");
             header.getChildren().addAll(btnEdit, btnDelete);
 
-            // Inline edit area
             TextArea editArea = new TextArea(c.getContenu());
             editArea.setStyle("-fx-background-color:#1a1035;-fx-text-fill:#e2e8f0;" +
                     "-fx-border-color:rgba(139,92,246,0.3);-fx-border-width:1;" +
@@ -275,7 +268,6 @@ public class EventDetailsController {
         if (commentaireService.save(c)) {
             fieldCommentaire.clear();
             if (hasBadWord) {
-                // Show warning but still post
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Commentaire signalé");
                 alert.setHeaderText(null);
