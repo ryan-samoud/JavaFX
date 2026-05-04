@@ -6,6 +6,7 @@ import com.esports.service.EvenementService;
 
 import com.esports.utils.Eventpredictionengine;
 
+import com.esports.utils.TranslationService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -43,11 +44,20 @@ public class EvenementsPublicController implements Initializable {
     @FXML private Label            lblEmpty;
     @FXML private Label            lblCalendarMonth;
     @FXML private GridPane         calendarGrid;
+    @FXML private Button           btnTranslate;
+    @FXML private Label            lblHeroTitle;
+    @FXML private Label            lblHeroSub;
+    @FXML private Label            lblStatTotal;
+    @FXML private Label            lblStatUpcoming;
+    @FXML private Label            lblStatPassed;
+    @FXML private Label            lblSectionUpcoming;
+    @FXML private Label            lblSectionPassed;
 
     private final IEvenementService dao = new EvenementService();
     private List<Evenement> allEvents   = new ArrayList<>();
     private final Set<Integer> participatedEvents = new HashSet<>();
     private YearMonth currentMonth = YearMonth.now();
+    private boolean translatedToEnglish = false;
 
     private static final DateTimeFormatter DATE_FMT  = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.FRENCH);
@@ -231,10 +241,12 @@ public class EvenementsPublicController implements Initializable {
         Label nom = new Label(e.getNom());
         nom.setStyle("-fx-text-fill:white;-fx-font-size:15px;-fx-font-weight:bold;");
         nom.setWrapText(true); nom.setMaxWidth(240);
+        nom.setUserData("nom");
 
         Label lieu = new Label("📍 " + (e.getLieu() != null ? e.getLieu() : "—"));
         lieu.setStyle("-fx-text-fill:" + accent + ";-fx-font-size:12px;-fx-font-weight:bold;");
         lieu.setWrapText(true); lieu.setMaxWidth(240);
+        lieu.setUserData("lieu");
 
         Label date = new Label("📅 " + (e.getDate() != null ? e.getDate().format(DATE_FMT) : "—"));
         date.setStyle("-fx-text-fill:#9ca3af;-fx-font-size:12px;");
@@ -244,6 +256,7 @@ public class EvenementsPublicController implements Initializable {
         Label desc = new Label(descText);
         desc.setStyle("-fx-text-fill:#6b7280;-fx-font-size:11px;");
         desc.setWrapText(true); desc.setMaxWidth(240);
+        desc.setUserData("desc");
 
         Region bot = new Region(); VBox.setVgrow(bot, Priority.ALWAYS);
         content.getChildren().addAll(topRow, nom, lieu, date, desc, bot);
@@ -342,9 +355,7 @@ public class EvenementsPublicController implements Initializable {
         Label lblStars = new Label(stars.toString());
         lblStars.setStyle("-fx-font-size: 28px; -fx-text-fill: #f59e0b;");
 
-        Label lblRating = new Label(rating + " / 5  —  " + p.ratingLabel);
-        lblRating.setStyle("-fx-text-fill: #e2e8f0; -fx-font-size: 14px; -fx-font-weight: bold;" +
-                "-fx-font-family: 'Courier New';");
+
 
         // Progress bar
         String barColor = rating >= 4.0 ? "#4ade80" : rating >= 2.5 ? "#f59e0b" : "#f87171";
@@ -360,7 +371,7 @@ public class EvenementsPublicController implements Initializable {
         lblStatement.setStyle("-fx-text-fill: #d1d5db; -fx-font-size: 13px; -fx-line-spacing: 4;");
         lblStatement.setWrapText(true);
 
-        Label disclaimer = new Label("Analyse de l'IA NexUs");
+        Label disclaimer = new Label("⚡ Analyse générée par l'IA NexUS — basée sur les données de l'événement.");
         disclaimer.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 10px; -fx-font-style: italic;");
         disclaimer.setWrapText(true);
 
@@ -373,7 +384,7 @@ public class EvenementsPublicController implements Initializable {
         btnRow.setAlignment(Pos.CENTER_RIGHT);
         btnRow.setPadding(new Insets(8, 0, 0, 0));
 
-        VBox root = new VBox(12, title, eventName, sep, lblStars, lblRating, barBox,
+        VBox root = new VBox(12, title, eventName, sep, lblStars,  barBox,
                 lblStatement, disclaimer, btnRow);
         root.setPadding(new Insets(28, 30, 28, 30));
         root.setStyle("-fx-background-color: #110f28;" +
@@ -385,6 +396,151 @@ public class EvenementsPublicController implements Initializable {
         scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
         stage.setScene(scene);
         stage.showAndWait();
+    }
+
+    // ── Page translation ──────────────────────────────────────────
+
+    @FXML
+    private void onToggleTranslation() {
+        if (translatedToEnglish) {
+            // Switch back to French
+            translatedToEnglish = false;
+            btnTranslate.setText("🌐 FR");
+            btnTranslate.setStyle("-fx-background-color: rgba(74,222,128,0.12); -fx-text-fill: #4ade80;" +
+                    "-fx-border-color: rgba(74,222,128,0.35); -fx-border-width: 1px;" +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px;" +
+                    "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                    "-fx-padding: 7 14 7 14; -fx-cursor: hand;");
+            // Restore French static labels
+            if (lblHeroTitle   != null) lblHeroTitle.setText("ÉVÉNEMENTS");
+            if (lblHeroSub     != null) lblHeroSub.setText("Découvrez et participez aux événements eSports NexUS");
+            if (lblStatTotal   != null) lblStatTotal.setText("Total");
+            if (lblStatUpcoming!= null) lblStatUpcoming.setText("À venir");
+            if (lblStatPassed  != null) lblStatPassed.setText("Passés");
+            if (lblSectionUpcoming != null) lblSectionUpcoming.setText("À VENIR");
+            if (lblSectionPassed   != null) lblSectionPassed.setText("PASSÉS");
+            // Reload cards in French
+            applyFilter();
+        } else {
+            // Translate to English
+            translatedToEnglish = true;
+            btnTranslate.setText("🌐 EN");
+            btnTranslate.setStyle("-fx-background-color: rgba(251,191,36,0.12); -fx-text-fill: #fbbf24;" +
+                    "-fx-border-color: rgba(251,191,36,0.35); -fx-border-width: 1px;" +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px;" +
+                    "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                    "-fx-padding: 7 14 7 14; -fx-cursor: hand;");
+            btnTranslate.setText("⏳ Translating...");
+
+            // Translate static UI labels asynchronously
+            TranslationService.translateAsync("ÉVÉNEMENTS", t -> {
+                if (lblHeroTitle != null) lblHeroTitle.setText(t.toUpperCase());
+            });
+            TranslationService.translateAsync(
+                    "Découvrez et participez aux événements eSports NexUS", t -> {
+                        if (lblHeroSub != null) lblHeroSub.setText(t);
+                    });
+            TranslationService.translateAsync("Total", t -> {
+                if (lblStatTotal != null) lblStatTotal.setText(t);
+            });
+            TranslationService.translateAsync("À venir", t -> {
+                if (lblStatUpcoming != null) lblStatUpcoming.setText(t);
+            });
+            TranslationService.translateAsync("Passés", t -> {
+                if (lblStatPassed != null) lblStatPassed.setText(t);
+                // All static labels done — now rebuild cards with translated content
+                translateCards();
+                btnTranslate.setText("🌐 EN ✓");
+                btnTranslate.setStyle("-fx-background-color: rgba(251,191,36,0.2); -fx-text-fill: #fbbf24;" +
+                        "-fx-border-color: rgba(251,191,36,0.5); -fx-border-width: 1px;" +
+                        "-fx-border-radius: 6px; -fx-background-radius: 6px;" +
+                        "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                        "-fx-padding: 7 14 7 14; -fx-cursor: hand;");
+            });
+            TranslationService.translateAsync("À VENIR", t -> {
+                if (lblSectionUpcoming != null) lblSectionUpcoming.setText(t.toUpperCase());
+            });
+            TranslationService.translateAsync("PASSÉS", t -> {
+                if (lblSectionPassed != null) lblSectionPassed.setText(t.toUpperCase());
+            });
+        }
+    }
+
+    /**
+     * Translates each event's name, description, lieu and rebuilds cards in English.
+     * Translations happen in batches on background threads.
+     */
+    private void translateCards() {
+        paneUpcoming.getChildren().clear();
+        panePassed.getChildren().clear();
+
+        String query  = fieldSearch.getText().trim().toLowerCase();
+        // Use original French filter values regardless of translation state
+        String filter = comboFilter.getValue();
+
+        List<Evenement> list = allEvents.stream()
+                .filter(e -> query.isEmpty()
+                        || e.getNom().toLowerCase().contains(query)
+                        || (e.getLieu() != null && e.getLieu().toLowerCase().contains(query)))
+                .filter(e -> {
+                    if (filter == null || filter.isEmpty() || "Tous".equals(filter) || "All".equals(filter)) return true;
+                    if ("À venir".equals(filter) || "Upcoming".equals(filter)) return !e.isPast();
+                    if ("Passés".equals(filter)  || "Past".equals(filter))     return  e.isPast();
+                    return true;
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        if (list.isEmpty()) {
+            lblEmpty.setVisible(true); lblEmpty.setManaged(true); return;
+        }
+        lblEmpty.setVisible(false); lblEmpty.setManaged(false);
+
+        for (Evenement e : list) {
+            VBox card = buildCard(e);
+            if (e.isPast()) panePassed.getChildren().add(card);
+            else            paneUpcoming.getChildren().add(card);
+            translateCardLabels(card, e);
+        }
+    }
+
+    private void translateCardLabels(VBox card, Evenement e) {
+        Thread t = new Thread(() -> {
+            String nomEN  = TranslationService.translateToEnglish(e.getNom());
+            String lieuEN = e.getLieu() != null
+                    ? TranslationService.translateToEnglish(e.getLieu()) : "—";
+            String descRaw = e.getDescription() != null && !e.getDescription().isBlank()
+                    ? e.getDescription() : "";
+            String descEN = !descRaw.isEmpty()
+                    ? TranslationService.translateToEnglish(
+                    descRaw.length() > 200 ? descRaw.substring(0, 200) : descRaw)
+                    : "";
+
+            javafx.application.Platform.runLater(() -> updateCardText(card, nomEN, lieuEN, descEN));
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** Recursively walks all nodes in the card and updates labels by userData tag */
+    private void updateCardText(javafx.scene.Node node, String nom, String lieu, String desc) {
+        if (node instanceof Label lbl && lbl.getUserData() != null) {
+            switch (lbl.getUserData().toString()) {
+                case "nom"  -> lbl.setText(nom);
+                case "lieu" -> lbl.setText("📍 " + lieu);
+                case "desc" -> {
+                    String d = desc.length() > 70 ? desc.substring(0, 70) + "…" : desc;
+                    lbl.setText(d);
+                }
+            }
+        } else if (node instanceof javafx.scene.layout.Pane pane) {
+            for (javafx.scene.Node child : pane.getChildren()) {
+                updateCardText(child, nom, lieu, desc);
+            }
+        } else if (node instanceof javafx.scene.layout.HBox hbox) {
+            for (javafx.scene.Node child : hbox.getChildren()) {
+                updateCardText(child, nom, lieu, desc);
+            }
+        }
     }
 
     @FXML

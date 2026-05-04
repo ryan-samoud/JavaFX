@@ -7,6 +7,8 @@ import com.esports.model.Sponsor;
 import com.esports.service.EvenementService;
 import com.esports.service.SponsorService;
 import com.esports.utils.NexusDialog;
+import com.esports.utils.EvenementPdfExporter;
+import com.esports.utils.TranslationService;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -115,16 +117,22 @@ public class EvenementsController implements Initializable {
             private final Button btnEdit     = new Button("Éditer");
             private final Button btnDelete   = new Button("Supprimer");
             private final Button btnSponsors = new Button("Sponsors");
-            private final HBox   box         = new HBox(6, btnEdit, btnDelete, btnSponsors);
+            private final Button btnPdf      = new Button("PDF");
+            private final Button btnTranslate= new Button("EN");
+            private final HBox   box         = new HBox(5, btnEdit, btnDelete, btnSponsors, btnPdf, btnTranslate);
 
             {
                 btnEdit.setStyle(actionBtnStyle("#00b8ff"));
                 btnDelete.setStyle(actionBtnStyle("#ff4757"));
                 btnSponsors.setStyle(actionBtnStyle("#a855f7"));
+                btnPdf.setStyle(actionBtnStyle("#f59e0b"));
+                btnTranslate.setStyle(actionBtnStyle("#4ade80"));
 
-                btnEdit.setOnAction(e    -> onEditEvent(getTableView().getItems().get(getIndex())));
-                btnDelete.setOnAction(e  -> onDeleteEvent(getTableView().getItems().get(getIndex())));
+                btnEdit.setOnAction(e     -> onEditEvent(getTableView().getItems().get(getIndex())));
+                btnDelete.setOnAction(e   -> onDeleteEvent(getTableView().getItems().get(getIndex())));
                 btnSponsors.setOnAction(e -> onManageSponsors(getTableView().getItems().get(getIndex())));
+                btnPdf.setOnAction(e      -> onExportPdf(getTableView().getItems().get(getIndex())));
+                btnTranslate.setOnAction(e-> onTranslate(getTableView().getItems().get(getIndex())));
             }
 
             @Override
@@ -653,6 +661,122 @@ public class EvenementsController implements Initializable {
                 "-fx-border-color: rgba(139,92,246,0.45); -fx-border-width: 1.5px;" +
                 "-fx-border-radius: 14px; -fx-background-radius: 14px;" +
                 "-fx-effect: dropshadow(gaussian, rgba(139,92,246,0.5), 30, 0.3, 0, 6);";
+    }
+
+    // ══════════════════════════════════════════════════
+    // PDF EXPORT
+    // ══════════════════════════════════════════════════
+
+    private void onExportPdf(Evenement ev) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Enregistrer le PDF");
+        fc.setInitialFileName("evenement-" + ev.getId() + ".pdf");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+
+        Stage stage = (Stage) tableEvents.getScene().getWindow();
+        File file = fc.showSaveDialog(stage);
+        if (file == null) return;
+
+        java.util.List<com.esports.model.Sponsor> sponsors =
+                sponsorService.findByEvenement(ev.getId());
+
+        boolean ok = EvenementPdfExporter.exportToPdf(ev, sponsors, file.getAbsolutePath());
+        if (ok) {
+            NexusDialog.showInfo("Export PDF", "PDF exporté avec succès :\n" + file.getAbsolutePath());
+        } else {
+            NexusDialog.showInfo("Erreur", "Impossible de générer le PDF. Vérifiez la console.");
+        }
+    }
+
+    // ══════════════════════════════════════════════════
+    // TRANSLATION FR → EN
+    // ══════════════════════════════════════════════════
+
+    private void onTranslate(Evenement ev) {
+        Stage stage = new Stage();
+        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setResizable(false);
+
+        Label title    = formTitle("TRADUCTION — " + ev.getNom().toUpperCase());
+        Node  sep      = gradientSep();
+
+        // Fields
+        Label lblNameFr  = formLabel("Nom (FR)");
+        Label valNameFr  = new Label(ev.getNom() != null ? ev.getNom() : "—");
+        valNameFr.setStyle("-fx-text-fill:#e2e8f0;-fx-font-size:13px;");
+
+        Label lblNameEn  = formLabel("Nom (EN)");
+        Label valNameEn  = new Label("⏳ Traduction en cours...");
+        valNameEn.setStyle("-fx-text-fill:#9ca3af;-fx-font-size:13px;");
+
+        Label lblDescFr  = formLabel("Description (FR)");
+        TextArea valDescFr = new TextArea(ev.getDescription() != null ? ev.getDescription() : "—");
+        valDescFr.setEditable(false); valDescFr.setPrefRowCount(3);
+        valDescFr.setStyle(textAreaStyle());
+
+        Label lblDescEn  = formLabel("Description (EN)");
+        TextArea valDescEn = new TextArea("⏳ Traduction en cours...");
+        valDescEn.setEditable(false); valDescEn.setPrefRowCount(3);
+        valDescEn.setStyle(textAreaStyle());
+
+        Label lblLieuFr  = formLabel("Lieu (FR)");
+        Label valLieuFr  = new Label(ev.getLieu() != null ? ev.getLieu() : "—");
+        valLieuFr.setStyle("-fx-text-fill:#e2e8f0;-fx-font-size:13px;");
+
+        Label lblLieuEn  = formLabel("Lieu (EN)");
+        Label valLieuEn  = new Label("⏳ Traduction en cours...");
+        valLieuEn.setStyle("-fx-text-fill:#9ca3af;-fx-font-size:13px;");
+
+        Label lblStatus  = new Label("🔄 Connexion à l'API de traduction...");
+        lblStatus.setStyle("-fx-text-fill:#c084fc;-fx-font-size:11px;-fx-font-family:'Courier New';");
+
+        VBox form = new VBox(8,
+                title, sep,
+                lblNameFr,  valNameFr,
+                lblNameEn,  valNameEn,
+                lblDescFr,  valDescFr,
+                lblDescEn,  valDescEn,
+                lblLieuFr,  valLieuFr,
+                lblLieuEn,  valLieuEn,
+                lblStatus
+        );
+        form.setPadding(new Insets(28, 30, 10, 30));
+
+        Button btnClose = cancelBtn("Fermer");
+        btnClose.setOnAction(e -> stage.close());
+        HBox btnRow = new HBox(btnClose);
+        btnRow.setAlignment(Pos.CENTER_RIGHT);
+        btnRow.setPadding(new Insets(10, 30, 28, 30));
+
+        VBox root = new VBox(0, form, btnRow);
+        root.setStyle(dialogStyle());
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root, 500, 580);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        stage.setScene(scene);
+        stage.show();
+
+        // Translate asynchronously
+        TranslationService.translateAsync(ev.getNom(), translated -> {
+            valNameEn.setText(translated);
+            valNameEn.setStyle("-fx-text-fill:#e2e8f0;-fx-font-size:13px;");
+        });
+
+        TranslationService.translateAsync(ev.getDescription(), translated -> {
+            valDescEn.setText(translated);
+            valDescEn.setStyle("-fx-control-inner-background:#1a1035;-fx-text-fill:#e2e8f0;" +
+                    "-fx-border-color:rgba(139,92,246,0.3);-fx-border-width:1;" +
+                    "-fx-border-radius:8;-fx-background-radius:8;" +
+                    "-fx-font-family:'Courier New';-fx-font-size:13px;-fx-padding:10 14 10 14;");
+        });
+
+        TranslationService.translateAsync(ev.getLieu(), translated -> {
+            valLieuEn.setText(translated);
+            valLieuEn.setStyle("-fx-text-fill:#e2e8f0;-fx-font-size:13px;");
+            lblStatus.setText("✅ Traduction terminée — MyMemory API");
+            lblStatus.setStyle("-fx-text-fill:#4ade80;-fx-font-size:11px;-fx-font-family:'Courier New';");
+        });
     }
 
     // ══════════════════════════════════════════════════
