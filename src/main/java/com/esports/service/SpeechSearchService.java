@@ -18,8 +18,8 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 
 public class SpeechSearchService {
-    public static final String DEEPGRAM_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
-    public static final String ELEVENLABS_API_KEY = "wxxxxxxxxxxxxxxxx";
+    public static final String DEEPGRAM_API_KEY = "6ea6cb427382abdf1987c86e2f1e6300569e8379";
+    public static final String ELEVENLABS_API_KEY = "sk_b0808208d9f22b9c1df2eec881b264aa8bed5800676ac4a8";
 
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(20))

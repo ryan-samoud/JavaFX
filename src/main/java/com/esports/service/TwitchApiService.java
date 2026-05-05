@@ -37,14 +37,12 @@ public class TwitchApiService {
         public String getTwitchUrl() { return twitchUrl; }
     }
 
-    private final String clientId = "xxxxxxxxxxxxxxxxxxxx";
-    private final String clientSecret = "xxxxxxxxxxxxxxxxxxxxx";
+    private final String clientId = "abc123xyz456def789ghi012jkl345";
+    private final String clientSecret = "secret123abc456def789ghi012jkl345mno678";
 
     private final HttpClient http = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(20))
             .build();
-
-
 
     private String appAccessToken;
     private Instant tokenExpiresAt = Instant.EPOCH;

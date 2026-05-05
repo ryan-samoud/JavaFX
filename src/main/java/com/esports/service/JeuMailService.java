@@ -2,11 +2,6 @@ package com.esports.service;
 
 import com.esports.model.Jeu;
 import com.esports.model.User;
-import com.esports.utils.DatabaseConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -198,51 +193,12 @@ public class JeuMailService {
     }
 
     private List<String> resolvePlayerEmails() {
-        List<String> emails = new ArrayList<>();
-
-        // Requete directe SQL — contourne UserService pour fiabilite maximale
-        String sql = "SELECT email, role FROM user WHERE is_active = 1 AND email IS NOT NULL AND email != ''";
-
-        try {
-            Connection conn = DatabaseConnection.getInstance();
-            try (PreparedStatement stmt = conn.prepareStatement(sql);
-                 ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String email = rs.getString("email");
-                    String role  = rs.getString("role");
-                    System.out.println("[JeuMailService] DB row -> email=" + email + ", role=[" + role + "]");
-
-                    if (role != null && role.toLowerCase().contains("player")) {
-                        emails.add(email.trim());
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("[JeuMailService] SQL error resolvePlayerEmails: " + e.getMessage());
-        }
-
-        // Fallback: si aucun player trouve, envoyer a tous les utilisateurs actifs
-        if (emails.isEmpty()) {
-            System.out.println("[JeuMailService] Aucun player par role, fallback: envoi a tous les utilisateurs actifs.");
-            String fallbackSql = "SELECT email FROM user WHERE is_active = 1 AND email IS NOT NULL AND email != ''";
-            try {
-                Connection conn = DatabaseConnection.getInstance();
-                try (PreparedStatement stmt = conn.prepareStatement(fallbackSql);
-                     ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        String email = rs.getString("email");
-                        if (email != null && !email.isBlank()) {
-                            emails.add(email.trim());
-                        }
-                    }
-                }
-            } catch (SQLException e) {
-                System.err.println("[JeuMailService] SQL error fallback: " + e.getMessage());
-            }
-        }
-
-        System.out.println("[JeuMailService] Emails finaux a notifier: " + emails);
-        return emails.stream().distinct().collect(Collectors.toList());
+        return userService.findAll().stream()
+                .filter(u -> u != null && u.getEmail() != null && !u.getEmail().isBlank())
+                .filter(u -> "player".equalsIgnoreCase(safe(u.getRole(), "")))
+                .map(u -> u.getEmail().trim())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private String resolveConnectedAdminEmail() {

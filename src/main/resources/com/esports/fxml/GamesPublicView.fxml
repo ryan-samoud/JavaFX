@@ -26,7 +26,6 @@
             <Region HBox.hgrow="ALWAYS"/>
             <Button text="Accueil" onAction="#onBackHome" styleClass="nav-link"/>
             <Button text="Jeux" style="-fx-background-color: rgba(168,85,247,0.12); -fx-text-fill: #c084fc; -fx-font-size: 14; -fx-font-weight: bold; -fx-border-color: transparent transparent #a855f7 transparent; -fx-border-width: 0 0 2 0; -fx-padding: 7 14 5 14;"/>
-            <Button text="Mes Favoris" onAction="#onShowFavorites" styleClass="nav-link"/>
             <Button text="Tournois" styleClass="nav-link"/>
             <Button text="Boutique" styleClass="nav-link"/>
             <Button text="Connexion" onAction="#onBackHome" styleClass="btn-outline-sm"/>

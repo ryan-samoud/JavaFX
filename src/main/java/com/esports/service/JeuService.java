@@ -179,36 +179,6 @@ public class JeuService implements IJeuService {
         return null;
     }
 
-    @Override
-    public List<Jeu> findFavoritesByUser(int userId) {
-        List<Jeu> list = new ArrayList<>();
-        // In this project, "Favorites" are stored as reactions of type 'heart'
-        String sql = "SELECT j.*, c.nom_categorie, c.genre FROM jeu j "
-                + "JOIN jeu_reaction r ON j.id = r.jeu_id "
-                + "LEFT JOIN categorie_jeu c ON j.categorie_id = c.id "
-                + "WHERE r.user_id = ? AND r.type = 'heart'";
-        try {
-            Connection conn = DatabaseConnection.getInstance();
-            ensureJeuSchema(conn);
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, userId);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    ResultSetMetaData meta = rs.getMetaData();
-                    Set<String> labels = new HashSet<>();
-                    for (int i = 1; i <= meta.getColumnCount(); i++) {
-                        labels.add(meta.getColumnLabel(i).toLowerCase(Locale.ROOT));
-                    }
-                    while (rs.next()) {
-                        list.add(mapFull(rs, labels));
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("[JeuService] findFavoritesByUser: " + e.getMessage());
-        }
-        return list;
-    }
-
     private Jeu mapFull(ResultSet rs, Set<String> labels) throws SQLException {
         int nbJoueurs = labels.contains("nb_joueurs") ? rs.getInt("nb_joueurs") : 1;
         double note = labels.contains("note") ? rs.getDouble("note") : 0.0;

@@ -162,11 +162,6 @@ public class GamesPublicController implements Initializable {
         VBox allCard = buildCategoryCard(null);
         paneCategories.getChildren().add(allCard);
 
-        // "Favorites" Category (if logged in)
-        if (AuthService.isLoggedIn()) {
-            paneCategories.getChildren().add(buildFavoritesCard());
-        }
-
         for (CategorieJeu c : allCategories) {
             paneCategories.getChildren().add(buildCategoryCard(c));
         }
@@ -205,44 +200,6 @@ public class GamesPublicController implements Initializable {
         if (!isSelected) {
             card.setOnMouseEntered(e -> card.setStyle(baseStyle + "-fx-background-color: #251f4d; -fx-border-color: #a855f7; -fx-border-width: 1; -fx-border-radius: 12;"));
             card.setOnMouseExited(e -> card.setStyle(baseStyle + "-fx-background-color: #1a1635; -fx-border-color: rgba(168,85,247,0.3); -fx-border-width: 1; -fx-border-radius: 12;"));
-        }
-
-        return card;
-    }
-
-    private VBox buildFavoritesCard() {
-        VBox card = new VBox(8);
-        card.setAlignment(Pos.CENTER);
-        card.setPadding(new Insets(10));
-        card.setPrefSize(120, 100);
-
-        boolean isSelected = (selectedCategoryId != null && selectedCategoryId == -1);
-
-        String baseStyle = "-fx-background-radius: 12; -fx-cursor: hand; -fx-transition: all 0.3s;";
-        if (isSelected) {
-            card.setStyle(baseStyle + "-fx-background-color: linear-gradient(to bottom right, #f43f5e, #ec4899); -fx-effect: dropshadow(gaussian, rgba(244,63,94,0.5), 10, 0, 0, 0);");
-        } else {
-            card.setStyle(baseStyle + "-fx-background-color: #1a1635; -fx-border-color: rgba(244,63,94,0.3); -fx-border-width: 1; -fx-border-radius: 12;");
-        }
-
-        Label icon = new Label("❤️");
-        icon.setStyle("-fx-font-size: 24px;");
-
-        Label name = new Label("Mes Favoris");
-        name.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;");
-
-        card.getChildren().addAll(icon, name);
-
-        card.setOnMouseClicked(e -> {
-            selectedCategoryId = -1;
-            lblCategoryTitle.setText("Mes Jeux Favoris");
-            renderCategories();
-            applyFilters();
-        });
-
-        if (!isSelected) {
-            card.setOnMouseEntered(e -> card.setStyle(baseStyle + "-fx-background-color: #251f4d; -fx-border-color: #f43f5e; -fx-border-width: 1; -fx-border-radius: 12;"));
-            card.setOnMouseExited(e -> card.setStyle(baseStyle + "-fx-background-color: #1a1635; -fx-border-color: rgba(244,63,94,0.3); -fx-border-width: 1; -fx-border-radius: 12;"));
         }
 
         return card;
@@ -775,22 +732,8 @@ public class GamesPublicController implements Initializable {
 
     private void applyFilters() {
         String query = fieldSearch.getText().toLowerCase().trim();
-        List<Jeu> source = allGames;
-
-        if (selectedCategoryId != null && selectedCategoryId == -1) {
-            User current = AuthService.getCurrentUser();
-            if (current != null) {
-                source = jeuService.findFavoritesByUser(current.getId());
-            } else {
-                source = new ArrayList<>();
-            }
-        }
-
-        List<Jeu> filtered = source.stream()
-                .filter(j -> {
-                    if (selectedCategoryId == null || selectedCategoryId == -1) return true;
-                    return j.getCategorieId() == selectedCategoryId;
-                })
+        List<Jeu> filtered = allGames.stream()
+                .filter(j -> (selectedCategoryId == null || j.getCategorieId() == selectedCategoryId))
                 .filter(j -> {
                     if (query.isEmpty()) {
                         return true;
@@ -801,18 +744,6 @@ public class GamesPublicController implements Initializable {
                 })
                 .collect(Collectors.toList());
         renderGames(filtered);
-    }
-
-    @FXML
-    public void onShowFavorites() {
-        if (!AuthService.isLoggedIn()) {
-            new Alert(Alert.AlertType.INFORMATION, "Connectez-vous pour voir vos favoris.", ButtonType.OK).showAndWait();
-            return;
-        }
-        selectedCategoryId = -1;
-        lblCategoryTitle.setText("Mes Jeux Favoris");
-        renderCategories();
-        applyFilters();
     }
 
     private String getCategoryEmoji(String genre) {

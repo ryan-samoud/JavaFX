@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class GeminiRecommendationService {
     private static final String MODEL = "gemini-2.5-flash";
-    private static final String DEFAULT_API_KEY = "wwwwwwwwwwww-wwwwww";
+    private static final String DEFAULT_API_KEY = "AIzaSyCngg8uxBabYRgTLWhS5EtfPP4-SjcTpWQ";
     private static final int MAX_RETRIES_ON_503 = 3;
 
     private final HttpClient client = HttpClient.newBuilder()

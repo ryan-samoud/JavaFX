@@ -14,10 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CloudinaryUploadService {
-    private static final String CLOUD_NAME = "dqeub6bry";
-    private static final String API_KEY = "xxxxxxxxxxxxxxxxx";
-    private static final String API_SECRET = "qxxxxxxxxxxxx";
-    private static final String UPLOAD_PRESET = "nexusjeu";
+    private static final String CLOUD_NAME = "dofap5wt0";
+    private static final String API_KEY = "213831313941832";
+    private static final String API_SECRET = "q8PU3_70fnA2EB_LrQ-_1TDdYOU";
+    private static final String UPLOAD_PRESET = "lzcare_behavior_logs";
 
     private final HttpClient http = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(20))

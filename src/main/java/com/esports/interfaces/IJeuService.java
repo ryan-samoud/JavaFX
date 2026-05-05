@@ -9,5 +9,4 @@ public interface IJeuService {
     boolean delete(int id);
     List<Jeu> findAll();
     Jeu findById(int id);
-    List<Jeu> findFavoritesByUser(int userId);
 }
