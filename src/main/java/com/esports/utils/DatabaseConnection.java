@@ -6,13 +6,13 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static final String URL      = "jdbc:mysql://localhost:3306/pi_webjava"
+    private static final String URL = "jdbc:mysql://localhost:3306/pi_webjava"
             + "?useSSL=false"
             + "&serverTimezone=UTC"
             + "&allowPublicKeyRetrieval=true"
             + "&characterEncoding=UTF-8";
     private static final String USER     = "root";   // ← à adapter
-    private static final String PASSWORD = "";       // ← a adapter
+    private static final String PASSWORD = "";       // ← à adapter
 
     private static Connection instance = null;
 

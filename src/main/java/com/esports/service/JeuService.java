@@ -16,6 +16,7 @@ public class JeuService implements IJeuService {
 
     private static final Object SCHEMA_LOCK = new Object();
     private static boolean jeuSchemaEnsured = false;
+    private final JeuMailService jeuMailService = new JeuMailService();
 
     /**
      * Aligns local DB with the Java model: extra columns + mode enum including {@code coop}.
@@ -63,6 +64,7 @@ public class JeuService implements IJeuService {
         try {
             Connection conn = DatabaseConnection.getInstance();
             ensureJeuSchema(conn);
+            boolean created = false;
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, j.getNom());
                 stmt.setInt(2, j.getTrancheAge());
@@ -72,8 +74,14 @@ public class JeuService implements IJeuService {
                 stmt.setString(6, j.getImage());
                 stmt.setInt(7, j.getNbJoueurs());
                 stmt.setDouble(8, j.getNote());
-                return stmt.executeUpdate() == 1;
+                int affectedRows = stmt.executeUpdate();
+                created = affectedRows == 1;
+                if (created && j instanceof Jeu) {
+                    // Trigger only after successful insert (post-persist equivalent).
+                    jeuMailService.sendJeuCreatedEmail(j);
+                }
             }
+            return created;
         } catch (SQLException e) {
             System.err.println("[JeuService] add: " + e.getMessage());
             return false;

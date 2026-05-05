@@ -3,9 +3,11 @@ package com.esports.controller;
 import com.esports.model.CategorieJeu;
 import com.esports.model.Jeu;
 import com.esports.service.CategorieJeuService;
+import com.esports.service.CloudinaryUploadService;
 import com.esports.service.JeuService;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,6 +31,7 @@ public class GameFormController implements Initializable {
 
     private final JeuService jeuService = new JeuService();
     private final CategorieJeuService catService = new CategorieJeuService();
+    private final CloudinaryUploadService cloudinaryUploadService = new CloudinaryUploadService();
     
     private Jeu jeuToEdit = null;
     private boolean saved = false;
@@ -82,9 +85,37 @@ public class GameFormController implements Initializable {
             new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.webp")
         );
         File file = fileChooser.showOpenDialog(fieldImage.getScene().getWindow());
-        if (file != null) {
-            fieldImage.setText(file.toURI().toString());
+        if (file == null) {
+            return;
         }
+
+        fieldImage.setText("Uploading to Cloudinary...");
+        btnSubmit.setDisable(true);
+
+        Task<String> uploadTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return cloudinaryUploadService.uploadImage(file);
+            }
+        };
+
+        uploadTask.setOnSucceeded(e -> {
+            fieldImage.setText(uploadTask.getValue());
+            btnSubmit.setDisable(false);
+            new Alert(Alert.AlertType.INFORMATION, "Image uploaded to Cloudinary successfully.", ButtonType.OK).showAndWait();
+        });
+        uploadTask.setOnFailed(e -> {
+            Throwable ex = uploadTask.getException();
+            fieldImage.setText("");
+            btnSubmit.setDisable(false);
+            new Alert(Alert.AlertType.ERROR,
+                    "Cloudinary upload failed: " + (ex != null ? ex.getMessage() : "unknown error"),
+                    ButtonType.OK).showAndWait();
+        });
+
+        Thread thread = new Thread(uploadTask, "cloudinary-upload-thread");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @FXML

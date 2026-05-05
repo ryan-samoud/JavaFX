@@ -91,9 +91,11 @@ public class MainController implements Initializable {
     public void onShop() {
         navigate("/com/esports/fxml/ShopView.fxml", btnShop);
     }
-    @FXML
-    private void onEvents() { navigate("/com/esports/fxml/EvenementsView.fxml", btnEvents); }
 
+    @FXML
+    private void onEvents() {
+        navigate("/com/esports/fxml/EvenementsView.fxml", btnEvents);
+    }
 
     @FXML
     private void onGames() {

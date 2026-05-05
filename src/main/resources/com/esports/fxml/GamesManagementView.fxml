@@ -56,19 +56,20 @@
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
                     <TextField fx:id="fieldSearchGame" promptText="🔍 Rechercher un jeu..." styleClass="modern-field" prefWidth="300" prefHeight="40"/>
+                    <Button text="⬇ Export CSV" onAction="#onExportGamesCsv" styleClass="btn-outline-sm" prefHeight="40" style="-fx-padding: 0 20;"/>
                     <Button text="+ Nouveau Jeu" onAction="#onOpenAddGame" styleClass="btn-primary" prefHeight="40" style="-fx-padding: 0 25;"/>
                 </HBox>
 
                 <TableView fx:id="tableGames" prefHeight="450" styleClass="modern-table">
                     <columns>
-                        <TableColumn fx:id="colGameImage" text="Image" prefWidth="100"/>
+                        <TableColumn fx:id="colGameImage" text="Image" prefWidth="120"/>
                         <TableColumn fx:id="colGameNom" text="Titre du Jeu" prefWidth="220"/>
                         <TableColumn fx:id="colGameCat" text="Catégorie" prefWidth="150"/>
                         <TableColumn fx:id="colGameMode" text="Mode" prefWidth="100"/>
                         <TableColumn fx:id="colGameAge" text="Âge" prefWidth="60"/>
                         <TableColumn fx:id="colGameNote" text="Note" prefWidth="70"/>
                         <TableColumn fx:id="colGamePlayers" text="Joueurs" prefWidth="80"/>
-                        <TableColumn fx:id="colGameActions" text="Actions" prefWidth="200"/>
+                        <TableColumn fx:id="colGameActions" text="Actions" prefWidth="260"/>
                     </columns>
                 </TableView>
             </VBox>
