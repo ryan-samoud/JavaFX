@@ -1,0 +1,549 @@
+package com.esports.controller;
+
+import com.esports.interfaces.IEvenementService;
+import com.esports.model.Evenement;
+import com.esports.service.EvenementService;
+
+import com.esports.utils.Eventpredictionengine;
+
+import com.esports.utils.TranslationService;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
+import java.io.File;
+import java.net.URL;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class EvenementsPublicController implements Initializable {
+
+    @FXML private Label            lblTotalCount;
+    @FXML private Label            lblUpcomingCount;
+    @FXML private Label            lblPassedCount;
+    @FXML private TextField        fieldSearch;
+    @FXML private ComboBox<String> comboFilter;
+    @FXML private ComboBox<String> comboSort;
+    @FXML private FlowPane         paneUpcoming;
+    @FXML private FlowPane         panePassed;
+    @FXML private Label            lblEmpty;
+    @FXML private Label            lblCalendarMonth;
+    @FXML private GridPane         calendarGrid;
+    @FXML private Button           btnTranslate;
+    @FXML private Label            lblHeroTitle;
+    @FXML private Label            lblHeroSub;
+    @FXML private Label            lblStatTotal;
+    @FXML private Label            lblStatUpcoming;
+    @FXML private Label            lblStatPassed;
+    @FXML private Label            lblSectionUpcoming;
+    @FXML private Label            lblSectionPassed;
+
+    private final IEvenementService dao = new EvenementService();
+    private List<Evenement> allEvents   = new ArrayList<>();
+    private final Set<Integer> participatedEvents = new HashSet<>();
+    private YearMonth currentMonth = YearMonth.now();
+    private boolean translatedToEnglish = false;
+
+    private static final DateTimeFormatter DATE_FMT  = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.FRENCH);
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        comboFilter.getItems().addAll("Tous", "À venir", "Passés");
+        comboFilter.setValue("Tous");
+        comboSort.getItems().addAll("Date (récent)", "Date (ancien)", "Nom A→Z", "Participants ↓");
+        comboSort.setValue("Date (récent)");
+        fieldSearch.textProperty().addListener((obs, o, n) -> applyFilter());
+        comboFilter.valueProperty().addListener((obs, o, n) -> applyFilter());
+        comboSort.valueProperty().addListener((obs, o, n)   -> applyFilter());
+        loadEvents();
+        renderCalendar();
+    }
+
+    private void loadEvents() {
+        try { allEvents = dao.findAll(); }
+        catch (Exception e) { System.err.println("[Public] " + e.getMessage()); allEvents = new ArrayList<>(); }
+        applyFilter();
+        renderCalendar();
+    }
+
+    private void participer(Evenement e) {
+        dao.incrementParticipants(e.getId());
+        participatedEvents.add(e.getId());
+        loadEvents();
+    }
+
+    private void annulerParticipation(Evenement e) {
+        dao.decrementParticipants(e.getId());
+        participatedEvents.remove(e.getId());
+        loadEvents();
+    }
+
+    private void openDetails(Evenement e) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/esports/fxml/EventDetails.fxml"));
+            Parent root = loader.load();
+            EventDetailsController ctrl = loader.getController();
+            ctrl.setEvent(e);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root, 700, 750));
+            stage.setTitle("Détails — " + e.getNom());
+            stage.show();
+        } catch (Exception ex) { ex.printStackTrace(); }
+    }
+
+    @FXML private void onSearch() { applyFilter(); }
+
+    private void applyFilter() {
+        String query  = fieldSearch.getText().trim().toLowerCase();
+        String filter = comboFilter.getValue();
+        String sort   = comboSort.getValue();
+
+        List<Evenement> filtered = allEvents.stream()
+                .filter(e -> query.isEmpty()
+                        || e.getNom().toLowerCase().contains(query)
+                        || (e.getLieu() != null && e.getLieu().toLowerCase().contains(query)))
+                .filter(e -> {
+                    if ("À venir".equals(filter)) return !e.isPast();
+                    if ("Passés".equals(filter))  return  e.isPast();
+                    return true;
+                }).collect(Collectors.toList());
+
+        if (sort != null) switch (sort) {
+            case "Date (récent)"  -> filtered.sort((a, b) -> b.getDate() == null ? 1 : a.getDate() == null ? -1 : b.getDate().compareTo(a.getDate()));
+            case "Date (ancien)"  -> filtered.sort((a, b) -> a.getDate() == null ? 1 : b.getDate() == null ? -1 : a.getDate().compareTo(b.getDate()));
+            case "Nom A→Z"        -> filtered.sort((a, b) -> a.getNom().compareToIgnoreCase(b.getNom()));
+            case "Participants ↓" -> filtered.sort((a, b) -> Integer.compare(b.getNbrParticipant(), a.getNbrParticipant()));
+        }
+
+        updateStats(filtered);
+        renderCards(filtered);
+    }
+
+    private void updateStats(List<Evenement> list) {
+        lblTotalCount.setText(String.valueOf(list.size()));
+        lblUpcomingCount.setText(String.valueOf(list.stream().filter(e -> !e.isPast()).count()));
+        lblPassedCount.setText(String.valueOf(list.stream().filter(Evenement::isPast).count()));
+    }
+
+    @FXML private void onPrevMonth() { currentMonth = currentMonth.minusMonths(1); renderCalendar(); }
+    @FXML private void onNextMonth() { currentMonth = currentMonth.plusMonths(1);  renderCalendar(); }
+
+    private void renderCalendar() {
+        if (calendarGrid == null || lblCalendarMonth == null) return;
+        lblCalendarMonth.setText(currentMonth.format(MONTH_FMT).toUpperCase());
+        calendarGrid.getChildren().clear();
+        calendarGrid.setHgap(4); calendarGrid.setVgap(4);
+
+        Set<Integer> eventDays = allEvents.stream()
+                .filter(e -> e.getDate() != null
+                        && e.getDate().getYear() == currentMonth.getYear()
+                        && e.getDate().getMonthValue() == currentMonth.getMonthValue())
+                .map(e -> e.getDate().getDayOfMonth()).collect(Collectors.toSet());
+
+        String[] days = {"L","M","M","J","V","S","D"};
+        for (int i = 0; i < 7; i++) {
+            Label h = new Label(days[i]);
+            h.setStyle("-fx-text-fill:#7c3aed;-fx-font-size:11px;-fx-font-weight:bold;-fx-font-family:'Courier New';-fx-min-width:28px;");
+            h.setMaxWidth(Double.MAX_VALUE); h.setAlignment(Pos.CENTER);
+            calendarGrid.add(h, i, 0);
+        }
+
+        int startCol = currentMonth.atDay(1).getDayOfWeek().getValue() - 1;
+        LocalDate today = LocalDate.now();
+        int col = startCol, row = 1;
+
+        for (int day = 1; day <= currentMonth.lengthOfMonth(); day++) {
+            Label lbl = new Label(String.valueOf(day));
+            lbl.setMaxWidth(Double.MAX_VALUE); lbl.setAlignment(Pos.CENTER);
+            LocalDate thisDay = currentMonth.atDay(day);
+            boolean isToday = thisDay.equals(today), hasEvent = eventDays.contains(day);
+
+            String style = "-fx-font-size:11px;-fx-font-family:'Courier New';-fx-min-width:28px;-fx-min-height:26px;-fx-background-radius:6px;";
+            if (isToday)       style += "-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-font-weight:bold;";
+            else if (hasEvent) {
+                style += "-fx-background-color:rgba(168,85,247,0.2);-fx-text-fill:#c084fc;-fx-font-weight:bold;";
+                List<String> names = allEvents.stream()
+                        .filter(e -> e.getDate() != null && e.getDate().equals(thisDay))
+                        .map(Evenement::getNom).collect(Collectors.toList());
+                Tooltip tip = new Tooltip(String.join("\n", names));
+                tip.setStyle("-fx-background-color:#1a1035;-fx-text-fill:#c084fc;-fx-font-family:'Courier New';");
+                Tooltip.install(lbl, tip);
+                lbl.setCursor(javafx.scene.Cursor.HAND);
+            } else style += "-fx-text-fill:#6b7280;";
+
+            lbl.setStyle(style);
+            calendarGrid.add(lbl, col, row);
+            col++; if (col == 7) { col = 0; row++; }
+        }
+    }
+
+    private void renderCards(List<Evenement> list) {
+        paneUpcoming.getChildren().clear();
+        panePassed.getChildren().clear();
+        if (list.isEmpty()) { lblEmpty.setVisible(true); lblEmpty.setManaged(true); return; }
+        lblEmpty.setVisible(false); lblEmpty.setManaged(false);
+        for (Evenement e : list) {
+            VBox card = buildCard(e);
+            if (e.isPast()) panePassed.getChildren().add(card);
+            else            paneUpcoming.getChildren().add(card);
+        }
+    }
+
+    private VBox buildCard(Evenement e) {
+        String accent = e.isPast() ? "#4b5563" : "#a855f7";
+        String border = e.isPast() ? "rgba(75,85,99,0.25)" : "rgba(168,85,247,0.25)";
+
+        VBox card = new VBox(0);
+        card.setPrefWidth(280);
+        card.setStyle(cardStyle(border, false));
+        card.setOnMouseEntered(ev -> card.setStyle(cardStyle(accent, true)));
+        card.setOnMouseExited(ev  -> card.setStyle(cardStyle(border, false)));
+
+        if (e.getImage() != null && !e.getImage().isEmpty()) {
+            try {
+                ImageView iv = new ImageView(new Image(
+                        new File("src/main/resources/images/events/" + e.getImage()).toURI().toString()));
+                iv.setFitWidth(280); iv.setFitHeight(130); iv.setPreserveRatio(false);
+                card.getChildren().add(iv);
+            } catch (Exception ignored) {}
+        }
+
+        VBox content = new VBox(8);
+        content.setPadding(new Insets(14, 18, 16, 18));
+
+        HBox topRow = new HBox(8); topRow.setAlignment(Pos.CENTER_LEFT);
+        Label badge = new Label(e.isPast() ? "✓ PASSÉ" : "◆ À VENIR");
+        badge.setStyle("-fx-text-fill:" + accent + ";-fx-background-color:" +
+                (e.isPast() ? "rgba(75,85,99,0.15)" : "rgba(168,85,247,0.12)") + ";" +
+                "-fx-font-size:10px;-fx-font-weight:bold;-fx-padding:4 10 4 10;-fx-background-radius:20px;");
+        Region spacer = new Region(); HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label partLabel = new Label("👥 " + e.getNbrParticipant());
+        partLabel.setStyle("-fx-text-fill:#9ca3af;-fx-font-size:12px;");
+        topRow.getChildren().addAll(badge, spacer, partLabel);
+
+        Label nom = new Label(e.getNom());
+        nom.setStyle("-fx-text-fill:white;-fx-font-size:15px;-fx-font-weight:bold;");
+        nom.setWrapText(true); nom.setMaxWidth(240);
+        nom.setUserData("nom");
+
+        Label lieu = new Label("📍 " + (e.getLieu() != null ? e.getLieu() : "—"));
+        lieu.setStyle("-fx-text-fill:" + accent + ";-fx-font-size:12px;-fx-font-weight:bold;");
+        lieu.setWrapText(true); lieu.setMaxWidth(240);
+        lieu.setUserData("lieu");
+
+        Label date = new Label("📅 " + (e.getDate() != null ? e.getDate().format(DATE_FMT) : "—"));
+        date.setStyle("-fx-text-fill:#9ca3af;-fx-font-size:12px;");
+
+        String descText = e.getDescription() != null ? e.getDescription() : "";
+        if (descText.length() > 70) descText = descText.substring(0, 70) + "…";
+        Label desc = new Label(descText);
+        desc.setStyle("-fx-text-fill:#6b7280;-fx-font-size:11px;");
+        desc.setWrapText(true); desc.setMaxWidth(240);
+        desc.setUserData("desc");
+
+        Region bot = new Region(); VBox.setVgrow(bot, Priority.ALWAYS);
+        content.getChildren().addAll(topRow, nom, lieu, date, desc, bot);
+
+        Button btnDetails = new Button("Voir les détails");
+        btnDetails.setStyle(outlineBtn());
+        btnDetails.setOnAction(ev -> openDetails(e));
+
+        Button btnPredict = new Button("🤖 Prédiction");
+        btnPredict.setStyle("-fx-background-color: rgba(168,85,247,0.12); -fx-text-fill: #c084fc;" +
+                "-fx-border-color: rgba(168,85,247,0.35); -fx-border-width: 1px;" +
+                "-fx-border-radius: 8px; -fx-background-radius: 8px;" +
+                "-fx-font-size: 12px; -fx-padding: 8 0 8 0; -fx-cursor: hand;");
+        btnPredict.setOnAction(ev -> showPrediction(e));
+        HBox.setHgrow(btnPredict, Priority.ALWAYS); btnPredict.setMaxWidth(Double.MAX_VALUE);
+
+        if (e.isPast()) {
+            HBox.setHgrow(btnDetails, Priority.ALWAYS); btnDetails.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(btnPredict, Priority.ALWAYS); btnPredict.setMaxWidth(Double.MAX_VALUE);
+            content.getChildren().add(new HBox(8, btnDetails, btnPredict));
+        } else {
+            boolean isParticipating = participatedEvents.contains(e.getId());
+            Button btnPart = isParticipating ? new Button("Annuler") : new Button("Participer →");
+            if (isParticipating) {
+                btnPart.setStyle("-fx-background-color:rgba(239,68,68,0.15);-fx-text-fill:#f87171;" +
+                        "-fx-border-color:rgba(239,68,68,0.4);-fx-border-width:1px;" +
+                        "-fx-border-radius:8px;-fx-background-radius:8px;" +
+                        "-fx-font-size:12px;-fx-padding:8 0 8 0;-fx-cursor:hand;");
+                btnPart.setOnAction(ev -> annulerParticipation(e));
+            } else {
+                btnPart.setStyle("-fx-background-color:linear-gradient(to right,#7c3aed,#ec4899);" +
+                        "-fx-text-fill:white;-fx-font-size:12px;-fx-font-weight:bold;" +
+                        "-fx-padding:8 0 8 0;-fx-border-radius:8px;-fx-background-radius:8px;-fx-cursor:hand;");
+                btnPart.setOnAction(ev -> participer(e));
+            }
+            HBox.setHgrow(btnDetails, Priority.ALWAYS); btnDetails.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(btnPart,    Priority.ALWAYS); btnPart.setMaxWidth(Double.MAX_VALUE);
+            content.getChildren().add(new HBox(8, btnDetails, btnPart));
+            content.getChildren().add(new HBox(btnPredict));
+        }
+
+        card.getChildren().add(content);
+        return card;
+    }
+
+    private String outlineBtn() {
+        return "-fx-background-color:transparent;-fx-text-fill:#9ca3af;" +
+                "-fx-border-color:#374151;-fx-border-width:1px;-fx-border-radius:8px;" +
+                "-fx-background-radius:8px;-fx-font-size:12px;-fx-padding:8 0 8 0;-fx-cursor:hand;";
+    }
+
+    private String cardStyle(String borderColor, boolean hovered) {
+        String s = "-fx-background-color:" + (hovered ? "rgba(26,14,55,0.98)" : "rgba(17,11,40,0.92)") + ";" +
+                "-fx-border-color:" + borderColor + ";-fx-border-width:1.5px;" +
+                "-fx-border-radius:14px;-fx-background-radius:14px;-fx-cursor:hand;";
+        if (hovered) s += "-fx-effect:dropshadow(gaussian," + borderColor + ",18,0.3,0,4);";
+        return s;
+    }
+
+    private void showPrediction(Evenement e) {
+        Eventpredictionengine.Prediction p = Eventpredictionengine.predict(e);
+
+        Stage stage = new Stage();
+        stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        stage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        stage.setResizable(false);
+
+        Label title = new Label("🤖 PRÉDICTION IA");
+        title.setStyle("-fx-text-fill: #c084fc; -fx-font-size: 14px; -fx-font-weight: bold;" +
+                "-fx-font-family: 'Courier New'; -fx-letter-spacing: 2px;");
+
+        Label eventName = new Label(e.getNom());
+        eventName.setStyle("-fx-text-fill: white; -fx-font-size: 17px; -fx-font-weight: bold;");
+        eventName.setWrapText(true);
+
+        Region sep = new Region();
+        sep.setPrefHeight(1.5); sep.setMaxWidth(Double.MAX_VALUE);
+        sep.setStyle("-fx-background-color: linear-gradient(to right, #7c3aed, rgba(236,72,153,0.4), transparent);");
+        VBox.setMargin(sep, new Insets(4, 0, 4, 0));
+
+        double rating = p.rating;
+        int fullStars = (int) rating;
+        boolean halfStar = (rating - fullStars) >= 0.5;
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < fullStars; i++) stars.append("★");
+        if (halfStar) stars.append("½");
+        for (int i = fullStars + (halfStar ? 1 : 0); i < 5; i++) stars.append("☆");
+
+        Label lblStars = new Label(stars.toString());
+        lblStars.setStyle("-fx-font-size: 28px; -fx-text-fill: #f59e0b;");
+
+
+
+        String barColor = rating >= 4.0 ? "#4ade80" : rating >= 2.5 ? "#f59e0b" : "#f87171";
+        Region barFill = new Region();
+        barFill.setPrefHeight(8);
+        barFill.setStyle("-fx-background-color: " + barColor + "; -fx-background-radius: 4px;");
+        HBox barBox = new HBox(barFill);
+        barFill.prefWidthProperty().bind(barBox.widthProperty().multiply(rating / 5.0));
+        barBox.setStyle("-fx-background-color: rgba(255,255,255,0.06); -fx-background-radius: 4px;");
+        barBox.setPrefHeight(8);
+
+        Label lblStatement = new Label(p.statement);
+        lblStatement.setStyle("-fx-text-fill: #d1d5db; -fx-font-size: 13px; -fx-line-spacing: 4;");
+        lblStatement.setWrapText(true);
+
+        Label disclaimer = new Label("⚡ Analyse générée par l'IA NexUS — basée sur les données de l'événement.");
+        disclaimer.setStyle("-fx-text-fill: #4b5563; -fx-font-size: 10px; -fx-font-style: italic;");
+        disclaimer.setWrapText(true);
+
+        Button btnClose = new Button("Fermer");
+        btnClose.setStyle("-fx-background-color: linear-gradient(to right, #7c3aed, #ec4899);" +
+                "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" +
+                "-fx-background-radius: 8px; -fx-padding: 9 28 9 28; -fx-cursor: hand;");
+        btnClose.setOnAction(ev -> stage.close());
+        HBox btnRow = new HBox(btnClose);
+        btnRow.setAlignment(Pos.CENTER_RIGHT);
+        btnRow.setPadding(new Insets(8, 0, 0, 0));
+
+        VBox root = new VBox(12, title, eventName, sep, lblStars,  barBox,
+                lblStatement, disclaimer, btnRow);
+        root.setPadding(new Insets(28, 30, 28, 30));
+        root.setStyle("-fx-background-color: #110f28;" +
+                "-fx-border-color: rgba(168,85,247,0.45); -fx-border-width: 1.5px;" +
+                "-fx-border-radius: 14px; -fx-background-radius: 14px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(168,85,247,0.5), 30, 0.3, 0, 6);");
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(root, 420, 420);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
+
+    // ── Page translation ──────────────────────────────────────────
+
+    @FXML
+    private void onToggleTranslation() {
+        if (translatedToEnglish) {
+            // Switch back to French
+            translatedToEnglish = false;
+            btnTranslate.setText("🌐 FR");
+            btnTranslate.setStyle("-fx-background-color: rgba(74,222,128,0.12); -fx-text-fill: #4ade80;" +
+                    "-fx-border-color: rgba(74,222,128,0.35); -fx-border-width: 1px;" +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px;" +
+                    "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                    "-fx-padding: 7 14 7 14; -fx-cursor: hand;");
+            // Restore French static labels
+            if (lblHeroTitle   != null) lblHeroTitle.setText("ÉVÉNEMENTS");
+            if (lblHeroSub     != null) lblHeroSub.setText("Découvrez et participez aux événements eSports NexUS");
+            if (lblStatTotal   != null) lblStatTotal.setText("Total");
+            if (lblStatUpcoming!= null) lblStatUpcoming.setText("À venir");
+            if (lblStatPassed  != null) lblStatPassed.setText("Passés");
+            if (lblSectionUpcoming != null) lblSectionUpcoming.setText("À VENIR");
+            if (lblSectionPassed   != null) lblSectionPassed.setText("PASSÉS");
+            // Reload cards in French
+            applyFilter();
+        } else {
+            // Translate to English
+            translatedToEnglish = true;
+            btnTranslate.setText("🌐 EN");
+            btnTranslate.setStyle("-fx-background-color: rgba(251,191,36,0.12); -fx-text-fill: #fbbf24;" +
+                    "-fx-border-color: rgba(251,191,36,0.35); -fx-border-width: 1px;" +
+                    "-fx-border-radius: 6px; -fx-background-radius: 6px;" +
+                    "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                    "-fx-padding: 7 14 7 14; -fx-cursor: hand;");
+            btnTranslate.setText("⏳ Translating...");
+
+            // Translate static UI labels asynchronously
+            TranslationService.translateAsync("ÉVÉNEMENTS", t -> {
+                if (lblHeroTitle != null) lblHeroTitle.setText(t.toUpperCase());
+            });
+            TranslationService.translateAsync(
+                    "Découvrez et participez aux événements eSports NexUS", t -> {
+                        if (lblHeroSub != null) lblHeroSub.setText(t);
+                    });
+            TranslationService.translateAsync("Total", t -> {
+                if (lblStatTotal != null) lblStatTotal.setText(t);
+            });
+            TranslationService.translateAsync("À venir", t -> {
+                if (lblStatUpcoming != null) lblStatUpcoming.setText(t);
+            });
+            TranslationService.translateAsync("Passés", t -> {
+                if (lblStatPassed != null) lblStatPassed.setText(t);
+                // All static labels done — now rebuild cards with translated content
+                translateCards();
+                btnTranslate.setText("🌐 EN ✓");
+                btnTranslate.setStyle("-fx-background-color: rgba(251,191,36,0.2); -fx-text-fill: #fbbf24;" +
+                        "-fx-border-color: rgba(251,191,36,0.5); -fx-border-width: 1px;" +
+                        "-fx-border-radius: 6px; -fx-background-radius: 6px;" +
+                        "-fx-font-size: 13px; -fx-font-weight: bold;" +
+                        "-fx-padding: 7 14 7 14; -fx-cursor: hand;");
+            });
+            TranslationService.translateAsync("À VENIR", t -> {
+                if (lblSectionUpcoming != null) lblSectionUpcoming.setText(t.toUpperCase());
+            });
+            TranslationService.translateAsync("PASSÉS", t -> {
+                if (lblSectionPassed != null) lblSectionPassed.setText(t.toUpperCase());
+            });
+        }
+    }
+
+    /**
+     * Translates each event's name, description, lieu and rebuilds cards in English.
+     * Translations happen in batches on background threads.
+     */
+    private void translateCards() {
+        paneUpcoming.getChildren().clear();
+        panePassed.getChildren().clear();
+
+        String query  = fieldSearch.getText().trim().toLowerCase();
+        // Use original French filter values regardless of translation state
+        String filter = comboFilter.getValue();
+
+        List<Evenement> list = allEvents.stream()
+                .filter(e -> query.isEmpty()
+                        || e.getNom().toLowerCase().contains(query)
+                        || (e.getLieu() != null && e.getLieu().toLowerCase().contains(query)))
+                .filter(e -> {
+                    if (filter == null || filter.isEmpty() || "Tous".equals(filter) || "All".equals(filter)) return true;
+                    if ("À venir".equals(filter) || "Upcoming".equals(filter)) return !e.isPast();
+                    if ("Passés".equals(filter)  || "Past".equals(filter))     return  e.isPast();
+                    return true;
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        if (list.isEmpty()) {
+            lblEmpty.setVisible(true); lblEmpty.setManaged(true); return;
+        }
+        lblEmpty.setVisible(false); lblEmpty.setManaged(false);
+
+        for (Evenement e : list) {
+            VBox card = buildCard(e);
+            if (e.isPast()) panePassed.getChildren().add(card);
+            else            paneUpcoming.getChildren().add(card);
+            translateCardLabels(card, e);
+        }
+    }
+
+    private void translateCardLabels(VBox card, Evenement e) {
+        Thread t = new Thread(() -> {
+            String nomEN  = TranslationService.translateToEnglish(e.getNom());
+            String lieuEN = e.getLieu() != null
+                    ? TranslationService.translateToEnglish(e.getLieu()) : "—";
+            String descRaw = e.getDescription() != null && !e.getDescription().isBlank()
+                    ? e.getDescription() : "";
+            String descEN = !descRaw.isEmpty()
+                    ? TranslationService.translateToEnglish(
+                    descRaw.length() > 200 ? descRaw.substring(0, 200) : descRaw)
+                    : "";
+
+            javafx.application.Platform.runLater(() -> updateCardText(card, nomEN, lieuEN, descEN));
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
+    /** Recursively walks all nodes in the card and updates labels by userData tag */
+    private void updateCardText(javafx.scene.Node node, String nom, String lieu, String desc) {
+        if (node instanceof Label lbl && lbl.getUserData() != null) {
+            switch (lbl.getUserData().toString()) {
+                case "nom"  -> lbl.setText(nom);
+                case "lieu" -> lbl.setText("📍 " + lieu);
+                case "desc" -> {
+                    String d = desc.length() > 70 ? desc.substring(0, 70) + "…" : desc;
+                    lbl.setText(d);
+                }
+            }
+        } else if (node instanceof javafx.scene.layout.Pane pane) {
+            for (javafx.scene.Node child : pane.getChildren()) {
+                updateCardText(child, nom, lieu, desc);
+            }
+        } else if (node instanceof javafx.scene.layout.HBox hbox) {
+            for (javafx.scene.Node child : hbox.getChildren()) {
+                updateCardText(child, nom, lieu, desc);
+            }
+        }
+    }
+
+    @FXML
+    private void onBackHome() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/com/esports/fxml/HomeView.fxml"));
+            Stage stage = (Stage) fieldSearch.getScene().getWindow();
+            double w = stage.getWidth(), h = stage.getHeight();
+            stage.setScene(new Scene(root, w, h));
+            stage.setWidth(w); stage.setHeight(h);
+            stage.setTitle("NexUS Gaming Arena");
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+}

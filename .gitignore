@@ -1,4 +1,5 @@
 target/
 .idea/
 *.class
-out/
+out/target/
+target/

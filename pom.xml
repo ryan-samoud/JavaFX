@@ -30,6 +30,8 @@
         <mysql.version>8.3.0</mysql.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <junit.version>5.10.2</junit.version>
+        <itext.version>8.0.4</itext.version>
+        <zxing.version>3.5.3</zxing.version>
     </properties>
 
     <!-- ══════════════════════════════════════════════════════════ -->
@@ -43,28 +45,36 @@
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
-        <!-- Pour les graphiques (charts) si besoin -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
-        <!-- Pour jouer des médias (vidéo/audio) — décommentez si nécessaire -->
-        <!--
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.31</version>
+        </dependency>
 
         <!-- ── Base de données MySQL ────────────────────────────── -->
         <dependency>
@@ -73,22 +83,14 @@
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- ── BCrypt — hachage de mots de passe (recommandé) ───── -->
-        <!--
-             Pour activer BCrypt dans AuthService.java :
-             1. Décommentez cette dépendance
-             2. Remplacez hashPassword() par :
-                  BCrypt.hashpw(password, BCrypt.gensalt(12))
-             3. Remplacez checkPassword() par :
-                  BCrypt.checkpw(rawPassword, storedHash)
-        -->
+        <!-- ── BCrypt — hachage de mots de passe ───────────────── -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt.version}</version>
         </dependency>
 
-        <!-- SMTP email notifications (Jakarta Mail 2.1+) -->
+        <!-- ── Email Jakarta Mail (jeux module) ────────────────── -->
         <dependency>
             <groupId>jakarta.mail</groupId>
             <artifactId>jakarta.mail-api</artifactId>
@@ -105,21 +107,87 @@
             <version>2.1.3</version>
         </dependency>
 
+        <!-- ── Email (JavaMail / SMTP) ──────────────────────────── -->
         <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>3.5.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>javase</artifactId>
-            <version>3.5.3</version>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
         </dependency>
 
+        <!-- ── JSON ─────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
+
+        <!-- ── jSerialComm — communication série Arduino ────────── -->
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+
+        <!-- ── iText7 PDF ───────────────────────────────────────── -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>${itext.version}</version>
+        </dependency>
+
+        <!-- ── OpenPDF — export PDF jeux module ─────────────────── -->
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
             <version>2.0.4</version>
+        </dependency>
+
+        <!-- ── ZXing — QR Codes ─────────────────────────────────── -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>${zxing.version}</version>
+        </dependency>
+
+        <!-- ── MapJFX ───────────────────────────────────────────── -->
+        <dependency>
+            <groupId>com.sothawo</groupId>
+            <artifactId>mapjfx</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+        <!-- ── SLF4J ────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+
+        <!-- ── Webcam Capture — Face ID ────────────────────────── -->
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture</artifactId>
+            <version>0.3.12</version>
         </dependency>
 
         <!-- ── Tests — JUnit 5 ──────────────────────────────────── -->
@@ -176,11 +244,14 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <!-- Classe principale de votre application -->
                     <mainClass>com.esports.MainApp</mainClass>
-                    <!-- Évite les NPE D3D (Prism) sur certains pilotes Windows -->
                     <options>
                         <option>-Dprism.order=sw</option>
+                        <option>-Xms128m</option>
+                        <option>-Xmx512m</option>
+                        <option>-XX:ReservedCodeCacheSize=128m</option>
+                        <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                        <option>--add-modules=java.net.http</option>
                     </options>
                 </configuration>
                 <executions>
@@ -190,6 +261,11 @@
                             <mainClass>com.esports.MainApp</mainClass>
                             <options>
                                 <option>-Dprism.order=sw</option>
+                                <option>-Xms128m</option>
+                                <option>-Xmx512m</option>
+                                <option>-XX:ReservedCodeCacheSize=128m</option>
+                                <option>-XX:HeapBaseMinAddress=0x100000000</option>
+                                <option>--add-modules=java.net.http</option>
                             </options>
                         </configuration>
                     </execution>
@@ -207,8 +283,7 @@
                         <goals><goal>shade</goal></goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation=
-                                                     "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.esports.MainApp</mainClass>
                                 </transformer>
                             </transformers>
@@ -219,6 +294,7 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>

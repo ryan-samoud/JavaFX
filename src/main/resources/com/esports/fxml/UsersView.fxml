@@ -2,133 +2,65 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.geometry.*?>
+<?import java.net.URL?>
 
-<!--
-    UsersView.fxml — Gestion des utilisateurs
-    Contrôleur : com.esports.controller.UsersController
--->
-
-<VBox spacing="0"
-      xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns:fx="http://javafx.com/fxml/1"
       xmlns="http://javafx.com/javafx/17"
       fx:controller="com.esports.controller.UsersController"
-      style="-fx-background-color: #0a0a0f;">
+      styleClass="content-area">
 
-    <!-- ── Top bar ───────────────────────────────────────────── -->
-    <HBox alignment="CENTER_LEFT" spacing="16"
-          style="-fx-padding: 28 40 20 40;
-                 -fx-border-color: transparent transparent #1a1a2e transparent;
-                 -fx-border-width: 0 0 1 0;">
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Rectangle width="4" height="26" arcWidth="2" arcHeight="2"
-                           style="-fx-fill: #00ff9d;"/>
-                <Label text="UTILISATEURS"
-                       style="-fx-text-fill: #ffffff;
-                              -fx-font-family: 'Courier New';
-                              -fx-font-size: 24px;
-                              -fx-font-weight: bold;
-                              -fx-letter-spacing: 3px;"/>
-            </HBox>
+    <stylesheets>
+        <URL value="@../css/dashboard.css"/>
+    </stylesheets>
+
+    <!-- ── TOPBAR ─────────────────────────────────────────── -->
+    <HBox alignment="CENTER_LEFT" spacing="16" styleClass="topbar">
+        <Label text="👥" style="-fx-font-size: 22px;"/>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Gestion des Utilisateurs" styleClass="page-title"/>
             <Label fx:id="lblUserCount" text="Chargement…"
-                   style="-fx-text-fill: #444455;
-                          -fx-font-family: 'Courier New';
-                          -fx-font-size: 12px;
-                          -fx-padding: 0 0 0 14;"/>
+                   style="-fx-text-fill: #7c6fa8; -fx-font-size: 12px;"/>
         </VBox>
 
-        <!-- Recherche -->
-        <TextField fx:id="fieldSearch" promptText="🔍  Rechercher un utilisateur…"
-                   prefWidth="280"
-                   style="-fx-background-color: #111122;
-                          -fx-text-fill: #ffffff;
-                          -fx-prompt-text-fill: #333344;
-                          -fx-font-family: 'Courier New';
-                          -fx-font-size: 13px;
-                          -fx-border-color: #1a1a2e;
-                          -fx-border-width: 1;
-                          -fx-border-radius: 6;
-                          -fx-background-radius: 6;
-                          -fx-padding: 10 14 10 14;"/>
+        <TextField fx:id="fieldSearch"
+                   promptText="🔍  Rechercher un utilisateur…"
+                   prefWidth="260" styleClass="input-field"/>
 
-        <!-- Filtre rôle -->
-        <ComboBox fx:id="comboRoleFilter" promptText="Tous les rôles"
-                  style="-fx-background-color: #111122;
-                         -fx-text-fill: #ffffff;
-                         -fx-font-family: 'Courier New';
-                         -fx-font-size: 13px;
-                         -fx-border-color: #1a1a2e;
-                         -fx-border-width: 1;
-                         -fx-border-radius: 6;
-                         -fx-background-radius: 6;
-                         -fx-padding: 4 10 4 10;"/>
+        <ComboBox fx:id="comboRoleFilter"
+                  promptText="Tous les rôles"
+                  prefWidth="150" styleClass="combo-filter"/>
 
-        <!-- Bouton ajouter -->
-        <Button text="＋  Ajouter" onAction="#onAddUser"
-                style="-fx-background-color: linear-gradient(to right, #00ff9d, #00b8ff);
-                       -fx-text-fill: #0a0a0f;
-                       -fx-font-family: 'Courier New';
-                       -fx-font-weight: bold;
-                       -fx-font-size: 13px;
-                       -fx-background-radius: 6;
-                       -fx-padding: 10 22 10 22;
-                       -fx-cursor: hand;"/>
+        <ComboBox fx:id="comboStatusFilter"
+                  promptText="Tous les statuts"
+                  prefWidth="160" styleClass="combo-filter"/>
+
+        <Button text="＋  Ajouter" onAction="#onAddUser" styleClass="btn-primary"/>
     </HBox>
 
-    <!-- ── Tableau ────────────────────────────────────────────── -->
-    <VBox VBox.vgrow="ALWAYS" style="-fx-padding: 24 40 40 40;">
-        <VBox style="-fx-background-color: #111122;
-                     -fx-border-color: #1a1a2e;
-                     -fx-border-width: 1;
-                     -fx-border-radius: 10;
-                     -fx-background-radius: 10;" VBox.vgrow="ALWAYS">
+    <!-- ── CONTENT (table + side form) ───────────────────── -->
+    <HBox VBox.vgrow="ALWAYS" spacing="0"
+          style="-fx-background-color: #0a0818;">
 
-            <!-- En-tête colonnes -->
-            <HBox style="-fx-padding: 14 20 14 20;
-                         -fx-background-color: rgba(255,255,255,0.02);
-                         -fx-border-color: transparent transparent #1a1a2e transparent;
-                         -fx-border-width: 0 0 1 0;
-                         -fx-background-radius: 10 10 0 0;">
-                <Label text="ID"    minWidth="50"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-                <Label text="PSEUDO" minWidth="160"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-                <Label text="EMAIL"  minWidth="220"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-                <Label text="RÔLE"   minWidth="110"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-                <Label text="STATUT" minWidth="100"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-                <Label text="INSCRIT LE" minWidth="130"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-                <Label text="ACTIONS"
-                       style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 11px; -fx-letter-spacing: 2px;"/>
-            </HBox>
-
-            <!-- Lignes TableView -->
+        <!-- TABLE -->
+        <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 24 0 30 36;">
             <TableView fx:id="tableUsers" VBox.vgrow="ALWAYS"
-                       style="-fx-background-color: transparent;
-                              -fx-border-color: transparent;
-                              -fx-table-cell-border-color: #1a1a2e;
-                              -fx-font-family: 'Courier New';
-                              -fx-font-size: 13px;">
+                       styleClass="esports-table">
                 <columns>
-                    <TableColumn fx:id="colId"        text="ID"         prefWidth="50"/>
-                    <TableColumn fx:id="colUsername"  text="PSEUDO"     prefWidth="160"/>
-                    <TableColumn fx:id="colEmail"     text="EMAIL"      prefWidth="220"/>
+                    <TableColumn fx:id="colId"        text="ID"         prefWidth="55"/>
+                    <TableColumn fx:id="colNom"       text="NOM"        prefWidth="120"/>
+                    <TableColumn fx:id="colPrenom"    text="PRÉNOM"     prefWidth="120"/>
+                    <TableColumn fx:id="colEmail"     text="EMAIL"      prefWidth="195"/>
                     <TableColumn fx:id="colRole"      text="RÔLE"       prefWidth="110"/>
-                    <TableColumn fx:id="colActive"    text="STATUT"     prefWidth="100"/>
-                    <TableColumn fx:id="colCreatedAt" text="INSCRIT LE" prefWidth="130"/>
-                    <TableColumn fx:id="colActions"   text="ACTIONS"    prefWidth="160"/>
+                    <TableColumn fx:id="colActive"    text="STATUT"     prefWidth="130"/>
+                    <TableColumn fx:id="colCreatedAt" text="INSCRIT LE" prefWidth="110"/>
+                    <TableColumn fx:id="colActions"   text="ACTIONS"    prefWidth="230"/>
                 </columns>
                 <placeholder>
                     <Label text="Aucun utilisateur trouvé."
-                           style="-fx-text-fill: #444455; -fx-font-family: 'Courier New'; -fx-font-size: 13px;"/>
+                           styleClass="empty-label"/>
                 </placeholder>
             </TableView>
-
         </VBox>
-    </VBox>
+
+    </HBox>
 </VBox>

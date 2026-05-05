@@ -2,13 +2,13 @@ package com.esports.interfaces;
 
 import com.esports.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * INTERFACE — IUserService.java
  * Contrat de la couche service pour les utilisateurs.
- * Permet de découpler les controllers de l'implémentation concrète.
  */
 public interface IUserService {
 
@@ -16,9 +16,21 @@ public interface IUserService {
 
     List<User> findAll();
 
+    List<User> findAllUsers();
+
     List<User> findRecent(int limit);
 
     int countActive();
 
+    boolean save(User user);
+
+    boolean update(User user);
+
     boolean deactivate(int id);
+
+    boolean ban(int id, String reason);
+
+    boolean unban(int id);
+
+    boolean suspend(int id, LocalDateTime until, String reason);
 }

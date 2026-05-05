@@ -1,7 +1,6 @@
 package com.esports;
 
 import com.esports.utils.DatabaseConnection;
-import com.esports.service.LocalWebServerService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,12 +15,6 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-
-        DatabaseConnection.getInstance();
-        System.out.println("DB = " + DatabaseConnection.getInstance());
-
-        // Start Local Web Server for Mobile QR Scanning
-        LocalWebServerService.getInstance().startServer();
 
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/esports/fxml/HomeView.fxml") // ← page d'accueil
@@ -38,9 +31,6 @@ public class MainApp extends Application {
 
     @Override
     public void stop() {
-        // Arrêter le serveur web local
-        LocalWebServerService.getInstance().stopServer();
-        
         // Fermer proprement la connexion MySQL à la fermeture de l'app
         DatabaseConnection.closeConnection();
     }

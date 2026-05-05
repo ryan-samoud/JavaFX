@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx/17"
+      fx:controller="com.esports.controller.CategorieProduitController"
+      styleClass="content-area">
+
+    <stylesheets>
+        <URL value="@../css/dashboard.css"/>
+    </stylesheets>
+
+    <!-- TOPBAR -->
+    <HBox alignment="CENTER_LEFT" spacing="16" styleClass="topbar">
+        <Label text="🏷" styleClass="topbar-icon"/>
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="Gestion des Catégories" styleClass="page-title"/>
+            <Label fx:id="lblCount" text="0 catégorie(s)" styleClass="page-subtitle"/>
+        </VBox>
+
+        <TextField fx:id="fieldSearch"
+                   promptText="🔍  Rechercher une catégorie…"
+                   prefWidth="280" styleClass="input-field"/>
+
+        <Button text="← Retour aux Produits" onAction="#onRetourBoutique"
+                style="-fx-background-color: rgba(139,92,246,0.15);
+                       -fx-text-fill: #c084fc; -fx-font-size: 13px;
+                       -fx-border-color: rgba(139,92,246,0.35); -fx-border-width: 1px;
+                       -fx-border-radius: 8px; -fx-background-radius: 8px;
+                       -fx-padding: 9 18 9 18; -fx-cursor: hand;"/>
+
+        <Button text="＋  Ajouter Catégorie" onAction="#onAdd" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- TABLE + FORM PANEL -->
+    <HBox VBox.vgrow="ALWAYS" spacing="0" style="-fx-background-color: #0a0818;">
+
+        <!-- TABLE -->
+        <VBox HBox.hgrow="ALWAYS" style="-fx-padding: 20 0 30 36;">
+            <TableView fx:id="tableCategories" VBox.vgrow="ALWAYS" styleClass="esports-table">
+                <columns>
+                    <TableColumn fx:id="colId"          text="ID"            prefWidth="55"/>
+                    <TableColumn fx:id="colNom"         text="NOM"           prefWidth="160"/>
+                    <TableColumn fx:id="colDescription" text="DESCRIPTION"   prefWidth="280"/>
+                    <TableColumn fx:id="colDateCreation" text="DATE CRÉATION" prefWidth="155"/>
+                    <TableColumn fx:id="colStatut"      text="STATUT"        prefWidth="110"/>
+                    <TableColumn fx:id="colActions"     text="ACTIONS"       prefWidth="170"/>
+                </columns>
+                <placeholder>
+                    <Label text="Aucune catégorie trouvée." styleClass="empty-label"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- FORM PANEL -->
+        <VBox fx:id="formPanel" prefWidth="310" spacing="14"
+              style="-fx-background-color: #14112b;
+                     -fx-border-color: rgba(139,92,246,0.2) transparent transparent transparent;
+                     -fx-border-width: 0 0 0 1; -fx-padding: 24 24 24 24;">
+
+            <Label fx:id="lblFormTitle" text="Catégorie"
+                   style="-fx-text-fill: #c084fc; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+            <!-- Nom -->
+            <Label text="Nom *" styleClass="kpi-title"/>
+            <TextField fx:id="fieldNom" promptText="Nom de la catégorie"
+                       styleClass="input-field"/>
+
+            <!-- Description -->
+            <Label text="Description" styleClass="kpi-title"/>
+            <TextArea fx:id="fieldDescription"
+                      promptText="Description de la catégorie…"
+                      prefHeight="90" styleClass="input-field" wrapText="true"/>
+
+            <!-- Statut -->
+            <Label text="Statut" styleClass="kpi-title"/>
+            <ComboBox fx:id="comboStatut" maxWidth="Infinity"
+                      styleClass="combo-filter"/>
+
+            <!-- Erreur -->
+            <Label fx:id="lblFormError"
+                   style="-fx-text-fill: #f87171; -fx-font-size: 12px;"/>
+
+            <!-- Boutons -->
+            <HBox spacing="10">
+                <Button text="💾  Enregistrer" onAction="#onSave"
+                        styleClass="btn-primary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="Annuler" onAction="#onCancel"
+                        style="-fx-background-color: transparent; -fx-text-fill: #7c6fa8;
+                               -fx-border-color: rgba(124,111,168,0.3); -fx-border-width: 1px;
+                               -fx-border-radius: 8px; -fx-background-radius: 8px;
+                               -fx-padding: 9 16 9 16; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>
