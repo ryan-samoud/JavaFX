@@ -30,6 +30,7 @@ public class MainController implements Initializable {
     @FXML private Button btnDashboard;
     @FXML private Button btnUsers;
     @FXML private Button btnTournaments;
+    @FXML private Button btnMatches;
     @FXML private Button btnTeams;
     @FXML private Button btnShop;
     @FXML private Button btnEvents;
@@ -75,6 +76,11 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void onMatches() {
+        navigate("/com/esports/fxml/MatchesView.fxml", btnMatches);
+    }
+
+    @FXML
     private void onTeams() {
         // TeamsView pas encore créée — affiche un message dans la console
         System.out.println("[MainController] TeamsView non disponible.");
@@ -83,15 +89,12 @@ public class MainController implements Initializable {
 
     @FXML
     private void onShop() {
-        System.out.println("[MainController] ShopView non disponible.");
-        setActiveButton(btnShop);
+        navigate("/com/esports/fxml/ShopView.fxml", btnShop);
     }
 
     @FXML
     private void onEvents() {
-        setActiveButton(btnEvents);
-        // EventsView à implémenter
-        System.out.println("[MainController] EventsView non disponible.");
+        navigate("/com/esports/fxml/EvenementsView.fxml", btnEvents);
     }
 
     @FXML
