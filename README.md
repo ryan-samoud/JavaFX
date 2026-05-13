@@ -1,6 +1,6 @@
 # NexUs Gaming Arena - Esports app
 ## Overview
-This project was developed as part of the PIDEV – 3rd Year Engineering Program at Esprit School of Engineering (Academic Year 2025–2026)
+This project was developed as part of the PI JAVA– 3rd Year Engineering Program at Esprit School of Engineering (Academic Year 2025–2026)
 it consists of a variety of content to enjoy like brwosing esports events or games, watching tournaments or buying products, the users can also have many customizations to their liking
 ## Features
 -Face recognition
@@ -23,7 +23,7 @@ NexUs Gaming Arena has an architecture that connects the User Interface, the bac
 -Rana Thabet
 ## Academic Context
 Developed at **Esprit School of Engineering** – Tunisia
-PIDEV - 3A36 | 2025-2026
+PI JAVA - 3A36 | 2025-2026
 ## Getting Started
 ### Requirements
 -Intellij
@@ -34,4 +34,4 @@ PIDEV - 3A36 | 2025-2026
 3. make the database
 4. Run 
 ## Acknowledgments 
-Big Thanks to our instructor Zeineb Maatoug for the guidance and coaching
+Big Thanks to our instructor Karray Gargouri and Hamza Chenenaoui for the guidance and coaching
